@@ -1,0 +1,73 @@
+Table IdentityUsers {
+  Id string [pk]
+  UserName string
+  NormalizedUserName string
+  Email string
+  NormalizedEmail string
+  EmailConfirmed bool
+  PasswordHash string
+  SecurityStamp string
+  ConcurrencyStamp string
+  PhoneNumber string
+  PhoneNumberConfirmed bool
+  TwoFactorEnabled bool
+  LockoutEnd datetime
+  LockoutEnabled bool
+  AccessFailedCount int
+
+  // Campos adicionais
+  Weight decimal(5,2) [note: "Peso do usuário em kg"]
+  Height decimal(4,2) [note: "Altura do usuário em metros"]
+  BirthDate date [note: "Data de nascimento do usuário"]
+}
+
+Table Exercises {
+  Id int [pk, increment]
+  Name string [note: "Ex: Supino Reto"]
+  Description string
+}
+
+Table ExerciseMuscleGroups {
+  ExerciseId int [pk, ref: > Exercises.Id]
+  MuscleGroupId int [pk, ref: > MuscleGroups.Id]
+  IsPrimary bool [default: false]
+}
+
+Table MuscleGroups {
+  Id int [pk, increment]
+  Name string [note: "Ex: Peitoral"]
+  Description string
+  Color string [note: "Ex: 1aff2b"]
+}
+
+Table WorkoutPlans {
+  Id int [pk, increment]
+  UserId string [ref: > IdentityUsers.Id]
+  Name string [note: "Ex: Treino A - Força"]
+  CreatedAt datetime
+}
+
+// Cabeçalho da sessão de treino
+Table WorkoutSessions {
+  Id int [pk, increment]
+  UserId string [ref: > IdentityUsers.Id]
+  WorkoutPlanId int [null, ref: > WorkoutPlans.Id, note: "Null se for Treino Livre"]
+  Date datetime [default: `now()`]
+  TotalDurationMinutes int [null]
+}
+
+// Registro de exercício
+Table LoggedExercises {
+  Id int [pk, increment]
+  WorkoutSessionId int [ref: > WorkoutSessions.Id]
+  ExerciseId int [ref: > Exercises.Id]
+  
+  Sets int [note: "Quantidade de séries totais"]
+  Reps string [note: "Pode ser fixo '12' ou faixa '10-12'"]
+  IntegerReps int [note: "Repetições inteiras para facilitar buscas e análises (ex.: 12 para '12' ou 13 para '10-15')"]
+  Weight decimal(5,2) [note: "Carga utilizada"]
+  RestSeconds int [note: "Tempo de descanso entre séries"]
+  
+  Observation string [note: "Notas rápidas sobre a execução"]
+  ShouldIncreaseLoad bool [default: false, note: "A flag para o próximo treino"]
+}

@@ -1,0 +1,3 @@
+- Use XMLDocs ou JSDocs para documentar todas as classes, métodos e propriedades públicas.
+- Siga as convenções de nomenclatura do C# e do JavaScript
+- Não use "using System;"
