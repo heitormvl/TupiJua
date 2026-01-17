@@ -1,0 +1,107 @@
+@model TupiJua.ViewModels.EditUserViewModel
+@{
+    ViewData["Title"] = "Editar Perfil";
+}
+
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
+    <div class="row w-100 justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4 p-md-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-user-edit fa-3x text-primary"></i>
+                        </div>
+                        <h2 class="fw-bold mb-2">Editar Perfil</h2>
+                        <p class="text-muted mb-0">Atualize suas informações pessoais</p>
+                    </div>
+
+                    <!-- Form -->
+                    <form asp-action="Edit" method="post" id="editUserForm" autocomplete="off">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="edit-form-fields">
+                            <!-- Weight Field -->
+                            <div class="mb-3 profile-field" id="weightField">
+                                <label asp-for="Weight" class="form-label fw-semibold">
+                                    Peso (kg)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-weight text-muted"></i>
+                                    </span>
+                                    <input asp-for="Weight" class="form-control border-start-0 ps-0" 
+                                           type="number" 
+                                           step="0.01"
+                                           min="0"
+                                           max="500"
+                                           placeholder="Ex: 70.50" 
+                                           autocomplete="off" 
+                                           autofocus />
+                                    <span class="input-group-text bg-light">kg</span>
+                                </div>
+                                <span asp-validation-for="Weight" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Height Field -->
+                            <div class="mb-3 profile-field" id="heightField">
+                                <label asp-for="Height" class="form-label fw-semibold">
+                                    Altura (m)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-ruler-vertical text-muted"></i>
+                                    </span>
+                                    <input asp-for="Height" class="form-control border-start-0 ps-0" 
+                                           type="number" 
+                                           step="0.01"
+                                           min="0"
+                                           max="3"
+                                           placeholder="Ex: 1.75" 
+                                           autocomplete="off" />
+                                    <span class="input-group-text bg-light">m</span>
+                                </div>
+                                <span asp-validation-for="Height" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Birth Date Field -->
+                            <div class="mb-4 profile-field" id="birthDateField">
+                                <label asp-for="BirthDate" class="form-label fw-semibold">
+                                    Data de Nascimento
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-birthday-cake text-muted"></i>
+                                    </span>
+                                    <input asp-for="BirthDate" class="form-control border-start-0 ps-0" 
+                                           type="date" 
+                                           autocomplete="off" />
+                                </div>
+                                <span asp-validation-for="BirthDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid mb-3 profile-field">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3">
+                                <i class="fas fa-save me-2"></i>Salvar Alterações
+                            </button>
+                        </div>
+
+                        <!-- Cancel Link -->
+                        <div class="text-center">
+                            <a asp-action="Index" class="text-muted text-decoration-none">
+                                <i class="fas fa-times me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -102,6 +102,28 @@ body {
   transform: translateY(-1px) scale(0.997);
 }
 
+/* Logout button with same animation */
+.btn-outline-danger {
+  transition: all 0.28s cubic-bezier(.2,.9,.2,1);
+  color: var(--bs-danger);
+  border-color: rgba(220,53,69,0.6);
+  background-color: transparent;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+  transform: translateY(-2px);
+  color: #fff;
+  background-color: rgba(220,53,69,0.9);
+  border-color: rgb(220,53,69);
+  box-shadow: 0 6px 18px rgba(220, 53, 69, 0.25);
+  text-decoration: none;
+}
+
+.btn-outline-danger:active {
+  transform: translateY(-1px) scale(0.997);
+}
+
 /* Keep submit button transition for smooth reveal */
 #submitButton {
   max-height: 0;
@@ -111,4 +133,97 @@ body {
 
 #submitButton.show {
   max-height: 100px;
+}
+
+/* User Profile Page Styles */
+.profile-field {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.profile-field:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.profile-field:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.profile-field:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.profile-field:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.profile-field:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.icon-wrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--bs-primary-rgb), 0.1);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.profile-field:hover .icon-wrapper {
+  background: rgba(var(--bs-primary-rgb), 0.2);
+  transform: scale(1.1);
+}
+
+.icon-wrapper i {
+  font-size: 1.25rem;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.profile-progress-card {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.85), rgba(84, 115, 255, 0.85));
+  border-radius: 1.25rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.profile-progress-card .progress {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  height: 0.6rem;
+  overflow: hidden;
+}
+
+.profile-progress-card .progress-bar {
+  background: rgba(255, 255, 255, 0.95);
+  transition: width 0.6s ease;
+}
+
+.profile-progress-card .btn-light {
+  color: #0d6efd;
 }

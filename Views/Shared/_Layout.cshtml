@@ -32,9 +32,16 @@
                         @if (User?.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="User" asp-action="Index">
-                                    <i class="fas fa-user"></i> Olá @User.Identity.Name
+                                <a class="btn btn-outline-primary mb-2 mb-md-0 me-md-2" asp-controller="User" asp-action="Index">
+                                    <i class="fas fa-user"></i> @User.Identity.Name
                                 </a>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="fas fa-sign-out-alt"></i> Sair
+                                    </button>
+                                </form>
                             </li>
                         }
                         else

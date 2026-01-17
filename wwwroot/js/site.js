@@ -110,8 +110,37 @@ function initLoginForm() {
     });
 }
 
+// User Profile Page
+function initUserProfile() {
+    const profileCard = document.querySelector('.profile-info');
+    
+    if (!profileCard) return; // Exit if not on user profile page
+    
+    // Add scale-in animation to card
+    const card = document.querySelector('.card');
+    if (card) {
+        card.style.animation = 'scaleIn 0.3s ease';
+    }
+
+    const progressBar = document.querySelector('[data-profile-progress]');
+    if (progressBar) {
+        const percent = Number(progressBar.dataset.profileProgress) || 0;
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', '0');
+        const progressLabel = document.querySelector('[data-profile-progress-label]');
+        setTimeout(() => {
+            progressBar.style.width = `${percent}%`;
+            progressBar.setAttribute('aria-valuenow', percent.toString());
+            if (progressLabel) {
+                progressLabel.textContent = `${percent}%`;
+            }
+        }, 160);
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     initRegisterForm();
     initLoginForm();
+    initUserProfile();
 });
