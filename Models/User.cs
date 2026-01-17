@@ -26,7 +26,7 @@ namespace TupiJua.Models
         /// </summary>
         [Column(TypeName = "date")]
         [DataType(DataType.Date)]
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
 
         /// <summary>
         /// Planos de treino do usuário.

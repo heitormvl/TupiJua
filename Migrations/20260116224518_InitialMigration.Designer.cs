@@ -12,7 +12,7 @@ using TupiJua.Models;
 namespace TupiJua.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260115200623_InitialMigration")]
+    [Migration("20260116224518_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -285,7 +285,7 @@ namespace TupiJua.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("BirthDate")
+                    b.Property<DateTime?>("BirthDate")
                         .HasColumnType("date");
 
                     b.Property<string>("ConcurrencyStamp")

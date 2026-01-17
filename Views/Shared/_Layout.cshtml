@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TupiJua.styles.css" asp-append-version="true" />
+    <script src="https://kit.fontawesome.com/aeecc34f9e.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
@@ -26,6 +27,29 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="Index">
+                                    <i class="fas fa-user"></i> Olá @User.Identity.Name
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-primary me-2" asp-controller="User" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary" asp-controller="User" asp-action="Register">
+                                    <i class="fas fa-user-plus"></i> Criar Conta
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

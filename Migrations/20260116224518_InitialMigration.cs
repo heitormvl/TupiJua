@@ -32,7 +32,7 @@ namespace TupiJua.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Weight = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
                     Height = table.Column<decimal>(type: "decimal(4,2)", nullable: true),
-                    BirthDate = table.Column<DateTime>(type: "date", nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "date", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
