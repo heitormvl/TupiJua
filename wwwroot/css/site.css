@@ -80,6 +80,29 @@ body {
   box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
 }
 
+/* Make outline buttons feel equally interactive as primary buttons (navbar 'Criar Conta') */
+.btn-outline-primary {
+  transition: all 0.28s cubic-bezier(.2,.9,.2,1);
+  color: var(--bs-primary);
+  border-color: rgba(13,110,253,0.6);
+  background-color: transparent;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  transform: translateY(-2px);
+  color: #fff;
+  background-color: rgba(13,110,253,0.9);
+  border-color: rgb(13,110,253);
+  box-shadow: 0 6px 18px rgba(13, 110, 253, 0.25);
+  text-decoration: none;
+}
+
+.btn-outline-primary:active {
+  transform: translateY(-1px) scale(0.997);
+}
+
+/* Keep submit button transition for smooth reveal */
 #submitButton {
   max-height: 0;
   overflow: hidden;
