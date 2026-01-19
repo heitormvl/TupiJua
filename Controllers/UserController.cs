@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TupiJua.Models;
 using TupiJua.ViewModels;
 
 namespace TupiJua.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -46,6 +48,7 @@ namespace TupiJua.Controllers
         /// </summary>
         /// <returns>View para registro de usuário</returns>
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Register() => View();
 
         /// <summary>
@@ -54,6 +57,7 @@ namespace TupiJua.Controllers
         /// <param name="model">Modelo com os dados do usuário a ser registrado</param>
         /// <returns>Redireciona para a página inicial em caso de sucesso ou retorna a view com erros</returns>
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -81,6 +85,7 @@ namespace TupiJua.Controllers
         /// </summary>
         /// <returns>View para login do usuário</returns>
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login() => View();
 
         /// <summary>
@@ -89,6 +94,7 @@ namespace TupiJua.Controllers
         /// <param name="model">Modelo com os dados para login</param>
         /// <returns>Redireciona para a página inicial em caso de sucesso ou retorna a view com erros</returns>
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)

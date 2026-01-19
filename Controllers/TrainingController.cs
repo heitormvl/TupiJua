@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TupiJua.Models;
@@ -6,6 +7,7 @@ using TupiJua.ViewModels;
 
 namespace TupiJua.Controllers
 {
+    [Authorize]
     public class TrainingController : Controller
     {
         private readonly UserManager<User> _userManager;
