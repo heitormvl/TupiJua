@@ -149,10 +149,13 @@
 
                                 <!-- Card Actions -->
                                 <div class="plan-card-actions">
-                                    <a asp-controller="Training" asp-action="StartWorkout" asp-route-planId="@plan.Id" class="btn btn-primary btn-lg flex-grow-1">
-                                        <i class="fas fa-fire me-2"></i>
-                                        Bora Treinar!
-                                    </a>
+                                    <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="flex-grow-1">
+                                        <input type="hidden" name="workoutPlanId" value="@plan.Id" />
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                                            <i class="fas fa-fire me-2"></i>
+                                            Bora Treinar!
+                                        </button>
+                                    </form>
                                     <div class="btn-group">
                                         <a asp-controller="WorkoutPlan" asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Editar" aria-label="Editar">
                                             <i class="fas fa-edit"></i>

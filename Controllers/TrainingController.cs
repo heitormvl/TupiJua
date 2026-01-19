@@ -63,7 +63,7 @@ namespace TupiJua.Controllers
 
             return RedirectToAction("AddExercise", new { sessionId = session.Id });
         }
-        
+
         /// <summary>
         /// Exibe o formulário para adicionar um exercício a uma sessão de treino.
         /// </summary>
@@ -174,6 +174,184 @@ namespace TupiJua.Controllers
                 }
             }
             throw new ArgumentException("Format de repetições inválido.");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StartTrainingFromPlan(int workoutPlanId)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // 1. Criar a sessão vinculada ao plano
+            var session = new WorkoutSession
+            {
+                UserId = userId!,
+                WorkoutPlanId = workoutPlanId
+            };
+
+            _context.WorkoutSessions.Add(session);
+            await _context.SaveChangesAsync();
+
+            // 2. Redirecionar para a execução guiada
+            return RedirectToAction("ExecutePlan", new { sessionId = session.Id });
+        }
+
+        /// <summary>
+        /// Exibe a tela de execução guiada do plano de treino.
+        /// </summary>
+        /// <param name="sessionId">ID da sessão de treino</param>
+        /// <returns>View com a lista de exercícios do plano e status de execução</returns>
+        [HttpGet]
+        public async Task<IActionResult> ExecutePlan(int sessionId)
+        {
+            var session = await _context.WorkoutSessions
+                .Include(ws => ws.WorkoutPlan)
+                .ThenInclude(wp => wp!.PlanExercises)
+                .ThenInclude(wpe => wpe.Exercise)
+                .Include(ws => ws.LoggedExercises)
+                .FirstOrDefaultAsync(ws => ws.Id == sessionId);
+
+            if (session == null || session.WorkoutPlan == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Verificar se o usuário é o dono da sessão
+            var userId = _userManager.GetUserId(User);
+            if (session.UserId != userId)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Montar o ViewModel
+            var model = new TrainingFromPlanViewModel
+            {
+                SessionId = session.Id,
+                WorkoutPlanId = session.WorkoutPlan.Id,
+                PlanName = session.WorkoutPlan.Name,
+                Exercises = session.WorkoutPlan.PlanExercises
+                    .OrderBy(wpe => wpe.Order)
+                    .Select(wpe => new PlanExerciseItemViewModel
+                    {
+                        ExerciseId = wpe.ExerciseId,
+                        ExerciseName = wpe.Exercise?.Name ?? "",
+                        Order = wpe.Order,
+                        TargetSets = wpe.TargetSets,
+                        TargetReps = wpe.TargetReps,
+                        RecommendedRestSeconds = wpe.RecommendedRestSeconds,
+                        IsCompleted = session.LoggedExercises.Any(le => le.ExerciseId == wpe.ExerciseId)
+                    })
+                    .ToList()
+            };
+
+            return View(model);
+        }
+
+        /// <summary>
+        /// Exibe o formulário para adicionar um exercício específico de um plano.
+        /// </summary>
+        /// <param name="sessionId">ID da sessão de treino</param>
+        /// <param name="exerciseId">ID do exercício a ser registrado</param>
+        /// <returns>View para adicionar exercício com dados pré-preenchidos</returns>
+        [HttpGet]
+        public async Task<IActionResult> AddExerciseFromPlan(int sessionId, int exerciseId)
+        {
+            var session = await _context.WorkoutSessions
+                .Include(ws => ws.WorkoutPlan)
+                .ThenInclude(wp => wp!.PlanExercises)
+                .FirstOrDefaultAsync(ws => ws.Id == sessionId);
+
+            if (session == null || session.WorkoutPlan == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Verificar se o usuário é o dono da sessão
+            var userId = _userManager.GetUserId(User);
+            if (session.UserId != userId)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Buscar informações do exercício no plano
+            var planExercise = session.WorkoutPlan.PlanExercises
+                .FirstOrDefault(wpe => wpe.ExerciseId == exerciseId);
+
+            if (planExercise == null)
+            {
+                return RedirectToAction("ExecutePlan", new { sessionId });
+            }
+
+            var exercise = await _context.Exercises.FindAsync(exerciseId);
+            ViewBag.Exercise = exercise;
+            ViewBag.TargetSets = planExercise.TargetSets;
+            ViewBag.TargetReps = planExercise.TargetReps;
+            ViewBag.RecommendedRestSeconds = planExercise.RecommendedRestSeconds;
+            ViewBag.FromPlan = true;
+
+            var model = new LogExerciseViewModel
+            {
+                WorkoutSessionId = sessionId,
+                ExerciseId = exerciseId,
+                Sets = planExercise.TargetSets,
+                Reps = planExercise.TargetReps ?? "12",
+                RestSeconds = planExercise.RecommendedRestSeconds > 0 ? planExercise.RecommendedRestSeconds : 60
+            };
+
+            return View("AddExercise", model);
+        }
+
+        /// <summary>
+        /// Processa o formulário de adição de exercício de um plano.
+        /// </summary>
+        /// <param name="model">Modelo de visualização contendo os dados do exercício</param>
+        /// <param name="action">Ação do botão pressionado ("continue" ou "finish")</param>
+        /// <returns>Redireciona para ExecutePlan</returns>
+        [HttpPost]
+        public async Task<IActionResult> AddExerciseFromPlan(LogExerciseViewModel model, string action)
+        {
+            if (ModelState.IsValid)
+            {
+                var loggedExercise = new LoggedExercise
+                {
+                    WorkoutSessionId = model.WorkoutSessionId,
+                    ExerciseId = model.ExerciseId,
+                    Sets = model.Sets,
+                    Reps = model.Reps,
+                    IntegerReps = CalculateIntegerReps(model.Reps),
+                    Weight = model.Weight,
+                    RestSeconds = model.RestSeconds,
+                    Observation = model.Observation
+                };
+
+                _context.LoggedExercises.Add(loggedExercise);
+                await _context.SaveChangesAsync();
+
+                // Sempre volta para ExecutePlan
+                return RedirectToAction("ExecutePlan", new { sessionId = model.WorkoutSessionId });
+            }
+
+            var session = await _context.WorkoutSessions
+                .Include(ws => ws.WorkoutPlan)
+                .ThenInclude(wp => wp!.PlanExercises)
+                .FirstOrDefaultAsync(ws => ws.Id == model.WorkoutSessionId);
+
+            if (session?.WorkoutPlan != null)
+            {
+                var planExercise = session.WorkoutPlan.PlanExercises
+                    .FirstOrDefault(wpe => wpe.ExerciseId == model.ExerciseId);
+
+                if (planExercise != null)
+                {
+                    var exercise = await _context.Exercises.FindAsync(model.ExerciseId);
+                    ViewBag.Exercise = exercise;
+                    ViewBag.TargetSets = planExercise.TargetSets;
+                    ViewBag.TargetReps = planExercise.TargetReps;
+                    ViewBag.RecommendedRestSeconds = planExercise.RecommendedRestSeconds;
+                    ViewBag.FromPlan = true;
+                }
+            }
+
+            return View("AddExercise", model);
         }
     }
 }

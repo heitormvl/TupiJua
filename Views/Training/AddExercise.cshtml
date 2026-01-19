@@ -3,6 +3,11 @@
 @{
     ViewData["Title"] = "Adicionar Exercício";
     var exercises = ViewBag.Exercises as List<TupiJua.Models.Exercise> ?? new List<TupiJua.Models.Exercise>();
+    var fromPlan = ViewBag.FromPlan as bool? ?? false;
+    var exercise = ViewBag.Exercise as TupiJua.Models.Exercise;
+    var targetSets = ViewBag.TargetSets as int? ?? 0;
+    var targetReps = ViewBag.TargetReps as string;
+    var recommendedRestSeconds = ViewBag.RecommendedRestSeconds as int? ?? 0;
 }
 
 <div class="container-fluid px-3 px-md-4 py-4">
@@ -16,6 +21,47 @@
                 </h2>
                 <p class="text-muted mb-0">Registre os detalhes do seu exercício</p>
             </div>
+
+            @if (fromPlan && exercise != null)
+            {
+                <!-- Plan Target Info -->
+                <div class="last-exercise-card mb-4" style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(84, 115, 255, 0.1)); border-color: rgba(13, 110, 253, 0.3);">
+                    <div class="d-flex align-items-start">
+                        <div class="last-exercise-icon" style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(84, 115, 255, 0.2)); color: #0d6efd;">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-2" style="color: #0d6efd;">
+                                <i class="fas fa-clipboard-list me-2"></i>
+                                Meta do Plano: @exercise.Name
+                            </h6>
+                            <div class="row g-2">
+                                <div class="col-6 col-sm-3">
+                                    <div class="last-exercise-stat">
+                                        <small class="text-muted">Séries Alvo</small>
+                                        <strong class="text-primary">@targetSets</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <div class="last-exercise-stat">
+                                        <small class="text-muted">Reps Alvo</small>
+                                        <strong class="text-primary">@targetReps</strong>
+                                    </div>
+                                </div>
+                                @if (recommendedRestSeconds > 0)
+                                {
+                                    <div class="col-6 col-sm-3">
+                                        <div class="last-exercise-stat">
+                                            <small class="text-muted">Descanso</small>
+                                            <strong class="text-primary">@recommendedRestSeconds seg</strong>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
 
             <!-- Last Exercise Info (will be populated by JS) -->
             <div id="lastExerciseInfo" class="last-exercise-card mb-4" style="display: none;">
@@ -33,24 +79,39 @@
 
             <!-- Main Form Card -->
             <div class="exercise-form-card">
-                <form asp-action="AddExercise" method="post" id="exerciseForm">
+                <form asp-action="@(fromPlan ? "AddExerciseFromPlan" : "AddExercise")" method="post" id="exerciseForm">
                     <input type="hidden" asp-for="WorkoutSessionId" />
 
-                    <!-- Exercise Selection -->
-                    <div class="form-section">
-                        <label class="form-label">
-                            <i class="fas fa-dumbbell me-2"></i>
-                            Exercício
-                        </label>
-                        <select asp-for="ExerciseId" class="form-select form-select-lg" id="exerciseSelect" required>
-                            <option value="">Selecione um exercício</option>
-                            @foreach (var exercise in exercises.OrderBy(e => e.Name))
-                            {
-                                <option value="@exercise.Id">@exercise.Name</option>
-                            }
-                        </select>
-                        <span asp-validation-for="ExerciseId" class="text-danger small"></span>
-                    </div>
+                    @if (fromPlan)
+                    {
+                        <!-- Exercise is pre-selected, show as readonly -->
+                        <input type="hidden" asp-for="ExerciseId" />
+                        <div class="form-section">
+                            <label class="form-label">
+                                <i class="fas fa-dumbbell me-2"></i>
+                                Exercício
+                            </label>
+                            <input type="text" class="form-control form-control-lg" value="@exercise?.Name" readonly />
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Exercise Selection -->
+                        <div class="form-section">
+                            <label class="form-label">
+                                <i class="fas fa-dumbbell me-2"></i>
+                                Exercício
+                            </label>
+                            <select asp-for="ExerciseId" class="form-select form-select-lg" id="exerciseSelect" required>
+                                <option value="">Selecione um exercício</option>
+                                @foreach (var ex in exercises.OrderBy(e => e.Name))
+                                {
+                                    <option value="@ex.Id">@ex.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ExerciseId" class="text-danger small"></span>
+                        </div>
+                    }
 
                     <!-- Sets -->
                     <div class="form-section">
@@ -164,14 +225,24 @@
 
                     <!-- Action Buttons -->
                     <div class="form-actions">
-                        <button type="submit" name="action" value="continue" class="btn btn-success btn-lg">
-                            <i class="fas fa-plus-circle me-2"></i>
-                            Salvar e Adicionar Próximo
-                        </button>
-                        <button type="submit" name="action" value="finish" class="btn btn-primary btn-lg">
-                            <i class="fas fa-check-circle me-2"></i>
-                            Salvar e Voltar
-                        </button>
+                        @if (fromPlan)
+                        {
+                            <button type="submit" name="action" value="finish" class="btn btn-success btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Salvar e Voltar ao Plano
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" name="action" value="continue" class="btn btn-success btn-lg">
+                                <i class="fas fa-plus-circle me-2"></i>
+                                Salvar e Adicionar Próximo
+                            </button>
+                            <button type="submit" name="action" value="finish" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Salvar e Voltar
+                            </button>
+                        }
                     </div>
                 </form>
             </div>

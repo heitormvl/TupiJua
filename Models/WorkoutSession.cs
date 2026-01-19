@@ -51,6 +51,11 @@ namespace TupiJua.Models
         public int? TotalDurationMinutes { get; set; }
 
         /// <summary>
+        /// Indica se a sessão foi concluída.
+        /// </summary>
+        public bool IsCompleted { get; set; } = false;
+
+        /// <summary>
         /// Exercícios registrados na sessão.
         /// </summary>
         public virtual ICollection<LoggedExercise> LoggedExercises { get; set; } = new List<LoggedExercise>();

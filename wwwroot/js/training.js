@@ -42,6 +42,11 @@ function initAddExercise() {
     
     if (!exerciseSelect) return; // Exit if not on add exercise page
     
+    // Check if exercise is pre-selected (from plan)
+    if (exerciseSelect.value && exerciseSelect.options[exerciseSelect.selectedIndex]) {
+        loadLastExerciseData(exerciseSelect.value);
+    }
+    
     // Load last exercise data when exercise is selected
     exerciseSelect.addEventListener('change', function() {
         const exerciseId = this.value;
