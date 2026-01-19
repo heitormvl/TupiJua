@@ -1,0 +1,358 @@
+@model TupiJua.ViewModels.CreateWorkoutPlanViewModel
+
+@{
+    ViewData["Title"] = "Criar Plano de Treino";
+    var exercises = ViewBag.Exercises as List<TupiJua.Models.Exercise> ?? new List<TupiJua.Models.Exercise>();
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <!-- Header Card -->
+            <div class="exercise-header-card mb-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h2 class="mb-2">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Criar Plano de Treino
+                        </h2>
+                        <p class="text-muted mb-0">Monte sua ficha personalizada</p>
+                    </div>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar
+                    </a>
+                </div>
+            </div>
+
+            <form asp-action="Create" method="post" id="workoutPlanForm">
+                @Html.AntiForgeryToken()
+
+                <!-- Plan Name Card -->
+                <div class="exercise-form-card mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-tag me-2"></i>
+                        Nome do Plano
+                    </h5>
+                    <div class="form-section">
+                        <label asp-for="Name" class="form-label">
+                            <i class="fas fa-bookmark me-2"></i>
+                            Dê um nome para seu treino
+                        </label>
+                        <input asp-for="Name" class="form-control form-control-lg" 
+                               placeholder="Ex: Treino A - Peito e Tríceps" required />
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Use nomes descritivos para facilitar a identificação
+                        </small>
+                        <span asp-validation-for="Name" class="text-danger small d-block"></span>
+                    </div>
+                </div>
+
+                <!-- Exercises Section -->
+                <div class="exercise-form-card mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-dumbbell me-2"></i>
+                            Exercícios
+                        </h5>
+                        <button type="button" class="btn btn-primary" onclick="addExerciseField()">
+                            <i class="fas fa-plus me-2"></i>
+                            Adicionar Exercício
+                        </button>
+                    </div>
+
+                    <!-- Exercises Container -->
+                    <div id="exercisesContainer" class="exercises-container">
+                        <!-- Exercise fields will be added here by JavaScript -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="empty-exercise-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p class="mb-3">Nenhum exercício adicionado ainda</p>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="exercise-form-card">
+                    <div class="form-actions">
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg" id="submitBtn" disabled>
+                            <i class="fas fa-save me-2"></i>
+                            Salvar Plano
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        let exerciseCounter = 0;
+        const exercisesList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(exercises.Select(e => new { 
+            e.Id, 
+            e.Name,
+            MuscleGroups = e.ExerciseMuscleGroups.Select(emg => new {
+                Name = emg.MuscleGroup.Name,
+                IsPrimary = emg.IsPrimary
+            })
+        })));
+
+        // Add exercise field
+        function addExerciseField() {
+            const container = document.getElementById('exercisesContainer');
+            const emptyState = document.getElementById('emptyState');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Hide empty state
+            emptyState.style.display = 'none';
+            
+            // Create exercise card
+            const exerciseCard = document.createElement('div');
+            exerciseCard.className = 'exercise-field-card';
+            exerciseCard.dataset.index = exerciseCounter;
+            exerciseCard.innerHTML = `
+                <div class="exercise-field-header">
+                    <div class="exercise-field-order">
+                        <i class="fas fa-grip-vertical me-2"></i>
+                        <strong>Exercício ${exerciseCounter + 1}</strong>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExerciseField(${exerciseCounter})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+
+                <div class="exercise-field-body">
+                    <!-- Exercise Selection -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-dumbbell me-2"></i>
+                            Exercício
+                        </label>
+                        <select name="Exercises[${exerciseCounter}].ExerciseId" 
+                                class="form-select exercise-select" 
+                                onchange="showMuscleGroups(this, ${exerciseCounter})" 
+                                required>
+                            <option value="">Selecione um exercício</option>
+                            ${exercisesList.map(e => `<option value="${e.Id}">${e.Name}</option>`).join('')}
+                        </select>
+                        <div id="muscleGroups-${exerciseCounter}" class="muscle-groups-container mt-2"></div>
+                    </div>
+
+                    <!-- Row for Sets and Reps -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-redo me-2"></i>
+                                Séries
+                            </label>
+                            <div class="number-input-group">
+                                <button type="button" class="btn-number-control" onclick="decrementValue('sets-${exerciseCounter}', 1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input name="Exercises[${exerciseCounter}].TargetSets" 
+                                       type="number" 
+                                       class="form-control text-center" 
+                                       id="sets-${exerciseCounter}"
+                                       min="1" 
+                                       max="100" 
+                                       value="3" 
+                                       required />
+                                <button type="button" class="btn-number-control" onclick="incrementValue('sets-${exerciseCounter}', 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-hashtag me-2"></i>
+                                Repetições
+                            </label>
+                            <input name="Exercises[${exerciseCounter}].TargetReps" 
+                                   type="text" 
+                                   class="form-control" 
+                                   placeholder="Ex: 12 ou 10-12"
+                                   pattern="^\\d+(\\s*-\\s*\\d+)?$"
+                                   title="Digite um número (ex: 12) ou faixa (ex: 10-12)"
+                                   required />
+                        </div>
+                    </div>
+
+                    <!-- Rest Time -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-stopwatch me-2"></i>
+                            Descanso entre séries
+                        </label>
+                        <div class="number-input-group">
+                            <button type="button" class="btn-number-control" onclick="decrementValue('rest-${exerciseCounter}', 15)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input name="Exercises[${exerciseCounter}].RecommendedRestSeconds" 
+                                   type="number" 
+                                   class="form-control text-center" 
+                                   id="rest-${exerciseCounter}"
+                                   min="0" 
+                                   max="3600" 
+                                   step="15" 
+                                   value="60" 
+                                   required />
+                            <button type="button" class="btn-number-control" onclick="incrementValue('rest-${exerciseCounter}', 15)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <span class="input-group-text-addon">seg</span>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Order Field -->
+                    <input name="Exercises[${exerciseCounter}].Order" type="hidden" value="${exerciseCounter + 1}" />
+                </div>
+            `;
+
+            container.appendChild(exerciseCard);
+            
+            // Animate card appearance
+            setTimeout(() => {
+                exerciseCard.style.opacity = '1';
+                exerciseCard.style.transform = 'translateY(0)';
+            }, 10);
+
+            exerciseCounter++;
+            
+            // Enable submit button
+            submitBtn.disabled = false;
+
+            // Update exercise numbers
+            updateExerciseNumbers();
+        }
+
+        // Remove exercise field
+        function removeExerciseField(index) {
+            const card = document.querySelector(`[data-index="${index}"]`);
+            if (!card) return;
+
+            // Animate removal
+            card.style.opacity = '0';
+            card.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                card.remove();
+                
+                // Check if container is empty
+                const container = document.getElementById('exercisesContainer');
+                const emptyState = document.getElementById('emptyState');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                if (container.children.length === 0) {
+                    emptyState.style.display = 'flex';
+                    submitBtn.disabled = true;
+                }
+                
+                // Update exercise numbers and indices
+                updateExerciseNumbers();
+            }, 300);
+        }
+
+        // Update exercise numbers and order values
+        function updateExerciseNumbers() {
+            const cards = document.querySelectorAll('.exercise-field-card');
+            cards.forEach((card, index) => {
+                const orderSpan = card.querySelector('.exercise-field-order strong');
+                orderSpan.textContent = `Exercício ${index + 1}`;
+                
+                const orderInput = card.querySelector('input[name*=".Order"]');
+                if (orderInput) {
+                    orderInput.value = index + 1;
+                }
+            });
+        }
+
+        // Increment value
+        function incrementValue(inputId, step) {
+            const input = document.getElementById(inputId);
+            const currentValue = parseFloat(input.value) || 0;
+            const maxValue = parseFloat(input.max);
+            const newValue = currentValue + step;
+            
+            if (newValue <= maxValue) {
+                input.value = newValue;
+            }
+        }
+
+        // Decrement value
+        function decrementValue(inputId, step) {
+            const input = document.getElementById(inputId);
+            const currentValue = parseFloat(input.value) || 0;
+            const minValue = parseFloat(input.min);
+            const newValue = currentValue - step;
+            
+            if (newValue >= minValue) {
+                input.value = newValue;
+            }
+        }
+
+        // Show muscle groups when exercise is selected
+        function showMuscleGroups(selectElement, index) {
+            const exerciseId = parseInt(selectElement.value);
+            const container = document.getElementById(`muscleGroups-${index}`);
+            
+            if (!exerciseId) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            const exercise = exercisesList.find(e => e.Id === exerciseId);
+            if (!exercise || !exercise.MuscleGroups || exercise.MuscleGroups.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            // Sort: primary first, then alphabetically
+            const sortedGroups = [...exercise.MuscleGroups].sort((a, b) => {
+                if (a.IsPrimary !== b.IsPrimary) return b.IsPrimary ? 1 : -1;
+                return a.Name.localeCompare(b.Name);
+            });
+            
+            const badgesHtml = sortedGroups.map(mg => {
+                const badgeClass = mg.IsPrimary ? 'badge bg-primary' : 'badge bg-secondary';
+                const icon = mg.IsPrimary ? '<i class="fas fa-star me-1"></i>' : '';
+                return `<span class="${badgeClass} me-1 mb-1">${icon}${mg.Name}</span>`;
+            }).join('');
+            
+            container.innerHTML = `<div class="d-flex flex-wrap">${badgesHtml}</div>`;
+            
+            // Animate badges
+            setTimeout(() => {
+                container.querySelectorAll('.badge').forEach((badge, i) => {
+                    badge.style.opacity = '0';
+                    badge.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        badge.style.transition = 'all 0.3s ease';
+                        badge.style.opacity = '1';
+                        badge.style.transform = 'scale(1)';
+                    }, i * 50);
+                });
+            }, 10);
+        }
+
+        // Initialize - add first exercise if coming back with errors
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if there are validation errors
+            const hasErrors = document.querySelectorAll('.text-danger').length > 0;
+            
+            if (!hasErrors) {
+                // Auto-add first exercise for better UX
+                // addExerciseField();
+            }
+        });
+    </script>
+}

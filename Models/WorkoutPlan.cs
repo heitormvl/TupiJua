@@ -43,11 +43,16 @@ namespace TupiJua.Models
         /// </summary>
         [Column(TypeName = "datetime")]
         [DataType(DataType.DateTime)]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// Sessões de treino associadas ao plano.
         /// </summary>
         public virtual ICollection<WorkoutSession> WorkoutSessions { get; set; } = new List<WorkoutSession>();
+
+        /// <summary>
+        /// Exercícios que compõem este plano de treino.
+        /// </summary>
+        public virtual ICollection<WorkoutPlanExercise> PlanExercises { get; set; } = new List<WorkoutPlanExercise>();
     }
 }

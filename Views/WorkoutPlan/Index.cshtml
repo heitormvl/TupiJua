@@ -1,0 +1,246 @@
+@model List<TupiJua.Models.WorkoutPlan>
+
+@{
+    ViewData["Title"] = "Meus Planos de Treino";
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row g-3 g-md-4">
+        <!-- Hero Section -->
+        <div class="col-12">
+            <div class="hero-card">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Meus Planos de Treino
+                    </h1>
+                    <p class="hero-subtitle">Organize suas fichas e maximize seus resultados</p>
+                    <a asp-action="Create" class="btn btn-cta">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Criar Nova Ficha
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <!-- Stats Summary -->
+            <div class="col-12">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <div class="stat-card stat-card-1">
+                            <div class="stat-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value">@Model.Count</div>
+                                <div class="stat-label">@(Model.Count == 1 ? "Plano criado" : "Planos criados")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="stat-card stat-card-2">
+                            <div class="stat-icon">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value">@Model.Sum(p => p.PlanExercises.Count)</div>
+                                <div class="stat-label">Total de exercícios</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="stat-card stat-card-3">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value">@Model.Count(p => p.IsActive)</div>
+                                <div class="stat-label">@(Model.Count(p => p.IsActive) == 1 ? "Plano ativo" : "Planos ativos")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workout Plans List -->
+            <div class="col-12">
+                <div class="row g-3">
+                    @foreach (var plan in Model.OrderByDescending(p => p.IsActive).ThenByDescending(p => p.CreatedAt))
+                    {
+                        <div class="col-12 col-lg-6">
+                            <div class="workout-plan-card">
+                                <!-- Card Header -->
+                                <div class="plan-card-header">
+                                    <div class="d-flex align-items-start justify-content-between mb-3">
+                                        <div class="flex-grow-1">
+                                            <h4 class="plan-name mb-2">
+                                                <i class="fas fa-bookmark me-2"></i>
+                                                @plan.Name
+                                            </h4>
+                                            @if (plan.IsActive)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    Ativo
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-pause-circle me-1"></i>
+                                                    Inativo
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <!-- Exercise Count -->
+                                    <div class="plan-stats">
+                                        <div class="stat-item">
+                                            <i class="fas fa-list-ol me-2"></i>
+                                            <span>@plan.PlanExercises.Count @(plan.PlanExercises.Count == 1 ? "exercício" : "exercícios")</span>
+                                        </div>
+                                        @if (plan.PlanExercises.Any())
+                                        {
+                                            var totalSets = plan.PlanExercises.Sum(pe => pe.TargetSets);
+                                            <div class="stat-item">
+                                                <i class="fas fa-redo me-2"></i>
+                                                <span>@totalSets @(totalSets == 1 ? "série" : "séries") total</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Exercises List -->
+                                @if (plan.PlanExercises.Any())
+                                {
+                                    <div class="plan-exercises-list">
+                                        <h6 class="exercises-title">
+                                            <i class="fas fa-dumbbell me-2"></i>
+                                            Exercícios
+                                        </h6>
+                                        <ul class="exercises-list">
+                                            @foreach (var pe in plan.PlanExercises.OrderBy(p => p.Order))
+                                            {
+                                                <li class="exercise-item">
+                                                    <span class="exercise-order">@pe.Order</span>
+                                                    <div class="exercise-details">
+                                                        <strong>@(pe.Exercise?.Name ?? "Exercício removido")</strong>
+                                                        <small class="text-muted">
+                                                            @pe.TargetSets×@pe.TargetReps
+                                                            @if (pe.RecommendedRestSeconds > 0)
+                                                            {
+                                                                <span class="ms-2">
+                                                                    <i class="fas fa-stopwatch"></i>
+                                                                    @pe.RecommendedRestSeconds seg
+                                                                </span>
+                                                            }
+                                                        </small>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+
+                                <!-- Card Actions -->
+                                <div class="plan-card-actions">
+                                    <a asp-controller="Training" asp-action="StartWorkout" asp-route-planId="@plan.Id" class="btn btn-primary btn-lg flex-grow-1">
+                                        <i class="fas fa-fire me-2"></i>
+                                        Bora Treinar!
+                                    </a>
+                                    <div class="btn-group">
+                                        <a asp-controller="WorkoutPlan" asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Editar" aria-label="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger" 
+                                                onclick="confirmDelete('@plan.Id', '@plan.Name')" title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h5>Você ainda não tem nenhuma ficha de treino</h5>
+                    <p class="text-muted mb-4">
+                        Crie sua primeira ficha personalizada com os exercícios que você mais gosta!
+                    </p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o plano <strong id="planNameToDelete"></strong>?</p>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Esta ação não pode ser desfeita!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Animate cards on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.workout-plan-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Delete confirmation
+        function confirmDelete(planId, planName) {
+            document.getElementById('planNameToDelete').textContent = planName;
+            const form = document.getElementById('deleteForm');
+            form.action = '@Url.Action("Delete")/' + planId;
+            
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+    </script>
+}

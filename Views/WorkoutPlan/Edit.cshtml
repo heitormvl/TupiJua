@@ -1,0 +1,479 @@
+@model TupiJua.ViewModels.EditWorkoutPlanViewModel
+
+@{
+    ViewData["Title"] = "Editar Plano de Treino";
+    var exercises = ViewBag.Exercises as List<TupiJua.Models.Exercise> ?? new List<TupiJua.Models.Exercise>();
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <!-- Header Card -->
+            <div class="exercise-header-card mb-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h1 class="h3 mb-1">
+                            <i class="fas fa-edit me-2 text-primary"></i>Editar Plano de Treino
+                        </h1>
+                        <p class="text-muted mb-0">Modifique seu plano, adicione ou remova exercícios</p>
+                    </div>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        <span class="d-none d-sm-inline">Voltar</span>
+                    </a>
+                </div>
+            </div>
+
+            <form asp-action="Edit" asp-route-id="@Model.Id" method="post" id="workoutPlanForm">
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.Id)
+
+                <!-- Plan Name Card -->
+                <div class="exercise-form-card mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-tag me-2 text-primary"></i>
+                        Nome do Plano
+                    </h5>
+                    <div class="form-section">
+                        <div class="form-floating">
+                            <input asp-for="Name" 
+                                   class="form-control" 
+                                   id="planName" 
+                                   placeholder="Nome do plano"
+                                   autocomplete="off">
+                            <label for="planName">
+                                <i class="fas fa-dumbbell me-2"></i>Nome do Plano
+                            </label>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercises Section -->
+                <div class="exercise-form-card mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list-ol me-2 text-primary"></i>
+                            Exercícios
+                        </h5>
+                        <button type="button" class="btn btn-primary" onclick="addExerciseField()">
+                            <i class="fas fa-plus me-2"></i>Adicionar Exercício
+                        </button>
+                    </div>
+
+                    <!-- Exercises Container -->
+                    <div id="exercisesContainer" class="exercises-container">
+                        @for (int i = 0; i < Model.Exercises.Count; i++)
+                        {
+                            <div class="exercise-field-card" data-index="@i" style="opacity: 1; transform: translateY(0);">
+                                <input type="hidden" name="Exercises[@i].Id" value="@Model.Exercises[i].Id" />
+                                
+                                <div class="exercise-field-header">
+                                    <div class="exercise-field-order">
+                                        <i class="fas fa-grip-vertical me-2"></i>
+                                        <strong>Exercício @(i + 1)</strong>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExerciseField(@i)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <div class="exercise-field-body">
+                                    <!-- Exercise Selection -->
+                                    <div class="form-section">
+                                        <label class="form-label">
+                                            <i class="fas fa-dumbbell me-2"></i>Exercício
+                                        </label>
+                                        <select name="Exercises[@i].ExerciseId" 
+                                                class="form-select exercise-select" 
+                                                id="exercise-@i"
+                                                onchange="showMuscleGroups(this, @i)"
+                                                required>
+                                            <option value="">Selecione um exercício</option>
+                                            @foreach (var exercise in exercises)
+                                            {
+                                                <option value="@exercise.Id" 
+                                                        selected="@(exercise.Id == Model.Exercises[i].ExerciseId)">
+                                                    @exercise.Name
+                                                </option>
+                                            }
+                                        </select>
+                                        <div id="muscleGroups-@i" class="mt-2 muscle-groups-container"></div>
+                                    </div>
+
+                                    <!-- Row for Sets and Reps -->
+                                    <div class="row g-3">
+                                        <!-- Sets -->
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                <i class="fas fa-layer-group me-2"></i>Séries
+                                            </label>
+                                            <div class="number-input-group input-group">
+                                                <button type="button" 
+                                                        class="btn btn-number-control" 
+                                                        onclick="decrementValue('sets-@i', 1)">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" 
+                                                       name="Exercises[@i].TargetSets" 
+                                                       class="form-control text-center" 
+                                                       id="sets-@i"
+                                                       value="@Model.Exercises[i].TargetSets"
+                                                       min="1" 
+                                                       max="100"
+                                                       required>
+                                                <button type="button" 
+                                                        class="btn btn-number-control" 
+                                                        onclick="incrementValue('sets-@i', 1)">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Reps -->
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                <i class="fas fa-redo me-2"></i>Repetições
+                                            </label>
+                                            <input type="text" 
+                                                   name="Exercises[@i].TargetReps" 
+                                                   class="form-control" 
+                                                   value="@Model.Exercises[i].TargetReps"
+                                                   placeholder="ex: 12 ou 10-12"
+                                                   pattern="^\d+(\s*-\s*\d+)?$"
+                                                   required>
+                                            <small class="text-muted">Ex: 12 ou 10-12</small>
+                                        </div>
+
+                                        <!-- Rest -->
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                <i class="fas fa-clock me-2"></i>Descanso (s)
+                                            </label>
+                                            <div class="number-input-group input-group">
+                                                <button type="button" 
+                                                        class="btn btn-number-control" 
+                                                        onclick="decrementValue('rest-@i', 15)">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" 
+                                                       name="Exercises[@i].RecommendedRestSeconds" 
+                                                       class="form-control text-center" 
+                                                       id="rest-@i"
+                                                       value="@Model.Exercises[i].RecommendedRestSeconds"
+                                                       min="0" 
+                                                       max="3600"
+                                                       step="15">
+                                                <span class="input-group-text-addon">s</span>
+                                                <button type="button" 
+                                                        class="btn btn-number-control" 
+                                                        onclick="incrementValue('rest-@i', 15)">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hidden Order Field -->
+                                    <input type="hidden" name="Exercises[@i].Order" value="@(i + 1)" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="empty-exercise-state" style="display: @(Model.Exercises.Count == 0 ? "flex" : "none")">
+                        <i class="fas fa-dumbbell mb-3"></i>
+                        <p class="mb-0">Nenhum exercício adicionado. Clique em "Adicionar Exercício" para começar.</p>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="exercise-form-card">
+                    <div class="form-actions">
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="fas fa-save me-2"></i>Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        let exerciseCounter = @Model.Exercises.Count;
+        const exercisesList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(exercises.Select(e => new { 
+            e.Id, 
+            e.Name,
+            MuscleGroups = e.ExerciseMuscleGroups.Select(emg => new {
+                Name = emg.MuscleGroup.Name,
+                IsPrimary = emg.IsPrimary
+            })
+        })));
+
+        // Initialize muscle groups for existing exercises
+        document.addEventListener('DOMContentLoaded', function() {
+            @for (int i = 0; i < Model.Exercises.Count; i++)
+            {
+                <text>
+                const select@(i) = document.getElementById('exercise-@i');
+                if (select@(i) && select@(i).value) {
+                    showMuscleGroups(select@(i), @i);
+                }
+                </text>
+            }
+        });
+
+        // Add exercise field
+        function addExerciseField() {
+            const container = document.getElementById('exercisesContainer');
+            const emptyState = document.getElementById('emptyState');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Hide empty state
+            emptyState.style.display = 'none';
+            
+            // Create exercise card
+            const exerciseCard = document.createElement('div');
+            exerciseCard.className = 'exercise-field-card';
+            exerciseCard.dataset.index = exerciseCounter;
+            exerciseCard.innerHTML = `
+                <input type="hidden" name="Exercises[${exerciseCounter}].Id" value="0" />
+                
+                <div class="exercise-field-header">
+                    <div class="exercise-field-order">
+                        <i class="fas fa-grip-vertical me-2"></i>
+                        <strong>Exercício ${exerciseCounter + 1}</strong>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExerciseField(${exerciseCounter})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="exercise-field-body">
+                    <!-- Exercise Selection -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-dumbbell me-2"></i>Exercício
+                        </label>
+                        <select name="Exercises[${exerciseCounter}].ExerciseId" 
+                                class="form-select exercise-select" 
+                                id="exercise-${exerciseCounter}"
+                                onchange="showMuscleGroups(this, ${exerciseCounter})"
+                                required>
+                            <option value="">Selecione um exercício</option>
+                            ${exercisesList.map(e => `<option value="${e.Id}">${e.Name}</option>`).join('')}
+                        </select>
+                        <div id="muscleGroups-${exerciseCounter}" class="mt-2 muscle-groups-container"></div>
+                    </div>
+
+                    <!-- Row for Sets and Reps -->
+                    <div class="row g-3">
+                        <!-- Sets -->
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="fas fa-layer-group me-2"></i>Séries
+                            </label>
+                            <div class="number-input-group input-group">
+                                <button type="button" 
+                                        class="btn btn-number-control" 
+                                        onclick="decrementValue('sets-${exerciseCounter}', 1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" 
+                                       name="Exercises[${exerciseCounter}].TargetSets" 
+                                       class="form-control text-center" 
+                                       id="sets-${exerciseCounter}"
+                                       value="3"
+                                       min="1" 
+                                       max="100"
+                                       required>
+                                <button type="button" 
+                                        class="btn btn-number-control" 
+                                        onclick="incrementValue('sets-${exerciseCounter}', 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Reps -->
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="fas fa-redo me-2"></i>Repetições
+                            </label>
+                            <input type="text" 
+                                   name="Exercises[${exerciseCounter}].TargetReps" 
+                                   class="form-control" 
+                                   value="12"
+                                   placeholder="ex: 12 ou 10-12"
+                                   pattern="^\\d+(\\s*-\\s*\\d+)?$"
+                                   required>
+                            <small class="text-muted">Ex: 12 ou 10-12</small>
+                        </div>
+
+                        <!-- Rest -->
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="fas fa-clock me-2"></i>Descanso (s)
+                            </label>
+                            <div class="number-input-group input-group">
+                                <button type="button" 
+                                        class="btn btn-number-control" 
+                                        onclick="decrementValue('rest-${exerciseCounter}', 15)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" 
+                                       name="Exercises[${exerciseCounter}].RecommendedRestSeconds" 
+                                       class="form-control text-center" 
+                                       id="rest-${exerciseCounter}"
+                                       value="60"
+                                       min="0" 
+                                       max="3600"
+                                       step="15">
+                                <span class="input-group-text-addon">s</span>
+                                <button type="button" 
+                                        class="btn btn-number-control" 
+                                        onclick="incrementValue('rest-${exerciseCounter}', 15)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Order Field -->
+                    <input type="hidden" name="Exercises[${exerciseCounter}].Order" value="${exerciseCounter + 1}" />
+                </div>
+            `;
+
+            container.appendChild(exerciseCard);
+            
+            // Animate card appearance
+            setTimeout(() => {
+                exerciseCard.style.opacity = '1';
+                exerciseCard.style.transform = 'translateY(0)';
+            }, 10);
+
+            exerciseCounter++;
+            
+            // Enable submit button
+            submitBtn.disabled = false;
+
+            // Update exercise numbers
+            updateExerciseNumbers();
+        }
+
+        // Remove exercise field
+        function removeExerciseField(index) {
+            const card = document.querySelector(`[data-index="${index}"]`);
+            if (!card) return;
+
+            // Animate removal
+            card.style.opacity = '0';
+            card.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                card.remove();
+                
+                // Check if container is empty
+                const container = document.getElementById('exercisesContainer');
+                const emptyState = document.getElementById('emptyState');
+                
+                if (container.children.length === 0) {
+                    emptyState.style.display = 'flex';
+                }
+                
+                // Update exercise numbers and indices
+                updateExerciseNumbers();
+            }, 300);
+        }
+
+        // Update exercise numbers and order values
+        function updateExerciseNumbers() {
+            const cards = document.querySelectorAll('.exercise-field-card');
+            cards.forEach((card, index) => {
+                const orderSpan = card.querySelector('.exercise-field-order strong');
+                orderSpan.textContent = `Exercício ${index + 1}`;
+                
+                const orderInput = card.querySelector('input[name*=".Order"]');
+                if (orderInput) {
+                    orderInput.value = index + 1;
+                }
+            });
+        }
+
+        // Increment value
+        function incrementValue(inputId, step) {
+            const input = document.getElementById(inputId);
+            const currentValue = parseFloat(input.value) || 0;
+            const maxValue = parseFloat(input.max);
+            const newValue = currentValue + step;
+            
+            if (newValue <= maxValue) {
+                input.value = newValue;
+            }
+        }
+
+        // Decrement value
+        function decrementValue(inputId, step) {
+            const input = document.getElementById(inputId);
+            const currentValue = parseFloat(input.value) || 0;
+            const minValue = parseFloat(input.min);
+            const newValue = currentValue - step;
+            
+            if (newValue >= minValue) {
+                input.value = newValue;
+            }
+        }
+
+        // Show muscle groups when exercise is selected
+        function showMuscleGroups(selectElement, index) {
+            const exerciseId = parseInt(selectElement.value);
+            const container = document.getElementById(`muscleGroups-${index}`);
+            
+            if (!exerciseId) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            const exercise = exercisesList.find(e => e.Id === exerciseId);
+            if (!exercise || !exercise.MuscleGroups || exercise.MuscleGroups.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            // Sort: primary first, then alphabetically
+            const sortedGroups = [...exercise.MuscleGroups].sort((a, b) => {
+                if (a.IsPrimary !== b.IsPrimary) return b.IsPrimary ? 1 : -1;
+                return a.Name.localeCompare(b.Name);
+            });
+            
+            const badgesHtml = sortedGroups.map(mg => {
+                const badgeClass = mg.IsPrimary ? 'badge bg-primary' : 'badge bg-secondary';
+                const icon = mg.IsPrimary ? '<i class="fas fa-star me-1"></i>' : '';
+                return `<span class="${badgeClass} me-1 mb-1">${icon}${mg.Name}</span>`;
+            }).join('');
+            
+            container.innerHTML = `<div class="d-flex flex-wrap">${badgesHtml}</div>`;
+            
+            // Animate badges
+            setTimeout(() => {
+                container.querySelectorAll('.badge').forEach((badge, i) => {
+                    badge.style.opacity = '0';
+                    badge.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        badge.style.transition = 'all 0.3s ease';
+                        badge.style.opacity = '1';
+                        badge.style.transform = 'scale(1)';
+                    }, i * 50);
+                });
+            }, 10);
+        }
+    </script>
+}
