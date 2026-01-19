@@ -27,6 +27,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Training" asp-action="Index">Meus Treinos</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="WorkoutPlan" asp-action="Index">Meus Planos</a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav">
                         @if (User?.Identity?.IsAuthenticated == true)
