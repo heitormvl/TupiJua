@@ -1,0 +1,198 @@
+@model TupiJua.ViewModels.LogExerciseViewModel
+
+@{
+    ViewData["Title"] = "Adicionar Exercício";
+    var exercises = ViewBag.Exercises as List<TupiJua.Models.Exercise> ?? new List<TupiJua.Models.Exercise>();
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <!-- Header Card -->
+            <div class="exercise-header-card mb-4">
+                <h2 class="mb-2">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Adicionar Exercício
+                </h2>
+                <p class="text-muted mb-0">Registre os detalhes do seu exercício</p>
+            </div>
+
+            <!-- Last Exercise Info (will be populated by JS) -->
+            <div id="lastExerciseInfo" class="last-exercise-card mb-4" style="display: none;">
+                <div class="d-flex align-items-start">
+                    <div class="last-exercise-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-2">Última vez que fez este exercício:</h6>
+                        <div id="lastExerciseData" class="last-exercise-data"></div>
+                    </div>
+                    <button type="button" class="btn-close btn-sm" onclick="closeLastExerciseInfo()"></button>
+                </div>
+            </div>
+
+            <!-- Main Form Card -->
+            <div class="exercise-form-card">
+                <form asp-action="AddExercise" method="post" id="exerciseForm">
+                    <input type="hidden" asp-for="WorkoutSessionId" />
+
+                    <!-- Exercise Selection -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-dumbbell me-2"></i>
+                            Exercício
+                        </label>
+                        <select asp-for="ExerciseId" class="form-select form-select-lg" id="exerciseSelect" required>
+                            <option value="">Selecione um exercício</option>
+                            @foreach (var exercise in exercises.OrderBy(e => e.Name))
+                            {
+                                <option value="@exercise.Id">@exercise.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ExerciseId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Sets -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-redo me-2"></i>
+                            Séries
+                        </label>
+                        <div class="number-input-group">
+                            <button type="button" class="btn-number-control" onclick="decrementValue('Sets', 1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input asp-for="Sets" type="number" class="form-control form-control-lg text-center" 
+                                   id="Sets" min="1" max="100" value="3" required />
+                            <button type="button" class="btn-number-control" onclick="incrementValue('Sets', 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Sets" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Reps -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-hashtag me-2"></i>
+                            Repetições
+                        </label>
+                        <div class="input-group input-group-lg">
+                            <input asp-for="Reps" type="text" class="form-control" 
+                                   placeholder="Ex: 12 ou 10-12" id="Reps" required />
+                            <span class="input-group-text">reps</span>
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Digite um número (ex: 12) ou uma faixa (ex: 10-12)
+                        </small>
+                        <span asp-validation-for="Reps" class="text-danger small d-block"></span>
+                    </div>
+
+                    <!-- Weight -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-weight-hanging me-2"></i>
+                            Carga
+                        </label>
+                        <div class="number-input-group">
+                            <button type="button" class="btn-number-control" onclick="decrementValue('Weight', 0.5)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input asp-for="Weight" type="number" class="form-control form-control-lg text-center" 
+                                   id="Weight" min="0" max="999.99" step="0.5" value="0" required />
+                            <button type="button" class="btn-number-control" onclick="incrementValue('Weight', 0.5)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <span class="input-group-text-addon">kg</span>
+                        </div>
+                        <span asp-validation-for="Weight" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Rest Seconds -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-stopwatch me-2"></i>
+                            Descanso entre séries
+                        </label>
+                        <div class="number-input-group">
+                            <button type="button" class="btn-number-control" onclick="decrementValue('RestSeconds', 15)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input asp-for="RestSeconds" type="number" class="form-control form-control-lg text-center" 
+                                   id="RestSeconds" min="0" max="3600" step="15" value="60" required />
+                            <button type="button" class="btn-number-control" onclick="incrementValue('RestSeconds', 15)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <span class="input-group-text-addon">seg</span>
+                        </div>
+                        <span asp-validation-for="RestSeconds" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Progress Flag -->
+                    <div class="form-section">
+                        <div class="progress-flag-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <label class="form-label mb-1">
+                                        <i class="fas fa-arrow-up me-2"></i>
+                                        Aumentar dificuldade no próximo?
+                                    </label>
+                                    <p class="small text-muted mb-0">
+                                        Marque se pretende aumentar carga ou repetições no próximo treino
+                                    </p>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input asp-for="ShouldIncreaseLoad" class="form-check-input" type="checkbox" 
+                                           role="switch" id="ShouldIncreaseLoad" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observation -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-sticky-note me-2"></i>
+                            Observações (opcional)
+                        </label>
+                        <textarea asp-for="Observation" class="form-control" rows="3" 
+                                  placeholder="Ex: Senti um pouco de dor no ombro direito..." 
+                                  maxlength="1000"></textarea>
+                        <span asp-validation-for="Observation" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" name="action" value="continue" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Salvar e Adicionar Próximo
+                        </button>
+                        <button type="submit" name="action" value="finish" class="btn btn-primary btn-lg">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Salvar e Voltar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Quick Tips Card -->
+            <div class="tips-card mt-4">
+                <h6 class="mb-3">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    Dicas Rápidas
+                </h6>
+                <ul class="tips-list">
+                    <li><i class="fas fa-check text-success me-2"></i>Use os botões <strong>+ / -</strong> para ajustes rápidos</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Marque "Aumentar dificuldade" quando sentir que está fácil</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Adicione observações importantes sobre forma ou sensações</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/training.js"></script>
+}

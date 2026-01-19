@@ -34,6 +34,11 @@ namespace TupiJua.Models
         public string Name { get; set; } = null!;
 
         /// <summary>
+        /// Indica se o plano está ativo.
+        /// </summary>
+        public bool IsActive { get; set; } = true;
+
+        /// <summary>
         /// Data e hora de criação do plano.
         /// </summary>
         [Column(TypeName = "datetime")]
