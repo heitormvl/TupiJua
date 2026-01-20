@@ -147,14 +147,14 @@
                                             <button type="button" class="btn-number-control" onclick="decrementValue('rest-@i', 15)">
                                                 <i class="fas fa-minus"></i>
                                             </button>
-                                            <input name="Exercises[@i].RecommendedRestSeconds" 
+                                            <input name="Exercises[@i].RecommendedRestTime" 
                                                    type="number" 
                                                    class="form-control text-center" 
                                                    id="rest-@i"
                                                    min="0" 
                                                    max="3600" 
                                                    step="15" 
-                                                   value="@Model.Exercises[i].RecommendedRestSeconds" 
+                                                   value="@Model.Exercises[i].RecommendedRestTime" 
                                                    required />
                                             <button type="button" class="btn-number-control" onclick="incrementValue('rest-@i', 15)">
                                                 <i class="fas fa-plus"></i>
@@ -321,7 +321,7 @@
                             <button type="button" class="btn-number-control" onclick="decrementValue('rest-${exerciseCounter}', 15)">
                                 <i class="fas fa-minus"></i>
                             </button>
-                            <input name="Exercises[${exerciseCounter}].RecommendedRestSeconds" 
+                            <input name="Exercises[${exerciseCounter}].RecommendedRestTime" 
                                    type="number" 
                                    class="form-control text-center" 
                                    id="rest-${exerciseCounter}"

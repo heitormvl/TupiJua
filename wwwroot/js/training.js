@@ -102,14 +102,14 @@ function loadLastExerciseData(exerciseId) {
                     );
                     document.getElementById('Weight').value = suggestedWeight.toFixed(2);
                     
-                    document.getElementById('RestSeconds').value = data.restSeconds;
+                    document.getElementById('RestTime').value = data.restTime;
                     document.getElementById('ShouldIncreaseLoad').checked = true;
                 } else {
                     // Just pre-fill with same values
                     document.getElementById('Sets').value = data.sets;
                     document.getElementById('Reps').value = data.reps;
                     document.getElementById('Weight').value = data.weight.toFixed(2);
-                    document.getElementById('RestSeconds').value = data.restSeconds;
+                    document.getElementById('RestTime').value = data.restTime;
                 }
             }
         })
@@ -152,7 +152,7 @@ function displayLastExerciseInfo(data) {
             <div class="col-6 col-sm-3">
                 <div class="last-exercise-stat">
                     <small class="text-muted">Descanso</small>
-                    <strong>${data.restSeconds}s</strong>
+                    <strong>${data.restTime}s</strong>
                 </div>
             </div>
         </div>

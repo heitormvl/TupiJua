@@ -224,7 +224,10 @@ namespace TupiJua.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("RestSeconds")
+                    b.Property<bool>("RestInMinutes")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("RestTime")
                         .HasColumnType("int");
 
                     b.Property<int>("Sets")
@@ -391,8 +394,11 @@ namespace TupiJua.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int>("RecommendedRestSeconds")
+                    b.Property<int>("RecommendedRestTime")
                         .HasColumnType("int");
+
+                    b.Property<bool>("RestInMinutes")
+                        .HasColumnType("bit");
 
                     b.Property<string>("TargetReps")
                         .HasMaxLength(50)

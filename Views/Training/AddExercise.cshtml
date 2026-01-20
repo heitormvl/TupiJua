@@ -7,7 +7,7 @@
     var exercise = ViewBag.Exercise as TupiJua.Models.Exercise;
     var targetSets = ViewBag.TargetSets as int? ?? 0;
     var targetReps = ViewBag.TargetReps as string;
-    var recommendedRestSeconds = ViewBag.RecommendedRestSeconds as int? ?? 0;
+    var recommendedRestTime = ViewBag.RecommendedRestTime as int? ?? 0;
 }
 
 <div class="container-fluid px-3 px-md-4 py-4">
@@ -48,12 +48,12 @@
                                         <strong class="text-primary">@targetReps</strong>
                                     </div>
                                 </div>
-                                @if (recommendedRestSeconds > 0)
+                                @if (recommendedRestTime > 0)
                                 {
                                     <div class="col-6 col-sm-3">
                                         <div class="last-exercise-stat">
                                             <small class="text-muted">Descanso</small>
-                                            <strong class="text-primary">@recommendedRestSeconds seg</strong>
+                                            <strong class="text-primary">@recommendedRestTime seg</strong>
                                         </div>
                                     </div>
                                 }
@@ -180,14 +180,14 @@
                             <button type="button" class="btn-number-control" onclick="decrementValue('RestSeconds', 15)">
                                 <i class="fas fa-minus"></i>
                             </button>
-                            <input asp-for="RestSeconds" type="number" class="form-control form-control-lg text-center" 
-                                   id="RestSeconds" min="0" max="3600" step="15" value="60" required />
+                            <input asp-for="RestTime" type="number" class="form-control form-control-lg text-center" 
+                                   id="RestTime" min="0" max="3600" step="15" value="60" required />
                             <button type="button" class="btn-number-control" onclick="incrementValue('RestSeconds', 15)">
                                 <i class="fas fa-plus"></i>
                             </button>
                             <span class="input-group-text-addon">seg</span>
                         </div>
-                        <span asp-validation-for="RestSeconds" class="text-danger small"></span>
+                        <span asp-validation-for="RestTime" class="text-danger small"></span>
                     </div>
 
                     <!-- Progress Flag -->
