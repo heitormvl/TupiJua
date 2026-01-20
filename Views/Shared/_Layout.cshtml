@@ -10,6 +10,20 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TupiJua.styles.css" asp-append-version="true" />
     <script src="https://kit.fontawesome.com/aeecc34f9e.js" crossorigin="anonymous"></script>
+
+    <link rel="manifest" href="~/manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <link rel="apple-touch-icon" href="/images/icon-192.png">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registrado!', reg))
+                    .catch(err => console.log('Falha ao registrar SW', err));
+            });
+        }
+    </script>
 </head>
 
 <body>
@@ -44,7 +58,8 @@
                                 </li>
                             }
                         </ul>
-                        <ul class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap">
+                        <ul
+                            class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap">
                             <li class="nav-item">
                                 <a class="btn btn-outline-primary mb-2 mb-md-0 me-2" asp-controller="User"
                                     asp-action="Index">
@@ -62,7 +77,8 @@
                     }
                     else
                     {
-                        <ul class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap">
+                        <ul
+                            class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap">
                             <li class="nav-item">
                                 <a class="btn btn-primary mb-2 mb-md-0 me-2" asp-controller="User" asp-action="Login">
                                     <i class="fas fa-sign-in-alt"></i> Login
@@ -84,12 +100,6 @@
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - TupiJua - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
