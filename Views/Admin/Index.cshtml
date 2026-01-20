@@ -1,0 +1,103 @@
+@model (int muscleGroupCount, int exerciseCount)
+
+@{
+    ViewData["Title"] = "Administração";
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row g-3 g-md-4">
+        <!-- Hero Section -->
+        <div class="col-12">
+            <div class="hero-card">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <i class="fas fa-tools me-2"></i>
+                        Administração
+                    </h1>
+                    <p class="hero-subtitle">Gerencie exercícios e grupos musculares</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="stat-card stat-card-1">
+                <div class="stat-icon">
+                    <i class="fas fa-dumbbell"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.exerciseCount</div>
+                    <div class="stat-label">Exercícios</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="stat-card stat-card-2">
+                <div class="stat-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.muscleGroupCount</div>
+                    <div class="stat-label">Grupos Musculares</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-12 col-lg-4">
+            <div class="stat-card stat-card-3">
+                <div class="stat-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">@(Model.exerciseCount * 2)</div>
+                    <div class="stat-label">Associações</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Actions -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-4">
+                        <i class="fas fa-cog me-2"></i>
+                        Gerenciar
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="admin-action-card">
+                                <div class="admin-action-icon bg-primary">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="admin-action-content">
+                                    <h6>Grupos Musculares</h6>
+                                    <p class="text-muted mb-3">Adicione e edite grupos musculares como Peitoral, Costas, etc.</p>
+                                    <a asp-action="MuscleGroups" class="btn btn-primary">
+                                        <i class="fas fa-arrow-right me-2"></i>
+                                        Gerenciar Grupos
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="admin-action-card">
+                                <div class="admin-action-icon bg-success">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div class="admin-action-content">
+                                    <h6>Exercícios</h6>
+                                    <p class="text-muted mb-3">Cadastre novos exercícios e associe com grupos musculares.</p>
+                                    <a asp-action="Exercises" class="btn btn-success">
+                                        <i class="fas fa-arrow-right me-2"></i>
+                                        Gerenciar Exercícios
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

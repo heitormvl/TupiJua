@@ -1134,3 +1134,214 @@ body {
     display: none;
   }
 }
+
+/* ======================================
+   ADMIN PAGES STYLES
+   ====================================== */
+
+/* Admin Action Cards */
+.admin-action-card {
+    display: flex;
+    align-items: start;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.admin-action-card:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.admin-action-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.admin-action-content {
+    flex: 1;
+}
+
+.admin-action-content h6 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.admin-action-content p {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* Muscle Group Color Badge */
+.muscle-group-color-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Exercise Admin Card */
+.exercise-admin-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.exercise-admin-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.exercise-admin-header {
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.exercise-admin-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.exercise-admin-body {
+    padding: 1.25rem;
+    flex: 1;
+}
+
+.exercise-admin-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+.exercise-admin-footer {
+    padding: 1rem 1.25rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Muscle Group Selection */
+.muscle-group-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.muscle-group-checkbox-card {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.muscle-group-checkbox-card:hover {
+    background: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.muscle-group-checkbox-card .form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+}
+
+.muscle-group-checkbox-card .form-check-input {
+    margin: 0;
+    cursor: pointer;
+}
+
+.muscle-group-checkbox-card .form-check-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+.muscle-group-color-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.muscle-group-name {
+    font-weight: 500;
+}
+
+.primary-check-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    padding-left: 1rem;
+}
+
+.primary-check-wrapper .form-check-input {
+    margin: 0;
+}
+
+.primary-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    white-space: nowrap;
+    margin: 0;
+    cursor: pointer;
+}
+
+.primary-label i {
+    color: #ffc107;
+}
+
+.primary-check:checked ~ .primary-label {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Color Picker Styles */
+.form-control-color {
+    width: 60px;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.25rem;
+}
+
+/* Admin Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .admin-action-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .muscle-group-checkbox-card .form-check {
+        flex-wrap: wrap;
+    }
+    
+    .primary-check-wrapper {
+        margin-left: 0;
+        padding-left: 0;
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+}
+

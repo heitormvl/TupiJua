@@ -1,0 +1,143 @@
+@model TupiJua.ViewModels.ExerciseViewModel
+
+@{
+    ViewData["Title"] = "Novo Exercício";
+    var muscleGroups = ViewBag.MuscleGroups as List<TupiJua.Models.MuscleGroup> ?? new List<TupiJua.Models.MuscleGroup>();
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <!-- Header -->
+            <div class="mb-4">
+                <h1 class="h3 mb-2">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Novo Exercício
+                </h1>
+                <p class="text-muted mb-0">Cadastre um novo exercício e associe com grupos musculares</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card">
+                <div class="card-body p-4">
+                    <form asp-action="CreateExercise" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Name Field -->
+                        <div class="form-section mb-4">
+                            <label asp-for="Name" class="form-label">
+                                <i class="fas fa-dumbbell me-2"></i>
+                                Nome do Exercício
+                            </label>
+                            <input asp-for="Name" class="form-control form-control-lg" 
+                                   placeholder="Ex: Supino Reto, Agachamento Livre..." 
+                                   autocomplete="off" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="form-section mb-4">
+                            <label asp-for="Description" class="form-label">
+                                <i class="fas fa-align-left me-2"></i>
+                                Descrição
+                            </label>
+                            <textarea asp-for="Description" class="form-control" 
+                                      rows="4"
+                                      placeholder="Descreva o exercício, forma de execução, dicas... (opcional)"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- Muscle Groups Selection -->
+                        <div class="form-section mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-layer-group me-2"></i>
+                                Grupos Musculares
+                            </label>
+                            @if (muscleGroups.Any())
+                            {
+                                <div class="muscle-group-selection">
+                                    @foreach (var mg in muscleGroups)
+                                    {
+                                        <div class="muscle-group-checkbox-card">
+                                            <div class="form-check">
+                                                <input class="form-check-input muscle-group-check" 
+                                                       type="checkbox" 
+                                                       name="MuscleGroupIds" 
+                                                       value="@mg.Id" 
+                                                       id="mg_@mg.Id" />
+                                                <label class="form-check-label flex-grow-1" for="mg_@mg.Id">
+                                                    @if (!string.IsNullOrEmpty(mg.Color))
+                                                    {
+                                                        <span class="muscle-group-color-dot" style="background-color: #@mg.Color;"></span>
+                                                    }
+                                                    <span class="muscle-group-name">@mg.Name</span>
+                                                </label>
+                                                <div class="primary-check-wrapper">
+                                                    <input class="form-check-input primary-check" 
+                                                           type="checkbox" 
+                                                           name="PrimaryMuscleGroupIds" 
+                                                           value="@mg.Id" 
+                                                           id="primary_@mg.Id"
+                                                           disabled />
+                                                    <label class="form-check-label primary-label" for="primary_@mg.Id">
+                                                        <i class="fas fa-star"></i>
+                                                        Primário
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Selecione os grupos musculares e marque como primários os principais
+                                </small>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Nenhum grupo muscular cadastrado. <a asp-action="CreateMuscleGroup">Cadastre um grupo</a> primeiro.
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <a asp-action="Exercises" class="btn btn-lg btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-lg btn-success">
+                                <i class="fas fa-save me-2"></i>
+                                Salvar Exercício
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Enable/disable primary checkbox based on muscle group selection
+        document.querySelectorAll('.muscle-group-check').forEach(function(checkbox) {
+            const mgId = checkbox.value;
+            const primaryCheckbox = document.getElementById('primary_' + mgId);
+            
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    primaryCheckbox.disabled = false;
+                } else {
+                    primaryCheckbox.disabled = true;
+                    primaryCheckbox.checked = false;
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,132 @@
+@model TupiJua.ViewModels.MuscleGroupViewModel
+
+@{
+    ViewData["Title"] = "Editar Grupo Muscular";
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <!-- Header -->
+            <div class="mb-4">
+                <h1 class="h3 mb-2">
+                    <i class="fas fa-edit me-2"></i>
+                    Editar Grupo Muscular
+                </h1>
+                <p class="text-muted mb-0">Atualize as informações do grupo muscular</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card">
+                <div class="card-body p-4">
+                    <form asp-action="EditMuscleGroup" asp-route-id="@Model.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Name Field -->
+                        <div class="form-section mb-4">
+                            <label asp-for="Name" class="form-label">
+                                <i class="fas fa-tag me-2"></i>
+                                Nome do Grupo
+                            </label>
+                            <input asp-for="Name" class="form-control form-control-lg" 
+                                   placeholder="Ex: Peitoral, Costas, Pernas..." 
+                                   autocomplete="off" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Color Field -->
+                        <div class="form-section mb-4">
+                            <label asp-for="Color" class="form-label">
+                                <i class="fas fa-palette me-2"></i>
+                                Cor (Hexadecimal)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">#</span>
+                                <input asp-for="Color" class="form-control" 
+                                       placeholder="1a73e8" 
+                                       maxlength="6"
+                                       autocomplete="off" />
+                                <input type="color" class="form-control form-control-color" 
+                                       id="colorPicker" 
+                                       title="Escolha uma cor" />
+                                <button type="button" class="btn btn-outline-secondary" id="randomColorBtn" title="Gerar cor aleatória">
+                                    <i class="fas fa-random"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Color" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Código hexadecimal de 6 caracteres (sem #)
+                            </small>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="form-section mb-4">
+                            <label asp-for="Description" class="form-label">
+                                <i class="fas fa-align-left me-2"></i>
+                                Descrição
+                            </label>
+                            <textarea asp-for="Description" class="form-control" 
+                                      rows="4"
+                                      placeholder="Descreva o grupo muscular (opcional)..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <a asp-action="MuscleGroups" class="btn btn-lg btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-lg btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Color picker sync
+        const colorInput = document.getElementById('Color');
+        const colorPicker = document.getElementById('colorPicker');
+        const randomColorBtn = document.getElementById('randomColorBtn');
+
+        if (colorInput && colorPicker) {
+            // Update color picker when input changes
+            colorInput.addEventListener('input', function() {
+                if (this.value.length === 6) {
+                    colorPicker.value = '#' + this.value;
+                }
+            });
+
+            // Update input when color picker changes
+            colorPicker.addEventListener('input', function() {
+                colorInput.value = this.value.substring(1);
+            });
+
+            // Initialize color picker if there's a value
+            if (colorInput.value && colorInput.value.length === 6) {
+                colorPicker.value = '#' + colorInput.value;
+            }
+        }
+
+        // Random color generator
+        if (randomColorBtn) {
+            randomColorBtn.addEventListener('click', function() {
+                const randomColor = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+                colorInput.value = randomColor;
+                colorPicker.value = '#' + randomColor;
+            });
+        }
+    </script>
+}
