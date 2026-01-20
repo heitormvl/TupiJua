@@ -424,8 +424,12 @@ namespace TupiJua.Controllers
 
             if (existingLog != null)
             {
-                // Se já existe, apenas atualizar para pulado
-                existingLog.IsSkipped = true;
+                // Se já existe e não está pulado, não permitir pular exercício já completado
+                if (!existingLog.IsSkipped)
+                {
+                    return RedirectToAction("ExecutePlan", new { sessionId });
+                }
+                // Se já está pulado, não fazer nada
             }
             else
             {
