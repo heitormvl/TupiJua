@@ -31,35 +31,30 @@
                 <!-- Plan Name Card -->
                 <div class="exercise-form-card mb-4">
                     <h5 class="mb-3">
-                        <i class="fas fa-tag me-2 text-primary"></i>
+                        <i class="fas fa-tag me-2"></i>
                         Nome do Plano
                     </h5>
                     <div class="form-section">
-                        <div class="form-floating">
-                            <input asp-for="Name" 
-                                   class="form-control" 
-                                   id="planName" 
-                                   placeholder="Nome do plano"
-                                   autocomplete="off">
-                            <label for="planName">
-                                <i class="fas fa-dumbbell me-2"></i>Nome do Plano
-                            </label>
-                            <span asp-validation-for="Name" class="text-danger small"></span>
-                        </div>
+                        <label asp-for="Name" class="form-label">
+                            <i class="fas fa-bookmark me-2"></i>
+                            Dê um nome para seu treino
+                        </label>
+                        <input asp-for="Name" class="form-control form-control-lg" 
+                               placeholder="Ex: Treino A - Peito e Tríceps" required />
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Use nomes descritivos para facilitar a identificação
+                        </small>
+                        <span asp-validation-for="Name" class="text-danger small d-block"></span>
                     </div>
                 </div>
 
                 <!-- Exercises Section -->
                 <div class="exercise-form-card mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h5 class="mb-0">
-                            <i class="fas fa-list-ol me-2 text-primary"></i>
-                            Exercícios
-                        </h5>
-                        <button type="button" class="btn btn-primary" onclick="addExerciseField()">
-                            <i class="fas fa-plus me-2"></i>Adicionar Exercício
-                        </button>
-                    </div>
+                    <h5 class="mb-3">
+                        <i class="fas fa-dumbbell me-2"></i>
+                        Exercícios
+                    </h5>
 
                     <!-- Exercises Container -->
                     <div id="exercisesContainer" class="exercises-container">
@@ -74,7 +69,7 @@
                                         <strong>Exercício @(i + 1)</strong>
                                     </div>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExerciseField(@i)">
-                                        <i class="fas fa-times"></i>
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
 
@@ -103,74 +98,68 @@
 
                                     <!-- Row for Sets and Reps -->
                                     <div class="row g-3">
-                                        <!-- Sets -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label class="form-label">
-                                                <i class="fas fa-layer-group me-2"></i>Séries
+                                                <i class="fas fa-redo me-2"></i>
+                                                Séries
                                             </label>
-                                            <div class="number-input-group input-group">
-                                                <button type="button" 
-                                                        class="btn btn-number-control" 
-                                                        onclick="decrementValue('sets-@i', 1)">
+                                            <div class="number-input-group">
+                                                <button type="button" class="btn-number-control" onclick="decrementValue('sets-@i', 1)">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
-                                                <input type="number" 
-                                                       name="Exercises[@i].TargetSets" 
+                                                <input name="Exercises[@i].TargetSets" 
+                                                       type="number" 
                                                        class="form-control text-center" 
                                                        id="sets-@i"
-                                                       value="@Model.Exercises[i].TargetSets"
                                                        min="1" 
-                                                       max="100"
-                                                       required>
-                                                <button type="button" 
-                                                        class="btn btn-number-control" 
-                                                        onclick="incrementValue('sets-@i', 1)">
+                                                       max="100" 
+                                                       value="@Model.Exercises[i].TargetSets" 
+                                                       required />
+                                                <button type="button" class="btn-number-control" onclick="incrementValue('sets-@i', 1)">
                                                     <i class="fas fa-plus"></i>
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <!-- Reps -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label class="form-label">
-                                                <i class="fas fa-redo me-2"></i>Repetições
+                                                <i class="fas fa-hashtag me-2"></i>
+                                                Repetições
                                             </label>
-                                            <input type="text" 
-                                                   name="Exercises[@i].TargetReps" 
+                                            <input name="Exercises[@i].TargetReps" 
+                                                   type="text" 
                                                    class="form-control" 
-                                                   value="@Model.Exercises[i].TargetReps"
-                                                   placeholder="ex: 12 ou 10-12"
+                                                   placeholder="Ex: 12 ou 10-12"
                                                    pattern="^\d+(\s*-\s*\d+)?$"
-                                                   required>
-                                            <small class="text-muted">Ex: 12 ou 10-12</small>
+                                                   title="Digite um número (ex: 12) ou faixa (ex: 10-12)"
+                                                   value="@Model.Exercises[i].TargetReps"
+                                                   required />
                                         </div>
+                                    </div>
 
-                                        <!-- Rest -->
-                                        <div class="col-md-4">
-                                            <label class="form-label">
-                                                <i class="fas fa-clock me-2"></i>Descanso (s)
-                                            </label>
-                                            <div class="number-input-group input-group">
-                                                <button type="button" 
-                                                        class="btn btn-number-control" 
-                                                        onclick="decrementValue('rest-@i', 15)">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
-                                                <input type="number" 
-                                                       name="Exercises[@i].RecommendedRestSeconds" 
-                                                       class="form-control text-center" 
-                                                       id="rest-@i"
-                                                       value="@Model.Exercises[i].RecommendedRestSeconds"
-                                                       min="0" 
-                                                       max="3600"
-                                                       step="15">
-                                                <span class="input-group-text-addon">s</span>
-                                                <button type="button" 
-                                                        class="btn btn-number-control" 
-                                                        onclick="incrementValue('rest-@i', 15)">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
+                                    <!-- Rest Time -->
+                                    <div class="form-section">
+                                        <label class="form-label">
+                                            <i class="fas fa-stopwatch me-2"></i>
+                                            Descanso entre séries
+                                        </label>
+                                        <div class="number-input-group">
+                                            <button type="button" class="btn-number-control" onclick="decrementValue('rest-@i', 15)">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input name="Exercises[@i].RecommendedRestSeconds" 
+                                                   type="number" 
+                                                   class="form-control text-center" 
+                                                   id="rest-@i"
+                                                   min="0" 
+                                                   max="3600" 
+                                                   step="15" 
+                                                   value="@Model.Exercises[i].RecommendedRestSeconds" 
+                                                   required />
+                                            <button type="button" class="btn-number-control" onclick="incrementValue('rest-@i', 15)">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <span class="input-group-text-addon">seg</span>
                                         </div>
                                     </div>
 
@@ -181,10 +170,18 @@
                         }
                     </div>
 
+                    <!-- Add Exercise Button -->
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn btn-primary" onclick="addExerciseField()">
+                            <i class="fas fa-plus me-2"></i>
+                            Adicionar Exercício
+                        </button>
+                    </div>
+
                     <!-- Empty State -->
                     <div id="emptyState" class="empty-exercise-state" style="display: @(Model.Exercises.Count == 0 ? "flex" : "none")">
-                        <i class="fas fa-dumbbell mb-3"></i>
-                        <p class="mb-0">Nenhum exercício adicionado. Clique em "Adicionar Exercício" para começar.</p>
+                        <i class="fas fa-clipboard-list"></i>
+                        <p class="mb-3">Nenhum exercício adicionado ainda</p>
                     </div>
                 </div>
 
@@ -253,7 +250,7 @@
                         <strong>Exercício ${exerciseCounter + 1}</strong>
                     </div>
                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExerciseField(${exerciseCounter})">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-trash"></i>
                     </button>
                 </div>
 
@@ -276,74 +273,67 @@
 
                     <!-- Row for Sets and Reps -->
                     <div class="row g-3">
-                        <!-- Sets -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label">
-                                <i class="fas fa-layer-group me-2"></i>Séries
+                                <i class="fas fa-redo me-2"></i>
+                                Séries
                             </label>
-                            <div class="number-input-group input-group">
-                                <button type="button" 
-                                        class="btn btn-number-control" 
-                                        onclick="decrementValue('sets-${exerciseCounter}', 1)">
+                            <div class="number-input-group">
+                                <button type="button" class="btn-number-control" onclick="decrementValue('sets-${exerciseCounter}', 1)">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <input type="number" 
-                                       name="Exercises[${exerciseCounter}].TargetSets" 
+                                <input name="Exercises[${exerciseCounter}].TargetSets" 
+                                       type="number" 
                                        class="form-control text-center" 
                                        id="sets-${exerciseCounter}"
-                                       value="3"
                                        min="1" 
-                                       max="100"
-                                       required>
-                                <button type="button" 
-                                        class="btn btn-number-control" 
-                                        onclick="incrementValue('sets-${exerciseCounter}', 1)">
+                                       max="100" 
+                                       value="3" 
+                                       required />
+                                <button type="button" class="btn-number-control" onclick="incrementValue('sets-${exerciseCounter}', 1)">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Reps -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label">
-                                <i class="fas fa-redo me-2"></i>Repetições
+                                <i class="fas fa-hashtag me-2"></i>
+                                Repetições
                             </label>
-                            <input type="text" 
-                                   name="Exercises[${exerciseCounter}].TargetReps" 
+                            <input name="Exercises[${exerciseCounter}].TargetReps" 
+                                   type="text" 
                                    class="form-control" 
-                                   value="12"
-                                   placeholder="ex: 12 ou 10-12"
+                                   placeholder="Ex: 12 ou 10-12"
                                    pattern="^\\d+(\\s*-\\s*\\d+)?$"
-                                   required>
-                            <small class="text-muted">Ex: 12 ou 10-12</small>
+                                   title="Digite um número (ex: 12) ou faixa (ex: 10-12)"
+                                   required />
                         </div>
+                    </div>
 
-                        <!-- Rest -->
-                        <div class="col-md-4">
-                            <label class="form-label">
-                                <i class="fas fa-clock me-2"></i>Descanso (s)
-                            </label>
-                            <div class="number-input-group input-group">
-                                <button type="button" 
-                                        class="btn btn-number-control" 
-                                        onclick="decrementValue('rest-${exerciseCounter}', 15)">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" 
-                                       name="Exercises[${exerciseCounter}].RecommendedRestSeconds" 
-                                       class="form-control text-center" 
-                                       id="rest-${exerciseCounter}"
-                                       value="60"
-                                       min="0" 
-                                       max="3600"
-                                       step="15">
-                                <span class="input-group-text-addon">s</span>
-                                <button type="button" 
-                                        class="btn btn-number-control" 
-                                        onclick="incrementValue('rest-${exerciseCounter}', 15)">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
+                    <!-- Rest Time -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            <i class="fas fa-stopwatch me-2"></i>
+                            Descanso entre séries
+                        </label>
+                        <div class="number-input-group">
+                            <button type="button" class="btn-number-control" onclick="decrementValue('rest-${exerciseCounter}', 15)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input name="Exercises[${exerciseCounter}].RecommendedRestSeconds" 
+                                   type="number" 
+                                   class="form-control text-center" 
+                                   id="rest-${exerciseCounter}"
+                                   min="0" 
+                                   max="3600" 
+                                   step="15" 
+                                   value="60" 
+                                   required />
+                            <button type="button" class="btn-number-control" onclick="incrementValue('rest-${exerciseCounter}', 15)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <span class="input-group-text-addon">seg</span>
                         </div>
                     </div>
 
