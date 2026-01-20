@@ -265,7 +265,8 @@ namespace TupiJua.Controllers
                         TargetSets = wpe.TargetSets,
                         TargetReps = wpe.TargetReps,
                         RecommendedRestSeconds = wpe.RecommendedRestSeconds,
-                        IsCompleted = session.LoggedExercises.Any(le => le.ExerciseId == wpe.ExerciseId)
+                        IsCompleted = session.LoggedExercises.Any(le => le.ExerciseId == wpe.ExerciseId && !le.IsSkipped),
+                        IsSkipped = session.LoggedExercises.Any(le => le.ExerciseId == wpe.ExerciseId && le.IsSkipped)
                     })
                     .ToList()
             };
@@ -379,6 +380,74 @@ namespace TupiJua.Controllers
             }
 
             return View("AddExercise", model);
+        }
+
+        /// <summary>
+        /// Marca um exercício como pulado em uma sessão de plano de treino.
+        /// </summary>
+        /// <param name="sessionId">ID da sessão de treino</param>
+        /// <param name="exerciseId">ID do exercício a ser pulado</param>
+        /// <returns>Redireciona para ExecutePlan</returns>
+        [HttpPost]
+        public async Task<IActionResult> SkipExerciseFromPlan(int sessionId, int exerciseId)
+        {
+            var session = await _context.WorkoutSessions
+                .Include(ws => ws.WorkoutPlan)
+                .ThenInclude(wp => wp!.PlanExercises)
+                .Include(ws => ws.LoggedExercises)
+                .FirstOrDefaultAsync(ws => ws.Id == sessionId);
+
+            if (session == null || session.WorkoutPlan == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Verificar se o usuário é o dono da sessão
+            var userId = _userManager.GetUserId(User);
+            if (session.UserId != userId)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Verificar se o exercício pertence ao plano
+            var planExercise = session.WorkoutPlan.PlanExercises
+                .FirstOrDefault(wpe => wpe.ExerciseId == exerciseId);
+
+            if (planExercise == null)
+            {
+                return RedirectToAction("ExecutePlan", new { sessionId });
+            }
+
+            // Verificar se o exercício já foi registrado (completado ou pulado)
+            var existingLog = session.LoggedExercises
+                .FirstOrDefault(le => le.ExerciseId == exerciseId);
+
+            if (existingLog != null)
+            {
+                // Se já existe, apenas atualizar para pulado
+                existingLog.IsSkipped = true;
+            }
+            else
+            {
+                // Criar novo registro marcado como pulado
+                var skippedExercise = new LoggedExercise
+                {
+                    WorkoutSessionId = sessionId,
+                    ExerciseId = exerciseId,
+                    Sets = 0,
+                    Reps = "0",
+                    IntegerReps = 0,
+                    Weight = 0,
+                    RestSeconds = 0,
+                    IsSkipped = true
+                };
+
+                _context.LoggedExercises.Add(skippedExercise);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ExecutePlan", new { sessionId });
         }
 
         /// <summary>

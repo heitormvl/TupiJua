@@ -83,5 +83,10 @@ namespace TupiJua.Models
         /// Flag indicando se deve aumentar a carga no próximo treino.
         /// </summary>
         public bool ShouldIncreaseLoad { get; set; } = false;
+
+        /// <summary>
+        /// Flag indicando se o exercício foi pulado na sessão.
+        /// </summary>
+        public bool IsSkipped { get; set; } = false;
     }
 }
