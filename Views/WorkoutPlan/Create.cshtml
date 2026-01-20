@@ -196,7 +196,7 @@
                             Descanso entre séries
                         </label>
                         <div class="number-input-group">
-                            <button type="button" class="btn-number-control" onclick="decrementValue('rest-${exerciseCounter}', 15)">
+                            <button type="button" class="btn-number-control" onclick="decrementRestValue(${exerciseCounter})">
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input name="Exercises[${exerciseCounter}].RecommendedRestTime" 
@@ -208,11 +208,14 @@
                                    step="15" 
                                    value="60" 
                                    required />
-                            <button type="button" class="btn-number-control" onclick="incrementValue('rest-${exerciseCounter}', 15)">
+                            <button type="button" class="btn-number-control" onclick="incrementRestValue(${exerciseCounter})">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            <span class="input-group-text-addon">seg</span>
+                            <button type="button" class="input-group-text-addon unit-toggle" id="restUnitToggle-${exerciseCounter}" onclick="toggleRestUnitPlan(${exerciseCounter})" style="cursor: pointer; user-select: none;">
+                                seg
+                            </button>
                         </div>
+                        <input name="Exercises[${exerciseCounter}].RestInMinutes" type="hidden" id="restInMinutes-${exerciseCounter}" value="false" />
                     </div>
 
                     <!-- Hidden Order Field -->
@@ -344,6 +347,64 @@
                     }, i * 50);
                 });
             }, 10);
+        }
+
+        // Toggle rest time unit between seconds and minutes for plan exercises
+        function toggleRestUnitPlan(index) {
+            const restInMinutesInput = document.getElementById(`restInMinutes-${index}`);
+            const restUnitToggle = document.getElementById(`restUnitToggle-${index}`);
+            const restTimeInput = document.getElementById(`rest-${index}`);
+            
+            if (!restInMinutesInput || !restUnitToggle || !restTimeInput) return;
+            
+            const isMinutes = restInMinutesInput.value === 'true';
+            const currentValue = parseInt(restTimeInput.value) || 0;
+            
+            if (isMinutes) {
+                // Convert from minutes to seconds
+                restInMinutesInput.value = 'false';
+                restUnitToggle.textContent = 'seg';
+                restTimeInput.value = currentValue * 60;
+                restTimeInput.step = 15;
+            } else {
+                // Convert from seconds to minutes
+                restInMinutesInput.value = 'true';
+                restUnitToggle.textContent = 'min';
+                restTimeInput.value = Math.round(currentValue / 60);
+                restTimeInput.step = 1;
+            }
+        }
+
+        // Increment rest time value
+        function incrementRestValue(index) {
+            const restTimeInput = document.getElementById(`rest-${index}`);
+            const restInMinutesInput = document.getElementById(`restInMinutes-${index}`);
+            
+            if (!restTimeInput || !restInMinutesInput) return;
+            
+            const isMinutes = restInMinutesInput.value === 'true';
+            const step = isMinutes ? 1 : 15;
+            const currentValue = parseInt(restTimeInput.value) || 0;
+            const maxValue = parseInt(restTimeInput.max) || 3600;
+            const newValue = Math.min(currentValue + step, maxValue);
+            
+            restTimeInput.value = newValue;
+        }
+
+        // Decrement rest time value
+        function decrementRestValue(index) {
+            const restTimeInput = document.getElementById(`rest-${index}`);
+            const restInMinutesInput = document.getElementById(`restInMinutes-${index}`);
+            
+            if (!restTimeInput || !restInMinutesInput) return;
+            
+            const isMinutes = restInMinutesInput.value === 'true';
+            const step = isMinutes ? 1 : 15;
+            const currentValue = parseInt(restTimeInput.value) || 0;
+            const minValue = parseInt(restTimeInput.min) || 0;
+            const newValue = Math.max(currentValue - step, minValue);
+            
+            restTimeInput.value = newValue;
         }
 
         // Initialize - add first exercise if coming back with errors

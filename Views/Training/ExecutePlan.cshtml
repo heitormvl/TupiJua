@@ -84,7 +84,7 @@
                                     {
                                         <span class="badge bg-light text-dark">
                                             <i class="fas fa-stopwatch me-1"></i>
-                                            @exercise.RecommendedRestTime seg
+                                            @exercise.RecommendedRestTime @(exercise.RestInMinutes ? "min" : "seg")
                                         </span>
                                     }
                                 </div>

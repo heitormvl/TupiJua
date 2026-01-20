@@ -103,6 +103,8 @@ function loadLastExerciseData(exerciseId) {
                     document.getElementById('Weight').value = suggestedWeight.toFixed(2);
                     
                     document.getElementById('RestTime').value = data.restTime;
+                    document.getElementById('RestInMinutes').value = data.restInMinutes;
+                    updateRestUnitToggle();
                     document.getElementById('ShouldIncreaseLoad').checked = true;
                 } else {
                     // Just pre-fill with same values
@@ -110,6 +112,8 @@ function loadLastExerciseData(exerciseId) {
                     document.getElementById('Reps').value = data.reps;
                     document.getElementById('Weight').value = data.weight.toFixed(2);
                     document.getElementById('RestTime').value = data.restTime;
+                    document.getElementById('RestInMinutes').value = data.restInMinutes;
+                    updateRestUnitToggle();
                 }
             }
         })
@@ -128,6 +132,8 @@ function displayLastExerciseInfo(data) {
     const increaseFlag = data.shouldIncreaseLoad 
         ? '<span class="badge bg-warning text-dark ms-2"><i class="fas fa-arrow-up me-1"></i>Aumentar</span>' 
         : '';
+    
+    const restUnit = data.restInMinutes ? 'min' : 'seg';
     
     dataContainer.innerHTML = `
         <div class="row g-2">
@@ -152,7 +158,7 @@ function displayLastExerciseInfo(data) {
             <div class="col-6 col-sm-3">
                 <div class="last-exercise-stat">
                     <small class="text-muted">Descanso</small>
-                    <strong>${data.restTime}s</strong>
+                    <strong>${data.restTime} ${restUnit}</strong>
                 </div>
             </div>
         </div>
@@ -208,6 +214,89 @@ function decrementValue(inputId, step) {
     // Add animation feedback
     input.classList.add('value-changed');
     setTimeout(() => input.classList.remove('value-changed'), 300);
+}
+
+// Toggle rest time unit between seconds and minutes
+function toggleRestUnit() {
+    const restInMinutesInput = document.getElementById('RestInMinutes');
+    const restUnitToggle = document.getElementById('restUnitToggle');
+    const restTimeInput = document.getElementById('RestTime');
+    
+    if (!restInMinutesInput || !restUnitToggle || !restTimeInput) return;
+    
+    const isMinutes = restInMinutesInput.value === 'true';
+    const currentValue = parseInt(restTimeInput.value) || 0;
+    
+    if (isMinutes) {
+        // Convert from minutes to seconds
+        restInMinutesInput.value = 'false';
+        restUnitToggle.textContent = 'seg';
+        restTimeInput.value = currentValue * 60;
+        restTimeInput.step = 15;
+    } else {
+        // Convert from seconds to minutes
+        restInMinutesInput.value = 'true';
+        restUnitToggle.textContent = 'min';
+        restTimeInput.value = Math.round(currentValue / 60);
+        restTimeInput.step = 1;
+    }
+    
+    // Add animation feedback
+    restUnitToggle.classList.add('value-changed');
+    setTimeout(() => restUnitToggle.classList.remove('value-changed'), 300);
+}
+
+// Update the rest unit toggle button text
+function updateRestUnitToggle() {
+    const restInMinutesInput = document.getElementById('RestInMinutes');
+    const restUnitToggle = document.getElementById('restUnitToggle');
+    const restTimeInput = document.getElementById('RestTime');
+    
+    if (!restInMinutesInput || !restUnitToggle || !restTimeInput) return;
+    
+    const isMinutes = restInMinutesInput.value === 'true';
+    restUnitToggle.textContent = isMinutes ? 'min' : 'seg';
+    restTimeInput.step = isMinutes ? 1 : 15;
+}
+
+// Increment rest time value
+function incrementRestTime() {
+    const restTimeInput = document.getElementById('RestTime');
+    const restInMinutesInput = document.getElementById('RestInMinutes');
+    
+    if (!restTimeInput || !restInMinutesInput) return;
+    
+    const isMinutes = restInMinutesInput.value === 'true';
+    const step = isMinutes ? 1 : 15;
+    const currentValue = parseInt(restTimeInput.value) || 0;
+    const maxValue = parseInt(restTimeInput.max) || 3600;
+    const newValue = Math.min(currentValue + step, maxValue);
+    
+    restTimeInput.value = newValue;
+    
+    // Add animation feedback
+    restTimeInput.classList.add('value-changed');
+    setTimeout(() => restTimeInput.classList.remove('value-changed'), 300);
+}
+
+// Decrement rest time value
+function decrementRestTime() {
+    const restTimeInput = document.getElementById('RestTime');
+    const restInMinutesInput = document.getElementById('RestInMinutes');
+    
+    if (!restTimeInput || !restInMinutesInput) return;
+    
+    const isMinutes = restInMinutesInput.value === 'true';
+    const step = isMinutes ? 1 : 15;
+    const currentValue = parseInt(restTimeInput.value) || 0;
+    const minValue = parseInt(restTimeInput.min) || 0;
+    const newValue = Math.max(currentValue - step, minValue);
+    
+    restTimeInput.value = newValue;
+    
+    // Add animation feedback
+    restTimeInput.classList.add('value-changed');
+    setTimeout(() => restTimeInput.classList.remove('value-changed'), 300);
 }
 
 // View workout details (placeholder - implement modal or navigate to details page)

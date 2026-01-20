@@ -8,6 +8,7 @@
     var targetSets = ViewBag.TargetSets as int? ?? 0;
     var targetReps = ViewBag.TargetReps as string;
     var recommendedRestTime = ViewBag.RecommendedRestTime as int? ?? 0;
+    var restInMinutes = ViewBag.RestInMinutes as bool? ?? false;
 }
 
 <div class="container-fluid px-3 px-md-4 py-4">
@@ -53,7 +54,7 @@
                                     <div class="col-6 col-sm-3">
                                         <div class="last-exercise-stat">
                                             <small class="text-muted">Descanso</small>
-                                            <strong class="text-primary">@recommendedRestTime seg</strong>
+                                            <strong class="text-primary">@recommendedRestTime @(restInMinutes ? "min" : "seg")</strong>
                                         </div>
                                     </div>
                                 }
@@ -170,23 +171,26 @@
                         <span asp-validation-for="Weight" class="text-danger small"></span>
                     </div>
 
-                    <!-- Rest Seconds -->
+                    <!-- Rest Time -->
                     <div class="form-section">
                         <label class="form-label">
                             <i class="fas fa-stopwatch me-2"></i>
                             Descanso entre séries
                         </label>
                         <div class="number-input-group">
-                            <button type="button" class="btn-number-control" onclick="decrementValue('RestSeconds', 15)">
+                            <button type="button" class="btn-number-control" onclick="decrementRestTime()">
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="RestTime" type="number" class="form-control form-control-lg text-center" 
                                    id="RestTime" min="0" max="3600" step="15" value="60" required />
-                            <button type="button" class="btn-number-control" onclick="incrementValue('RestSeconds', 15)">
+                            <button type="button" class="btn-number-control" onclick="incrementRestTime()">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            <span class="input-group-text-addon">seg</span>
+                            <button type="button" class="input-group-text-addon unit-toggle" id="restUnitToggle" onclick="toggleRestUnit()" style="cursor: pointer; user-select: none;">
+                                seg
+                            </button>
                         </div>
+                        <input type="hidden" asp-for="RestInMinutes" id="RestInMinutes" value="false" />
                         <span asp-validation-for="RestTime" class="text-danger small"></span>
                     </div>
 
