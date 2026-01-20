@@ -48,6 +48,31 @@ namespace TupiJua.Controllers
         }
 
         /// <summary>
+        /// Exibe os detalhes de uma sessão de treino.
+        /// </summary>
+        /// <param name="sessionId">ID da sessão de treino</param>
+        /// <returns>View com os detalhes da sessão</returns>
+        [HttpGet]
+        public async Task<IActionResult> ViewWorkout(int sessionId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var session = await _context.WorkoutSessions
+                .Include(ws => ws.WorkoutPlan)
+                .Include(ws => ws.LoggedExercises)
+                .ThenInclude(le => le.Exercise)
+                .ThenInclude(e => e.ExerciseMuscleGroups)
+                .ThenInclude(emg => emg.MuscleGroup)
+                .FirstOrDefaultAsync(ws => ws.Id == sessionId && ws.UserId == userId);
+
+            if (session == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(session);
+        }
+
+        /// <summary>
         /// Inicia uma nova sessão de treino livre para o usuário.
         /// </summary>
         /// <returns>Redireciona para a página de adicionar exercício na nova sessão</returns>
@@ -354,6 +379,29 @@ namespace TupiJua.Controllers
             }
 
             return View("AddExercise", model);
+        }
+
+        /// <summary>
+        /// Finaliza uma sessão de treino marcando-a como concluída.
+        /// </summary>
+        /// <param name="sessionId">ID da sessão de treino</param>
+        /// <returns>Redireciona para a visualização do treino concluído</returns>
+        [HttpPost]
+        public async Task<IActionResult> FinishWorkout(int sessionId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var session = await _context.WorkoutSessions
+                .FirstOrDefaultAsync(ws => ws.Id == sessionId && ws.UserId == userId);
+
+            if (session == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            session.IsCompleted = true;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ViewWorkout", new { sessionId });
         }
     }
 }

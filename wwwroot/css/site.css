@@ -1345,3 +1345,72 @@ body {
     }
 }
 
+/* ======================================
+   View Workout Details Page Styles
+   ====================================== */
+
+.exercise-detail-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.exercise-detail-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.exercise-detail-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.exercise-muscles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.exercises-list {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 768px) {
+    .detail-item {
+        padding: 0.75rem;
+    }
+
+    .detail-value {
+        font-size: 1.25rem;
+    }
+
+    .exercise-detail-name {
+        font-size: 1.1rem;
+    }
+}
+

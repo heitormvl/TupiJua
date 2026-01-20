@@ -261,3 +261,11 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+/**
+ * View workout details
+ * @param {number} sessionId - The workout session ID
+ */
+function viewWorkoutDetails(sessionId) {
+    window.location.href = `/Training/ViewWorkout?sessionId=${sessionId}`;
+}
