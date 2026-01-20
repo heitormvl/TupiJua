@@ -216,47 +216,59 @@ function decrementValue(inputId, step) {
     setTimeout(() => input.classList.remove('value-changed'), 300);
 }
 
-// Toggle rest time unit between seconds and minutes
-function toggleRestUnit() {
+// Set rest time unit (seconds or minutes)
+function setRestUnit(isMinutes) {
     const restInMinutesInput = document.getElementById('RestInMinutes');
-    const restUnitToggle = document.getElementById('restUnitToggle');
+    const restUnitSeg = document.getElementById('restUnitSeg');
+    const restUnitMin = document.getElementById('restUnitMin');
     const restTimeInput = document.getElementById('RestTime');
     
-    if (!restInMinutesInput || !restUnitToggle || !restTimeInput) return;
+    if (!restInMinutesInput || !restUnitSeg || !restUnitMin || !restTimeInput) return;
     
-    const isMinutes = restInMinutesInput.value === 'true';
+    const currentIsMinutes = restInMinutesInput.value === 'true';
+    
+    // If already in the desired unit, do nothing
+    if (currentIsMinutes === isMinutes) return;
+    
     const currentValue = parseInt(restTimeInput.value) || 0;
     
     if (isMinutes) {
-        // Convert from minutes to seconds
-        restInMinutesInput.value = 'false';
-        restUnitToggle.textContent = 'seg';
-        restTimeInput.value = currentValue * 60;
-        restTimeInput.step = 15;
-    } else {
         // Convert from seconds to minutes
         restInMinutesInput.value = 'true';
-        restUnitToggle.textContent = 'min';
         restTimeInput.value = Math.round(currentValue / 60);
         restTimeInput.step = 1;
+        restUnitSeg.classList.remove('active');
+        restUnitMin.classList.add('active');
+    } else {
+        // Convert from minutes to seconds
+        restInMinutesInput.value = 'false';
+        restTimeInput.value = currentValue * 60;
+        restTimeInput.step = 15;
+        restUnitMin.classList.remove('active');
+        restUnitSeg.classList.add('active');
     }
-    
-    // Add animation feedback
-    restUnitToggle.classList.add('value-changed');
-    setTimeout(() => restUnitToggle.classList.remove('value-changed'), 300);
 }
 
-// Update the rest unit toggle button text
+// Update the rest unit toggle button state
 function updateRestUnitToggle() {
     const restInMinutesInput = document.getElementById('RestInMinutes');
-    const restUnitToggle = document.getElementById('restUnitToggle');
+    const restUnitSeg = document.getElementById('restUnitSeg');
+    const restUnitMin = document.getElementById('restUnitMin');
     const restTimeInput = document.getElementById('RestTime');
     
-    if (!restInMinutesInput || !restUnitToggle || !restTimeInput) return;
+    if (!restInMinutesInput || !restUnitSeg || !restUnitMin || !restTimeInput) return;
     
     const isMinutes = restInMinutesInput.value === 'true';
-    restUnitToggle.textContent = isMinutes ? 'min' : 'seg';
-    restTimeInput.step = isMinutes ? 1 : 15;
+    
+    if (isMinutes) {
+        restUnitSeg.classList.remove('active');
+        restUnitMin.classList.add('active');
+        restTimeInput.step = 1;
+    } else {
+        restUnitMin.classList.remove('active');
+        restUnitSeg.classList.add('active');
+        restTimeInput.step = 15;
+    }
 }
 
 // Increment rest time value

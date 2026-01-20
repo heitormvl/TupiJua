@@ -186,9 +186,16 @@
                             <button type="button" class="btn-number-control" onclick="incrementRestTime()">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            <button type="button" class="input-group-text-addon unit-toggle" id="restUnitToggle" onclick="toggleRestUnit()" style="cursor: pointer; user-select: none;">
-                                seg
-                            </button>
+                            <div class="input-group-text-addon" style="padding: 0; border: none; background: transparent;">
+                                <div class="btn-group btn-group-sm" role="group" style="box-shadow: none;">
+                                    <button type="button" class="btn btn-outline-primary active" id="restUnitSeg" onclick="setRestUnit(false)" style="border-radius: 0.25rem 0 0 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        seg
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" id="restUnitMin" onclick="setRestUnit(true)" style="border-radius: 0 0.25rem 0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        min
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <input type="hidden" asp-for="RestInMinutes" id="RestInMinutes" value="false" />
                         <span asp-validation-for="RestTime" class="text-danger small"></span>

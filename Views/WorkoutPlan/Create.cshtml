@@ -211,9 +211,16 @@
                             <button type="button" class="btn-number-control" onclick="incrementRestValue(${exerciseCounter})">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            <button type="button" class="input-group-text-addon unit-toggle" id="restUnitToggle-${exerciseCounter}" onclick="toggleRestUnitPlan(${exerciseCounter})" style="cursor: pointer; user-select: none;">
-                                seg
-                            </button>
+                            <div class="input-group-text-addon" style="padding: 0; border: none; background: transparent;">
+                                <div class="btn-group btn-group-sm" role="group" style="box-shadow: none;">
+                                    <button type="button" class="btn btn-outline-primary active" id="restUnitSeg-${exerciseCounter}" onclick="setRestUnitPlan(${exerciseCounter}, false)" style="border-radius: 0.25rem 0 0 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        seg
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" id="restUnitMin-${exerciseCounter}" onclick="setRestUnitPlan(${exerciseCounter}, true)" style="border-radius: 0 0.25rem 0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        min
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <input name="Exercises[${exerciseCounter}].RestInMinutes" type="hidden" id="restInMinutes-${exerciseCounter}" value="false" />
                     </div>
@@ -349,29 +356,36 @@
             }, 10);
         }
 
-        // Toggle rest time unit between seconds and minutes for plan exercises
-        function toggleRestUnitPlan(index) {
+        // Set rest time unit for plan exercises (seconds or minutes)
+        function setRestUnitPlan(index, isMinutes) {
             const restInMinutesInput = document.getElementById(`restInMinutes-${index}`);
-            const restUnitToggle = document.getElementById(`restUnitToggle-${index}`);
+            const restUnitSeg = document.getElementById(`restUnitSeg-${index}`);
+            const restUnitMin = document.getElementById(`restUnitMin-${index}`);
             const restTimeInput = document.getElementById(`rest-${index}`);
             
-            if (!restInMinutesInput || !restUnitToggle || !restTimeInput) return;
+            if (!restInMinutesInput || !restUnitSeg || !restUnitMin || !restTimeInput) return;
             
-            const isMinutes = restInMinutesInput.value === 'true';
+            const currentIsMinutes = restInMinutesInput.value === 'true';
+            
+            // If already in the desired unit, do nothing
+            if (currentIsMinutes === isMinutes) return;
+            
             const currentValue = parseInt(restTimeInput.value) || 0;
             
             if (isMinutes) {
-                // Convert from minutes to seconds
-                restInMinutesInput.value = 'false';
-                restUnitToggle.textContent = 'seg';
-                restTimeInput.value = currentValue * 60;
-                restTimeInput.step = 15;
-            } else {
                 // Convert from seconds to minutes
                 restInMinutesInput.value = 'true';
-                restUnitToggle.textContent = 'min';
                 restTimeInput.value = Math.round(currentValue / 60);
                 restTimeInput.step = 1;
+                restUnitSeg.classList.remove('active');
+                restUnitMin.classList.add('active');
+            } else {
+                // Convert from minutes to seconds
+                restInMinutesInput.value = 'false';
+                restTimeInput.value = currentValue * 60;
+                restTimeInput.step = 15;
+                restUnitMin.classList.remove('active');
+                restUnitSeg.classList.add('active');
             }
         }
 
