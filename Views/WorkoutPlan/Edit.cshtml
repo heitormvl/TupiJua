@@ -144,23 +144,33 @@
                                             Descanso entre séries
                                         </label>
                                         <div class="number-input-group">
-                                            <button type="button" class="btn-number-control" onclick="decrementValue('rest-@i', 15)">
+                                            <button type="button" class="btn-number-control" onclick="decrementRestValue(@i)">
                                                 <i class="fas fa-minus"></i>
                                             </button>
-                                            <input name="Exercises[@i].RecommendedRestSeconds" 
+                                            <input name="Exercises[@i].RecommendedRestTime" 
                                                    type="number" 
                                                    class="form-control text-center" 
                                                    id="rest-@i"
                                                    min="0" 
                                                    max="3600" 
-                                                   step="15" 
-                                                   value="@Model.Exercises[i].RecommendedRestSeconds" 
+                                                   step="@(Model.Exercises[i].RestInMinutes ? 1 : 15)" 
+                                                   value="@Model.Exercises[i].RecommendedRestTime" 
                                                    required />
-                                            <button type="button" class="btn-number-control" onclick="incrementValue('rest-@i', 15)">
+                                            <button type="button" class="btn-number-control" onclick="incrementRestValue(@i)">
                                                 <i class="fas fa-plus"></i>
                                             </button>
-                                            <span class="input-group-text-addon">seg</span>
+                                            <div class="input-group-text-addon" style="padding: 0; border: none; background: transparent;">
+                                                <div class="btn-group btn-group-sm" role="group" style="box-shadow: none;">
+                                                    <button type="button" class="btn btn-outline-primary @(Model.Exercises[i].RestInMinutes ? "" : "active")" id="restUnitSeg-@i" onclick="setRestUnitPlan(@i, false)" style="border-radius: 0.25rem 0 0 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                                        seg
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary @(Model.Exercises[i].RestInMinutes ? "active" : "")" id="restUnitMin-@i" onclick="setRestUnitPlan(@i, true)" style="border-radius: 0 0.25rem 0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                                        min
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
+                                        <input name="Exercises[@i].RestInMinutes" type="hidden" id="restInMinutes-@i" value="@(Model.Exercises[i].RestInMinutes ? "true" : "false")" />
                                     </div>
 
                                     <!-- Hidden Order Field -->
@@ -318,10 +328,10 @@
                             Descanso entre séries
                         </label>
                         <div class="number-input-group">
-                            <button type="button" class="btn-number-control" onclick="decrementValue('rest-${exerciseCounter}', 15)">
+                            <button type="button" class="btn-number-control" onclick="decrementRestValue(${exerciseCounter})">
                                 <i class="fas fa-minus"></i>
                             </button>
-                            <input name="Exercises[${exerciseCounter}].RecommendedRestSeconds" 
+                            <input name="Exercises[${exerciseCounter}].RecommendedRestTime" 
                                    type="number" 
                                    class="form-control text-center" 
                                    id="rest-${exerciseCounter}"
@@ -330,11 +340,21 @@
                                    step="15" 
                                    value="60" 
                                    required />
-                            <button type="button" class="btn-number-control" onclick="incrementValue('rest-${exerciseCounter}', 15)">
+                            <button type="button" class="btn-number-control" onclick="incrementRestValue(${exerciseCounter})">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            <span class="input-group-text-addon">seg</span>
+                            <div class="input-group-text-addon" style="padding: 0; border: none; background: transparent;">
+                                <div class="btn-group btn-group-sm" role="group" style="box-shadow: none;">
+                                    <button type="button" class="btn btn-outline-primary active" id="restUnitSeg-${exerciseCounter}" onclick="setRestUnitPlan(${exerciseCounter}, false)" style="border-radius: 0.25rem 0 0 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        seg
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" id="restUnitMin-${exerciseCounter}" onclick="setRestUnitPlan(${exerciseCounter}, true)" style="border-radius: 0 0.25rem 0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        min
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                        <input name="Exercises[${exerciseCounter}].RestInMinutes" type="hidden" id="restInMinutes-${exerciseCounter}" value="false" />
                     </div>
 
                     <!-- Hidden Order Field -->
@@ -464,6 +484,71 @@
                     }, i * 50);
                 });
             }, 10);
+        }
+
+        // Set rest time unit for plan exercises (seconds or minutes)
+        function setRestUnitPlan(index, isMinutes) {
+            const restInMinutesInput = document.getElementById(`restInMinutes-${index}`);
+            const restUnitSeg = document.getElementById(`restUnitSeg-${index}`);
+            const restUnitMin = document.getElementById(`restUnitMin-${index}`);
+            const restTimeInput = document.getElementById(`rest-${index}`);
+            
+            if (!restInMinutesInput || !restUnitSeg || !restUnitMin || !restTimeInput) return;
+            
+            const currentIsMinutes = restInMinutesInput.value === 'true';
+            
+            // If already in the desired unit, do nothing
+            if (currentIsMinutes === isMinutes) return;
+            
+            const currentValue = parseInt(restTimeInput.value) || 0;
+            
+            if (isMinutes) {
+                // Convert from seconds to minutes
+                restInMinutesInput.value = 'true';
+                restTimeInput.value = Math.round(currentValue / 60);
+                restTimeInput.step = 1;
+                restUnitSeg.classList.remove('active');
+                restUnitMin.classList.add('active');
+            } else {
+                // Convert from minutes to seconds
+                restInMinutesInput.value = 'false';
+                restTimeInput.value = currentValue * 60;
+                restTimeInput.step = 15;
+                restUnitMin.classList.remove('active');
+                restUnitSeg.classList.add('active');
+            }
+        }
+
+        // Increment rest time value
+        function incrementRestValue(index) {
+            const restTimeInput = document.getElementById(`rest-${index}`);
+            const restInMinutesInput = document.getElementById(`restInMinutes-${index}`);
+            
+            if (!restTimeInput || !restInMinutesInput) return;
+            
+            const isMinutes = restInMinutesInput.value === 'true';
+            const step = isMinutes ? 1 : 15;
+            const currentValue = parseInt(restTimeInput.value) || 0;
+            const maxValue = parseInt(restTimeInput.max) || 3600;
+            const newValue = Math.min(currentValue + step, maxValue);
+            
+            restTimeInput.value = newValue;
+        }
+
+        // Decrement rest time value
+        function decrementRestValue(index) {
+            const restTimeInput = document.getElementById(`rest-${index}`);
+            const restInMinutesInput = document.getElementById(`restInMinutes-${index}`);
+            
+            if (!restTimeInput || !restInMinutesInput) return;
+            
+            const isMinutes = restInMinutesInput.value === 'true';
+            const step = isMinutes ? 1 : 15;
+            const currentValue = parseInt(restTimeInput.value) || 0;
+            const minValue = parseInt(restTimeInput.min) || 0;
+            const newValue = Math.max(currentValue - step, minValue);
+            
+            restTimeInput.value = newValue;
         }
     </script>
 }

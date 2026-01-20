@@ -21,9 +21,14 @@
         public decimal Weight { get; set; }
 
         /// <summary>
-        /// Tempo de descanso entre as séries, em segundos.
+        /// Tempo de descanso entre as séries.
         /// </summary>
-        public int RestSeconds { get; set; }
+        public int RestTime { get; set; }
+
+        /// <summary>
+        /// Flag indicando se o tempo de descanso está em minutos (true) ou segundos (false).
+        /// </summary>
+        public bool RestInMinutes { get; set; } = false;
 
         /// <summary>
         /// Observações adicionais sobre o exercício.

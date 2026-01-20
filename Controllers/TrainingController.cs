@@ -129,7 +129,8 @@ namespace TupiJua.Controllers
                     Sets = lastLoggedExercise.Sets,
                     Reps = lastLoggedExercise.Reps,
                     Weight = lastLoggedExercise.Weight,
-                    RestSeconds = lastLoggedExercise.RestSeconds,
+                    RestTime = lastLoggedExercise.RestTime,
+                    RestInMinutes = lastLoggedExercise.RestInMinutes,
                     Observation = lastLoggedExercise.Observation,
                     ShouldIncreaseLoad = true
                 };
@@ -158,7 +159,8 @@ namespace TupiJua.Controllers
                     Reps = model.Reps,
                     IntegerReps = CalculateIntegerReps(model.Reps),
                     Weight = model.Weight,
-                    RestSeconds = model.RestSeconds,
+                    RestTime = model.RestTime,
+                    RestInMinutes = model.RestInMinutes,
                     Observation = model.Observation
                 };
 
@@ -264,7 +266,8 @@ namespace TupiJua.Controllers
                         Order = wpe.Order,
                         TargetSets = wpe.TargetSets,
                         TargetReps = wpe.TargetReps,
-                        RecommendedRestSeconds = wpe.RecommendedRestSeconds,
+                        RecommendedRestTime = wpe.RecommendedRestTime,
+                        RestInMinutes = wpe.RestInMinutes,
                         IsCompleted = session.LoggedExercises.Any(le => le.ExerciseId == wpe.ExerciseId)
                     })
                     .ToList()
@@ -312,7 +315,8 @@ namespace TupiJua.Controllers
             ViewBag.Exercise = exercise;
             ViewBag.TargetSets = planExercise.TargetSets;
             ViewBag.TargetReps = planExercise.TargetReps;
-            ViewBag.RecommendedRestSeconds = planExercise.RecommendedRestSeconds;
+            ViewBag.RecommendedRestTime = planExercise.RecommendedRestTime;
+            ViewBag.RestInMinutes = planExercise.RestInMinutes;
             ViewBag.FromPlan = true;
 
             var model = new LogExerciseViewModel
@@ -321,7 +325,8 @@ namespace TupiJua.Controllers
                 ExerciseId = exerciseId,
                 Sets = planExercise.TargetSets,
                 Reps = planExercise.TargetReps ?? "12",
-                RestSeconds = planExercise.RecommendedRestSeconds > 0 ? planExercise.RecommendedRestSeconds : 60
+                RestTime = planExercise.RecommendedRestTime > 0 ? planExercise.RecommendedRestTime : 60,
+                RestInMinutes = planExercise.RestInMinutes
             };
 
             return View("AddExercise", model);
@@ -346,7 +351,8 @@ namespace TupiJua.Controllers
                     Reps = model.Reps,
                     IntegerReps = CalculateIntegerReps(model.Reps),
                     Weight = model.Weight,
-                    RestSeconds = model.RestSeconds,
+                    RestTime = model.RestTime,
+                    RestInMinutes = model.RestInMinutes,
                     Observation = model.Observation
                 };
 
@@ -373,7 +379,8 @@ namespace TupiJua.Controllers
                     ViewBag.Exercise = exercise;
                     ViewBag.TargetSets = planExercise.TargetSets;
                     ViewBag.TargetReps = planExercise.TargetReps;
-                    ViewBag.RecommendedRestSeconds = planExercise.RecommendedRestSeconds;
+                    ViewBag.RecommendedRestTime = planExercise.RecommendedRestTime;
+                    ViewBag.RestInMinutes = planExercise.RestInMinutes;
                     ViewBag.FromPlan = true;
                 }
             }
