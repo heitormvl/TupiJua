@@ -36,6 +36,13 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="WorkoutPlan"
                                     asp-action="Index">Meus Planos</a>
                             </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin"
+                                        asp-action="Index">Admin</a>
+                                </li>
+                            }
                         </ul>
                         <ul class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap">
                             <li class="nav-item">

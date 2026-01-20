@@ -6,7 +6,7 @@ using TupiJua.ViewModels;
 
 namespace TupiJua.Controllers
 {
-    [Authorize]
+    [Authorize (Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly AppDbContext _context;
