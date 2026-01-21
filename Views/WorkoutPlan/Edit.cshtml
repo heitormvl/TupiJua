@@ -85,12 +85,27 @@
                                                 onchange="showMuscleGroups(this, @i)"
                                                 required>
                                             <option value="">Selecione um exercício</option>
-                                            @foreach (var exercise in exercises)
-                                            {
-                                                <option value="@exercise.Id" 
-                                                        selected="@(exercise.Id == Model.Exercises[i].ExerciseId)">
-                                                    @exercise.Name
-                                                </option>
+                                            @{
+                                                var exercisesByCategory = exercises
+                                                    .GroupBy(e => e.ExerciseMuscleGroups
+                                                        .Where(emg => emg.IsPrimary)
+                                                        .Select(emg => emg.MuscleGroup.Name)
+                                                        .FirstOrDefault() ?? "Sem Categoria")
+                                                    .OrderBy(g => g.Key)
+                                                    .ToList();
+
+                                                foreach (var category in exercisesByCategory)
+                                                {
+                                                    <optgroup label="@category.Key">
+                                                        @foreach (var exercise in category.OrderBy(e => e.Name))
+                                                        {
+                                                            <option value="@exercise.Id" 
+                                                                    selected="@(exercise.Id == Model.Exercises[i].ExerciseId)">
+                                                                @exercise.Name
+                                                            </option>
+                                                        }
+                                                    </optgroup>
+                                                }
                                             }
                                         </select>
                                         <div id="muscleGroups-@i" class="mt-2 muscle-groups-container"></div>
@@ -213,6 +228,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/exercise-helpers.js"></script>
     
     <script>
         let exerciseCounter = @Model.Exercises.Count;
@@ -275,8 +291,7 @@
                                 id="exercise-${exerciseCounter}"
                                 onchange="showMuscleGroups(this, ${exerciseCounter})"
                                 required>
-                            <option value="">Selecione um exercício</option>
-                            ${exercisesList.map(e => `<option value="${e.Id}">${e.Name}</option>`).join('')}
+                            ${generateExerciseOptionsHTML(exercisesList)}
                         </select>
                         <div id="muscleGroups-${exerciseCounter}" class="mt-2 muscle-groups-container"></div>
                     </div>

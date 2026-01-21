@@ -121,7 +121,11 @@ namespace TupiJua.Controllers
         [HttpGet]
         public async Task<IActionResult> AddExercise(int sessionId)
         {
-            ViewBag.Exercises = await _context.Exercises.OrderBy(e => e.Name).ToListAsync();
+            ViewBag.Exercises = await _context.Exercises
+                .Include(e => e.ExerciseMuscleGroups)
+                .ThenInclude(emg => emg.MuscleGroup)
+                .OrderBy(e => e.Name)
+                .ToListAsync();
 
             var model = new LogExerciseViewModel
             {
@@ -198,7 +202,11 @@ namespace TupiJua.Controllers
                 return RedirectToAction("AddExercise", new { sessionId = model.WorkoutSessionId });
             }
 
-            ViewBag.Exercises = await _context.Exercises.OrderBy(e => e.Name).ToListAsync();
+            ViewBag.Exercises = await _context.Exercises
+                .Include(e => e.ExerciseMuscleGroups)
+                .ThenInclude(emg => emg.MuscleGroup)
+                .OrderBy(e => e.Name)
+                .ToListAsync();
             return View(model);
         }
 

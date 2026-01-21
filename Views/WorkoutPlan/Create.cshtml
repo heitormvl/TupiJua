@@ -96,6 +96,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/exercise-helpers.js"></script>
     
     <script>
         let exerciseCounter = 0;
@@ -143,8 +144,7 @@
                                 class="form-select exercise-select" 
                                 onchange="showMuscleGroups(this, ${exerciseCounter})" 
                                 required>
-                            <option value="">Selecione um exercício</option>
-                            ${exercisesList.map(e => `<option value="${e.Id}">${e.Name}</option>`).join('')}
+                            ${generateExerciseOptionsHTML(exercisesList)}
                         </select>
                         <div id="muscleGroups-${exerciseCounter}" class="muscle-groups-container mt-2"></div>
                     </div>
