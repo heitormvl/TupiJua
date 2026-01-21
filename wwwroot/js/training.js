@@ -408,6 +408,11 @@ function initWorkoutPlanFormsValidation() {
 async function validateAndSubmitTrainingForm(form) {
     try {
         const response = await fetch('/Training/CheckTodayWorkout');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
         if (data.hasWorkout) {

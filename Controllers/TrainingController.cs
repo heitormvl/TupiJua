@@ -88,11 +88,10 @@ namespace TupiJua.Controllers
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
             
-            var todayWorkout = await _context.WorkoutSessions
-                .Where(ws => ws.UserId == userId && ws.Date >= today && ws.Date < tomorrow)
-                .FirstOrDefaultAsync();
+            var hasWorkout = await _context.WorkoutSessions
+                .AnyAsync(ws => ws.UserId == userId && ws.Date >= today && ws.Date < tomorrow);
             
-            return Json(new { hasWorkout = todayWorkout != null });
+            return Json(new { hasWorkout });
         }
 
         /// <summary>
