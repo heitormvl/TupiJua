@@ -324,6 +324,7 @@ function viewWorkoutDetails(sessionId) {
 document.addEventListener('DOMContentLoaded', function() {
     initTrainingIndex();
     initAddExercise();
+    initWorkoutPlanFormsValidation();
 });
 
 // Keyframes for animations
@@ -379,22 +380,25 @@ function viewWorkoutDetails(sessionId) {
  */
 function initFreeTrainingValidation() {
     const freeTrainingForm = document.getElementById('startFreeTrainingForm');
-    if (!freeTrainingForm) return;
-
-    freeTrainingForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        await validateAndSubmitTrainingForm(freeTrainingForm);
-    });
+    if (freeTrainingForm) {
+        freeTrainingForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await validateAndSubmitTrainingForm(freeTrainingForm);
+        });
+    }
 }
 
 /**
- * Check if there's a workout today before starting from plan
- * @param {Event} e - The form submit event
- * @param {HTMLFormElement} form - The form element
+ * Initialize workout plan forms validation
  */
-async function checkWorkoutBeforeStartPlan(e, form) {
-    e.preventDefault();
-    await validateAndSubmitTrainingForm(form);
+function initWorkoutPlanFormsValidation() {
+    const planForms = document.querySelectorAll('.start-plan-form');
+    planForms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await validateAndSubmitTrainingForm(form);
+        });
+    });
 }
 
 /**

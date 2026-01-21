@@ -80,6 +80,11 @@ namespace TupiJua.Controllers
         public async Task<IActionResult> CheckTodayWorkout()
         {
             var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Json(new { hasWorkout = false });
+            }
+            
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
             

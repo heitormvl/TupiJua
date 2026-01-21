@@ -149,7 +149,7 @@
 
                                 <!-- Card Actions -->
                                 <div class="plan-card-actions">
-                                    <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="flex-grow-1 start-plan-form" onsubmit="return checkWorkoutBeforeStartPlan(event, this)">
+                                    <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="flex-grow-1 start-plan-form">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="workoutPlanId" value="@plan.Id" />
                                         <button type="submit" class="btn btn-primary btn-lg w-100">
