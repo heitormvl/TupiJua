@@ -7,7 +7,8 @@
     var exercise = ViewBag.Exercise as TupiJua.Models.Exercise;
     var targetSets = ViewBag.TargetSets as int? ?? 0;
     var targetReps = ViewBag.TargetReps as string;
-    var recommendedRestSeconds = ViewBag.RecommendedRestSeconds as int? ?? 0;
+    var recommendedRestTime = ViewBag.RecommendedRestTime as int? ?? 0;
+    var restInMinutes = ViewBag.RestInMinutes as bool? ?? false;
 }
 
 <div class="container-fluid px-3 px-md-4 py-4">
@@ -48,12 +49,12 @@
                                         <strong class="text-primary">@targetReps</strong>
                                     </div>
                                 </div>
-                                @if (recommendedRestSeconds > 0)
+                                @if (recommendedRestTime > 0)
                                 {
                                     <div class="col-6 col-sm-3">
                                         <div class="last-exercise-stat">
                                             <small class="text-muted">Descanso</small>
-                                            <strong class="text-primary">@recommendedRestSeconds seg</strong>
+                                            <strong class="text-primary">@recommendedRestTime @(restInMinutes ? "min" : "seg")</strong>
                                         </div>
                                     </div>
                                 }
@@ -170,24 +171,34 @@
                         <span asp-validation-for="Weight" class="text-danger small"></span>
                     </div>
 
-                    <!-- Rest Seconds -->
+                    <!-- Rest Time -->
                     <div class="form-section">
                         <label class="form-label">
                             <i class="fas fa-stopwatch me-2"></i>
                             Descanso entre séries
                         </label>
                         <div class="number-input-group">
-                            <button type="button" class="btn-number-control" onclick="decrementValue('RestSeconds', 15)">
+                            <button type="button" class="btn-number-control" onclick="decrementRestTime()">
                                 <i class="fas fa-minus"></i>
                             </button>
-                            <input asp-for="RestSeconds" type="number" class="form-control form-control-lg text-center" 
-                                   id="RestSeconds" min="0" max="3600" step="15" value="60" required />
-                            <button type="button" class="btn-number-control" onclick="incrementValue('RestSeconds', 15)">
+                            <input asp-for="RestTime" type="number" class="form-control form-control-lg text-center" 
+                                   id="RestTime" min="0" max="3600" step="15" value="60" required />
+                            <button type="button" class="btn-number-control" onclick="incrementRestTime()">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            <span class="input-group-text-addon">seg</span>
+                            <div class="input-group-text-addon" style="padding: 0; border: none; background: transparent;">
+                                <div class="btn-group btn-group-sm" role="group" style="box-shadow: none;">
+                                    <button type="button" class="btn btn-outline-primary active" id="restUnitSeg" onclick="setRestUnit(false)" style="border-radius: 0.25rem 0 0 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        seg
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" id="restUnitMin" onclick="setRestUnit(true)" style="border-radius: 0 0.25rem 0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        min
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <span asp-validation-for="RestSeconds" class="text-danger small"></span>
+                        <input type="hidden" asp-for="RestInMinutes" id="RestInMinutes" value="false" />
+                        <span asp-validation-for="RestTime" class="text-danger small"></span>
                     </div>
 
                     <!-- Progress Flag -->
@@ -200,7 +211,7 @@
                                         Aumentar dificuldade no próximo?
                                     </label>
                                     <p class="small text-muted mb-0">
-                                        Marque se pretende aumentar carga ou repetições no próximo treino
+                                        Ao marcar essa opção, será exibido um lembrete no próximo treino deste exercício, além de sugerir o aumento de carga em 5%
                                     </p>
                                 </div>
                                 <div class="form-check form-switch">

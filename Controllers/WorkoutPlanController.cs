@@ -76,7 +76,8 @@ namespace TupiJua.Controllers
                         ExerciseId = e.ExerciseId,
                         TargetSets = e.TargetSets,
                         TargetReps = e.TargetReps!,
-                        RecommendedRestSeconds = e.RecommendedRestSeconds,
+                        RecommendedRestTime = e.RecommendedRestTime,
+                        RestInMinutes = e.RestInMinutes,
                         Order = e.Order
                     }).ToList()
                 };
@@ -123,7 +124,8 @@ namespace TupiJua.Controllers
                     ExerciseId = pe.ExerciseId,
                     TargetSets = pe.TargetSets,
                     TargetReps = pe.TargetReps,
-                    RecommendedRestSeconds = pe.RecommendedRestSeconds,
+                    RecommendedRestTime = pe.RecommendedRestTime,
+                    RestInMinutes = pe.RestInMinutes,
                     Order = pe.Order
                 }).ToList()
             };
@@ -185,7 +187,8 @@ namespace TupiJua.Controllers
                     {
                         existingExercise.TargetSets = exerciseModel.TargetSets;
                         existingExercise.TargetReps = exerciseModel.TargetReps;
-                        existingExercise.RecommendedRestSeconds = exerciseModel.RecommendedRestSeconds;
+                        existingExercise.RecommendedRestTime = exerciseModel.RecommendedRestTime;
+                        existingExercise.RestInMinutes = exerciseModel.RestInMinutes;
                         existingExercise.Order = exerciseModel.Order;
                         existingExercise.ExerciseId = exerciseModel.ExerciseId; // Caso mude o exercício
                     }
@@ -196,7 +199,8 @@ namespace TupiJua.Controllers
                             ExerciseId = exerciseModel.ExerciseId,
                             TargetSets = exerciseModel.TargetSets,
                             TargetReps = exerciseModel.TargetReps,
-                            RecommendedRestSeconds = exerciseModel.RecommendedRestSeconds,
+                            RecommendedRestTime = exerciseModel.RecommendedRestTime,
+                            RestInMinutes = exerciseModel.RestInMinutes,
                             Order = exerciseModel.Order
                         });
                     }

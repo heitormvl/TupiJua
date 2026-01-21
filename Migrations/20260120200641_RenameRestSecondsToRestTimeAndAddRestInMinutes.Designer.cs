@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TupiJua.Models;
 
@@ -11,9 +12,11 @@ using TupiJua.Models;
 namespace TupiJua.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260120200641_RenameRestSecondsToRestTimeAndAddRestInMinutes")]
+    partial class RenameRestSecondsToRestTimeAndAddRestInMinutes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,9 +217,6 @@ namespace TupiJua.Migrations
 
                     b.Property<int>("IntegerReps")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsSkipped")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Observation")
                         .HasMaxLength(1000)

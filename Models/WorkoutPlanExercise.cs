@@ -52,8 +52,13 @@ namespace TupiJua.Models
         public int Order { get; set; } // Para o usuário organizar a sequência do treino
 
         /// <summary>
-        /// Descanso recomendado entre séries, em segundos.
+        /// Tempo de descanso recomendado entre séries.
         /// </summary>
-        public int RecommendedRestSeconds { get; set; } // Descanso recomendado entre séries
+        public int RecommendedRestTime { get; set; }
+
+        /// <summary>
+        /// Flag indicando se o tempo de descanso está em minutos (true) ou segundos (false).
+        /// </summary>
+        public bool RestInMinutes { get; set; } = false;
     }
 }

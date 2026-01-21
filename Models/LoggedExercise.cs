@@ -68,10 +68,15 @@ namespace TupiJua.Models
         public decimal Weight { get; set; }
 
         /// <summary>
-        /// Tempo de descanso entre séries, em segundos.
+        /// Tempo de descanso entre séries.
         /// </summary>
-        [Range(0, 3600, ErrorMessage = "O descanso deve ser entre {1} e {2} segundos.")]
-        public int RestSeconds { get; set; }
+        [Range(0, 3600, ErrorMessage = "O descanso deve ser entre {1} e {2}.")]
+        public int RestTime { get; set; }
+
+        /// <summary>
+        /// Flag indicando se o tempo de descanso está em minutos (true) ou segundos (false).
+        /// </summary>
+        public bool RestInMinutes { get; set; } = false;
 
         /// <summary>
         /// Notas rápidas sobre a execução.

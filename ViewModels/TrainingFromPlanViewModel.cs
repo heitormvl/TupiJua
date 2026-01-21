@@ -61,9 +61,14 @@ namespace TupiJua.ViewModels
         public string? TargetReps { get; set; }
 
         /// <summary>
-        /// Descanso recomendado em segundos entre séries.
+        /// Tempo de descanso recomendado entre séries.
         /// </summary>
-        public int RecommendedRestSeconds { get; set; }
+        public int RecommendedRestTime { get; set; }
+
+        /// <summary>
+        /// Flag indicando se o tempo de descanso está em minutos (true) ou segundos (false).
+        /// </summary>
+        public bool RestInMinutes { get; set; } = false;
 
         /// <summary>
         /// Indica se o exercício já foi executado na sessão atual.

@@ -28,10 +28,15 @@ namespace TupiJua.ViewModels
         public string? TargetReps { get; set; }
 
         /// <summary>
-        /// Tempo de descanso entre séries, em segundos.
+        /// Tempo de descanso recomendado entre séries.
         /// </summary>
-        [Range(0, 3600, ErrorMessage = "O descanso deve ser entre {1} e {2} segundos.")]
-        public int RecommendedRestSeconds { get; set; }
+        [Range(0, 3600, ErrorMessage = "O descanso deve ser entre {1} e {2}.")]
+        public int RecommendedRestTime { get; set; }
+
+        /// <summary>
+        /// Flag indicando se o tempo de descanso está em minutos (true) ou segundos (false).
+        /// </summary>
+        public bool RestInMinutes { get; set; } = false;
 
         /// <summary>
         /// Ordem do exercício no plano de treino.
