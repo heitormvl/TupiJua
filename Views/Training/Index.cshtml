@@ -18,7 +18,8 @@
                         Pronto para Treinar?
                     </h1>
                     <p class="hero-subtitle">Registre seus exercícios e acompanhe sua evolução</p>
-                    <form asp-action="StartFreeTraining" method="post" class="d-inline">
+                    <form asp-action="StartFreeTraining" method="post" class="d-inline" id="startFreeTrainingForm">
+                        @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-cta">
                             <i class="fas fa-fire me-2"></i>
                             Bora Treinar!
@@ -197,6 +198,35 @@
                         <p>Comece agora e acompanhe sua evolução!</p>
                     </div>
                 }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal for Multiple Workouts -->
+<div class="modal fade" id="multipleWorkoutsModal" tabindex="-1" aria-labelledby="multipleWorkoutsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="multipleWorkoutsModalLabel">
+                    <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                    Confirmar Novo Treino
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Você já registrou um treino hoje.</p>
+                <p class="mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Deseja realmente iniciar outro treino?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmStartTraining">
+                    <i class="fas fa-check me-1"></i>
+                    Sim, Continuar
+                </button>
             </div>
         </div>
     </div>

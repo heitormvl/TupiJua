@@ -34,6 +34,9 @@ function initTrainingIndex() {
     timelineItems.forEach(item => {
         observer.observe(item);
     });
+
+    // Handle free training form submission
+    initFreeTrainingValidation();
 }
 
 // Initialize Add Exercise page
@@ -369,4 +372,73 @@ document.head.appendChild(style);
  */
 function viewWorkoutDetails(sessionId) {
     window.location.href = `/Training/ViewWorkout?sessionId=${sessionId}`;
+}
+
+/**
+ * Initialize free training form validation
+ */
+function initFreeTrainingValidation() {
+    const freeTrainingForm = document.getElementById('startFreeTrainingForm');
+    if (!freeTrainingForm) return;
+
+    freeTrainingForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const response = await fetch('/Training/CheckTodayWorkout');
+            const data = await response.json();
+            
+            if (data.hasWorkout) {
+                // Show confirmation modal
+                const modal = new bootstrap.Modal(document.getElementById('multipleWorkoutsModal'));
+                modal.show();
+                
+                // Handle confirmation
+                document.getElementById('confirmStartTraining').onclick = function() {
+                    modal.hide();
+                    freeTrainingForm.submit();
+                };
+            } else {
+                // No workout today, proceed normally
+                freeTrainingForm.submit();
+            }
+        } catch (error) {
+            console.error('Erro ao verificar treinos do dia:', error);
+            // In case of error, allow the form to submit
+            freeTrainingForm.submit();
+        }
+    });
+}
+
+/**
+ * Check if there's a workout today before starting from plan
+ * @param {Event} e - The form submit event
+ * @param {HTMLFormElement} form - The form element
+ */
+async function checkWorkoutBeforeStartPlan(e, form) {
+    e.preventDefault();
+    
+    try {
+        const response = await fetch('/Training/CheckTodayWorkout');
+        const data = await response.json();
+        
+        if (data.hasWorkout) {
+            // Show confirmation modal
+            const modal = new bootstrap.Modal(document.getElementById('multipleWorkoutsModal'));
+            modal.show();
+            
+            // Handle confirmation
+            document.getElementById('confirmStartTraining').onclick = function() {
+                modal.hide();
+                form.submit();
+            };
+        } else {
+            // No workout today, proceed normally
+            form.submit();
+        }
+    } catch (error) {
+        console.error('Erro ao verificar treinos do dia:', error);
+        // In case of error, allow the form to submit
+        form.submit();
+    }
 }

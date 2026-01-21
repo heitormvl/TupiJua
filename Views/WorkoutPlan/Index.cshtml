@@ -149,7 +149,8 @@
 
                                 <!-- Card Actions -->
                                 <div class="plan-card-actions">
-                                    <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="flex-grow-1">
+                                    <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="flex-grow-1 start-plan-form" onsubmit="return checkWorkoutBeforeStartPlan(event, this)">
+                                        @Html.AntiForgeryToken()
                                         <input type="hidden" name="workoutPlanId" value="@plan.Id" />
                                         <button type="submit" class="btn btn-primary btn-lg w-100">
                                             <i class="fas fa-fire me-2"></i>
@@ -220,7 +221,37 @@
     </div>
 </div>
 
+<!-- Confirmation Modal for Multiple Workouts -->
+<div class="modal fade" id="multipleWorkoutsModal" tabindex="-1" aria-labelledby="multipleWorkoutsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="multipleWorkoutsModalLabel">
+                    <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                    Confirmar Novo Treino
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Você já registrou um treino hoje.</p>
+                <p class="mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Deseja realmente iniciar outro treino?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmStartTraining">
+                    <i class="fas fa-check me-1"></i>
+                    Sim, Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <script src="~/js/training.js"></script>
     <script>
         // Animate cards on load
         document.addEventListener('DOMContentLoaded', function() {
