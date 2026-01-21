@@ -96,6 +96,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/exercise-helpers.js"></script>
     
     <script>
         let exerciseCounter = 0;
@@ -107,46 +108,6 @@
                 IsPrimary = emg.IsPrimary
             })
         })));
-
-        // Group exercises by primary muscle group
-        function groupExercisesByPrimaryMuscle() {
-            const grouped = {};
-            
-            exercisesList.forEach(exercise => {
-                const primaryMuscle = exercise.MuscleGroups.find(mg => mg.IsPrimary);
-                const category = primaryMuscle ? primaryMuscle.Name : 'Sem Categoria';
-                
-                if (!grouped[category]) {
-                    grouped[category] = [];
-                }
-                grouped[category].push(exercise);
-            });
-            
-            // Sort categories alphabetically and exercises within each category
-            const sortedCategories = Object.keys(grouped).sort();
-            const result = {};
-            sortedCategories.forEach(category => {
-                result[category] = grouped[category].sort((a, b) => a.Name.localeCompare(b.Name));
-            });
-            
-            return result;
-        }
-
-        // Generate exercise options HTML with optgroups
-        function generateExerciseOptionsHTML() {
-            const groupedExercises = groupExercisesByPrimaryMuscle();
-            let html = '<option value="">Selecione um exercício</option>';
-            
-            Object.keys(groupedExercises).forEach(category => {
-                html += `<optgroup label="${category}">`;
-                groupedExercises[category].forEach(exercise => {
-                    html += `<option value="${exercise.Id}">${exercise.Name}</option>`;
-                });
-                html += '</optgroup>';
-            });
-            
-            return html;
-        }
 
         // Add exercise field
         function addExerciseField() {
@@ -183,7 +144,7 @@
                                 class="form-select exercise-select" 
                                 onchange="showMuscleGroups(this, ${exerciseCounter})" 
                                 required>
-                            ${generateExerciseOptionsHTML()}
+                            ${generateExerciseOptionsHTML(exercisesList)}
                         </select>
                         <div id="muscleGroups-${exerciseCounter}" class="muscle-groups-container mt-2"></div>
                     </div>
