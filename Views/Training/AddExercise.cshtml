@@ -105,9 +105,24 @@
                             </label>
                             <select asp-for="ExerciseId" class="form-select form-select-lg" id="exerciseSelect" required>
                                 <option value="">Selecione um exercício</option>
-                                @foreach (var ex in exercises.OrderBy(e => e.Name))
-                                {
-                                    <option value="@ex.Id">@ex.Name</option>
+                                @{
+                                    var exercisesByCategory = exercises
+                                        .GroupBy(e => e.ExerciseMuscleGroups
+                                            .Where(emg => emg.IsPrimary)
+                                            .Select(emg => emg.MuscleGroup.Name)
+                                            .FirstOrDefault() ?? "Sem Categoria")
+                                        .OrderBy(g => g.Key)
+                                        .ToList();
+
+                                    foreach (var category in exercisesByCategory)
+                                    {
+                                        <optgroup label="@category.Key">
+                                            @foreach (var ex in category.OrderBy(e => e.Name))
+                                            {
+                                                <option value="@ex.Id">@ex.Name</option>
+                                            }
+                                        </optgroup>
+                                    }
                                 }
                             </select>
                             <span asp-validation-for="ExerciseId" class="text-danger small"></span>

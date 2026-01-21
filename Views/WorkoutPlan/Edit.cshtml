@@ -85,12 +85,27 @@
                                                 onchange="showMuscleGroups(this, @i)"
                                                 required>
                                             <option value="">Selecione um exercício</option>
-                                            @foreach (var exercise in exercises)
-                                            {
-                                                <option value="@exercise.Id" 
-                                                        selected="@(exercise.Id == Model.Exercises[i].ExerciseId)">
-                                                    @exercise.Name
-                                                </option>
+                                            @{
+                                                var exercisesByCategory = exercises
+                                                    .GroupBy(e => e.ExerciseMuscleGroups
+                                                        .Where(emg => emg.IsPrimary)
+                                                        .Select(emg => emg.MuscleGroup.Name)
+                                                        .FirstOrDefault() ?? "Sem Categoria")
+                                                    .OrderBy(g => g.Key)
+                                                    .ToList();
+
+                                                foreach (var category in exercisesByCategory)
+                                                {
+                                                    <optgroup label="@category.Key">
+                                                        @foreach (var exercise in category.OrderBy(e => e.Name))
+                                                        {
+                                                            <option value="@exercise.Id" 
+                                                                    selected="@(exercise.Id == Model.Exercises[i].ExerciseId)">
+                                                                @exercise.Name
+                                                            </option>
+                                                        }
+                                                    </optgroup>
+                                                }
                                             }
                                         </select>
                                         <div id="muscleGroups-@i" class="mt-2 muscle-groups-container"></div>
@@ -225,6 +240,46 @@
             })
         })));
 
+        // Group exercises by primary muscle group
+        function groupExercisesByPrimaryMuscle() {
+            const grouped = {};
+            
+            exercisesList.forEach(exercise => {
+                const primaryMuscle = exercise.MuscleGroups.find(mg => mg.IsPrimary);
+                const category = primaryMuscle ? primaryMuscle.Name : 'Sem Categoria';
+                
+                if (!grouped[category]) {
+                    grouped[category] = [];
+                }
+                grouped[category].push(exercise);
+            });
+            
+            // Sort categories alphabetically and exercises within each category
+            const sortedCategories = Object.keys(grouped).sort();
+            const result = {};
+            sortedCategories.forEach(category => {
+                result[category] = grouped[category].sort((a, b) => a.Name.localeCompare(b.Name));
+            });
+            
+            return result;
+        }
+
+        // Generate exercise options HTML with optgroups
+        function generateExerciseOptionsHTML() {
+            const groupedExercises = groupExercisesByPrimaryMuscle();
+            let html = '<option value="">Selecione um exercício</option>';
+            
+            Object.keys(groupedExercises).forEach(category => {
+                html += `<optgroup label="${category}">`;
+                groupedExercises[category].forEach(exercise => {
+                    html += `<option value="${exercise.Id}">${exercise.Name}</option>`;
+                });
+                html += '</optgroup>';
+            });
+            
+            return html;
+        }
+
         // Initialize muscle groups for existing exercises
         document.addEventListener('DOMContentLoaded', function() {
             @for (int i = 0; i < Model.Exercises.Count; i++)
@@ -275,8 +330,7 @@
                                 id="exercise-${exerciseCounter}"
                                 onchange="showMuscleGroups(this, ${exerciseCounter})"
                                 required>
-                            <option value="">Selecione um exercício</option>
-                            ${exercisesList.map(e => `<option value="${e.Id}">${e.Name}</option>`).join('')}
+                            ${generateExerciseOptionsHTML()}
                         </select>
                         <div id="muscleGroups-${exerciseCounter}" class="mt-2 muscle-groups-container"></div>
                     </div>
