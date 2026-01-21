@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TupiJua.Models;
 
@@ -11,9 +12,11 @@ using TupiJua.Models;
 namespace TupiJua.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260120200305_AddIsSkippedToLoggedExercise")]
+    partial class AddIsSkippedToLoggedExercise
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,10 +230,7 @@ namespace TupiJua.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<bool>("RestInMinutes")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("RestTime")
+                    b.Property<int>("RestSeconds")
                         .HasColumnType("int");
 
                     b.Property<int>("Sets")
@@ -397,11 +397,8 @@ namespace TupiJua.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int>("RecommendedRestTime")
+                    b.Property<int>("RecommendedRestSeconds")
                         .HasColumnType("int");
-
-                    b.Property<bool>("RestInMinutes")
-                        .HasColumnType("bit");
 
                     b.Property<string>("TargetReps")
                         .HasMaxLength(50)

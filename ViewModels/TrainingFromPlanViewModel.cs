@@ -74,5 +74,10 @@ namespace TupiJua.ViewModels
         /// Indica se o exercício já foi executado na sessão atual.
         /// </summary>
         public bool IsCompleted { get; set; }
+
+        /// <summary>
+        /// Indica se o exercício foi pulado na sessão atual.
+        /// </summary>
+        public bool IsSkipped { get; set; }
     }
 }
