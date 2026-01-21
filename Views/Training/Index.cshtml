@@ -18,7 +18,8 @@
                         Pronto para Treinar?
                     </h1>
                     <p class="hero-subtitle">Registre seus exercícios e acompanhe sua evolução</p>
-                    <form asp-action="StartFreeTraining" method="post" class="d-inline">
+                    <form asp-action="StartFreeTraining" method="post" class="d-inline" id="startFreeTrainingForm">
+                        @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-cta">
                             <i class="fas fa-fire me-2"></i>
                             Bora Treinar!
@@ -201,6 +202,8 @@
         </div>
     </div>
 </div>
+
+<partial name="_MultipleWorkoutsModal" />
 
 @section Scripts {
     <script src="~/js/training.js"></script>

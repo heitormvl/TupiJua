@@ -34,6 +34,9 @@ function initTrainingIndex() {
     timelineItems.forEach(item => {
         observer.observe(item);
     });
+
+    // Handle free training form submission
+    initFreeTrainingValidation();
 }
 
 // Initialize Add Exercise page
@@ -321,6 +324,7 @@ function viewWorkoutDetails(sessionId) {
 document.addEventListener('DOMContentLoaded', function() {
     initTrainingIndex();
     initAddExercise();
+    initWorkoutPlanFormsValidation();
 });
 
 // Keyframes for animations
@@ -369,4 +373,83 @@ document.head.appendChild(style);
  */
 function viewWorkoutDetails(sessionId) {
     window.location.href = `/Training/ViewWorkout?sessionId=${sessionId}`;
+}
+
+/**
+ * Initialize free training form validation
+ */
+function initFreeTrainingValidation() {
+    const freeTrainingForm = document.getElementById('startFreeTrainingForm');
+    if (freeTrainingForm) {
+        freeTrainingForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await validateAndSubmitTrainingForm(freeTrainingForm);
+        });
+    }
+}
+
+/**
+ * Initialize workout plan forms validation
+ */
+function initWorkoutPlanFormsValidation() {
+    const planForms = document.querySelectorAll('.start-plan-form');
+    planForms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await validateAndSubmitTrainingForm(form);
+        });
+    });
+}
+
+/**
+ * Common validation logic for training forms
+ * @param {HTMLFormElement} form - The form element to validate and submit
+ */
+async function validateAndSubmitTrainingForm(form) {
+    try {
+        const response = await fetch('/Training/CheckTodayWorkout');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.hasWorkout) {
+            // Show confirmation modal
+            showMultipleWorkoutsModal(form);
+        } else {
+            // No workout today, proceed normally
+            form.submit();
+        }
+    } catch (error) {
+        console.error('Erro ao verificar treinos do dia:', error);
+        // In case of error, allow the form to submit
+        form.submit();
+    }
+}
+
+/**
+ * Show the multiple workouts confirmation modal
+ * @param {HTMLFormElement} form - The form to submit on confirmation
+ */
+function showMultipleWorkoutsModal(form) {
+    const modalElement = document.getElementById('multipleWorkoutsModal');
+    const confirmButton = document.getElementById('confirmStartTraining');
+    
+    if (!modalElement || !confirmButton) return;
+    
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Remove any existing event listeners by cloning the button
+    const newConfirmButton = confirmButton.cloneNode(true);
+    confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+    
+    // Add new event listener
+    newConfirmButton.addEventListener('click', function() {
+        modal.hide();
+        form.submit();
+    });
+    
+    modal.show();
 }

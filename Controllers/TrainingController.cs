@@ -73,6 +73,28 @@ namespace TupiJua.Controllers
         }
 
         /// <summary>
+        /// Verifica se o usuário já tem um treino registrado no dia de hoje.
+        /// </summary>
+        /// <returns>JSON com informação sobre treinos do dia</returns>
+        [HttpGet]
+        public async Task<IActionResult> CheckTodayWorkout()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Json(new { hasWorkout = false });
+            }
+            
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+            
+            var hasWorkout = await _context.WorkoutSessions
+                .AnyAsync(ws => ws.UserId == userId && ws.Date >= today && ws.Date < tomorrow);
+            
+            return Json(new { hasWorkout });
+        }
+
+        /// <summary>
         /// Inicia uma nova sessão de treino livre para o usuário.
         /// </summary>
         /// <returns>Redireciona para a página de adicionar exercício na nova sessão</returns>
