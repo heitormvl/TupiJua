@@ -41,12 +41,19 @@
                     <div class="row g-2">
                         @foreach (var plan in Model.workoutPlans)
                         {
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="plan-badge">
-                                    <i class="fas fa-bookmark me-2"></i>
-                                    @plan.Name
+                            <form asp-action="StartTrainingFromPlan" method="post" class="w-100">
+                                <div class="col-12 col-md-6 col-lg-4">
+                                    <div class="plan-badge">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="workoutPlanId" value="@plan.Id" />
+                                        <button type="submit"
+                                            class="btn btn-link text-decoration-none text-reset d-flex align-items-center w-100 p-0">
+                                            <i class="fas fa-bookmark me-2"></i>
+                                            @plan.Name
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         }
                     </div>
                 </div>
@@ -99,7 +106,8 @@
                         <div class="stat-content">
                             <div class="stat-value">
                                 @{
-                                    var streak = daysAgo <= 2 && totalThisMonth >= 3 ? "Alto" : daysAgo <= 5 && totalThisMonth >= 2 ? "Médio" : "Baixo";
+                                    var streak = daysAgo <= 2 && totalThisMonth >= 3 ? "Alto" : daysAgo <= 5 &&
+                                    totalThisMonth >= 2 ? "Médio" : "Baixo";
                                 }
                                 @streak
                             </div>
@@ -121,12 +129,14 @@
                 @if (Model.sessions.Any())
                 {
                     var sessionsToShow = Model.sessions.Take(5);
-                    
+
                     <div class="timeline">
                         @foreach (var session in sessionsToShow)
                         {
-                            var hasProgressFlag = session.LoggedExercises.Any(le => le.Observation?.Contains("aumentar") == true);
-                            var exerciseNames = string.Join(", ", session.LoggedExercises.Select(le => le.Exercise.Name).Take(3));
+                            var hasProgressFlag = session.LoggedExercises.Any(le => le.Observation?.Contains("aumentar") ==
+                            true);
+                            var exerciseNames = string.Join(", ", session.LoggedExercises.Select(le =>
+                            le.Exercise.Name).Take(3));
                             if (session.LoggedExercises.Count > 3)
                             {
                                 exerciseNames += $" +{session.LoggedExercises.Count - 3}";
@@ -138,14 +148,15 @@
                                     <div class="workout-header">
                                         <div>
                                             <h5 class="workout-date">
-                                                @session.Date.ToString("dd 'de' MMM", new System.Globalization.CultureInfo("pt-BR"))
-                                            </h5>
-                                            <p class="workout-time text-muted mb-0">
-                                                <i class="fas fa-clock me-1"></i>
-                                                @session.Date.ToString("HH:mm")
-                                            </p>
-                                        </div>
-                                        @if (hasProgressFlag)
+                                                @session.Date.ToString("dd 'de' MMM", new
+                                                System.Globalization.CultureInfo("pt-BR"))
+                                    </h5>
+                                    <p class="workout-time text-muted mb-0">
+                                        <i class="fas fa-clock me-1"></i>
+                                        @session.Date.ToString("HH:mm")
+                                    </p>
+                                </div>
+                                @if (hasProgressFlag)
                                         {
                                             <span class="badge bg-warning text-dark">
                                                 <i class="fas fa-arrow-up me-1"></i>
@@ -161,16 +172,19 @@
                                         <div class="workout-stats">
                                             <span class="stat-badge">
                                                 <i class="fas fa-list-ol me-1"></i>
-                                                @session.LoggedExercises.Count exercício@(session.LoggedExercises.Count != 1 ? "s" : "")
+                                                @session.LoggedExercises.Count exercício@(session.LoggedExercises.Count != 1 ?
+                                                "s" : "")
                                             </span>
                                             <span class="stat-badge">
                                                 <i class="fas fa-redo me-1"></i>
-                                                @session.LoggedExercises.Sum(le => le.Sets) série@(session.LoggedExercises.Sum(le => le.Sets) != 1 ? "s" : "")
+                                                @session.LoggedExercises.Sum(le => le.Sets)
+                                                série@(session.LoggedExercises.Sum(le => le.Sets) != 1 ? "s" : "")
                                             </span>
                                         </div>
                                     </div>
                                     <div class="workout-footer">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="viewWorkoutDetails(@session.Id)">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            onclick="viewWorkoutDetails(@session.Id)">
                                             <i class="fas fa-eye me-1"></i>
                                             Detalhes
                                         </button>
