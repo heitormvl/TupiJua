@@ -535,6 +535,12 @@ namespace TupiJua.Controllers
                 return RedirectToAction("Index");
             }
 
+            // Não permitir edição de exercícios em treinos concluídos
+            if (loggedExercise.WorkoutSession.IsCompleted)
+            {
+                return RedirectToAction("ViewWorkout", new { sessionId = loggedExercise.WorkoutSessionId });
+            }
+
             var model = new EditLoggedExerciseViewModel
             {
                 Id = loggedExercise.Id,
@@ -573,6 +579,12 @@ namespace TupiJua.Controllers
                     return RedirectToAction("Index");
                 }
 
+                // Não permitir edição de exercícios em treinos concluídos
+                if (loggedExercise.WorkoutSession.IsCompleted)
+                {
+                    return RedirectToAction("ViewWorkout", new { sessionId = model.WorkoutSessionId });
+                }
+
                 loggedExercise.Sets = model.Sets;
                 loggedExercise.Reps = model.Reps;
                 loggedExercise.IntegerReps = CalculateIntegerReps(model.Reps);
@@ -608,6 +620,12 @@ namespace TupiJua.Controllers
             if (loggedExercise == null)
             {
                 return RedirectToAction("Index");
+            }
+
+            // Não permitir exclusão de exercícios em treinos concluídos
+            if (loggedExercise.WorkoutSession.IsCompleted)
+            {
+                return RedirectToAction("ViewWorkout", new { sessionId = loggedExercise.WorkoutSessionId });
             }
 
             var sessionId = loggedExercise.WorkoutSessionId;
