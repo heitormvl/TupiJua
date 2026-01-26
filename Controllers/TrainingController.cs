@@ -158,7 +158,7 @@ namespace TupiJua.Controllers
                     RestTime = lastLoggedExercise.RestTime,
                     RestInMinutes = lastLoggedExercise.RestInMinutes,
                     Observation = lastLoggedExercise.Observation,
-                    ShouldIncreaseLoad = true
+                    ShouldIncreaseLoad = lastLoggedExercise.ShouldIncreaseLoad
                 };
                 return Json(model);
             }
@@ -187,7 +187,8 @@ namespace TupiJua.Controllers
                     Weight = model.Weight,
                     RestTime = model.RestTime,
                     RestInMinutes = model.RestInMinutes,
-                    Observation = model.Observation
+                    Observation = model.Observation,
+                    ShouldIncreaseLoad = model.ShouldIncreaseLoad
                 };
 
                 _context.LoggedExercises.Add(loggedExercise);
@@ -384,7 +385,8 @@ namespace TupiJua.Controllers
                     Weight = model.Weight,
                     RestTime = model.RestTime,
                     RestInMinutes = model.RestInMinutes,
-                    Observation = model.Observation
+                    Observation = model.Observation,
+                    ShouldIncreaseLoad = model.ShouldIncreaseLoad
                 };
 
                 _context.LoggedExercises.Add(loggedExercise);
