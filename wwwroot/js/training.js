@@ -117,6 +117,7 @@ function loadLastExerciseData(exerciseId) {
                     document.getElementById('RestTime').value = data.restTime;
                     document.getElementById('RestInMinutes').value = data.restInMinutes;
                     updateRestUnitToggle();
+                    document.getElementById('ShouldIncreaseLoad').checked = false;
                 }
             }
         })
