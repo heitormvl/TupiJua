@@ -254,6 +254,26 @@
                                             Volume: <strong>@FormatVolume(loggedExercise.Weight * loggedExercise.Sets * loggedExercise.IntegerReps) kg</strong>
                                         </div>
                                     </div>
+
+                                    @if (!Model.IsCompleted)
+                                    {
+                                        <div class="mt-3 pt-3 border-top">
+                                            <div class="d-flex gap-2">
+                                                <a asp-action="EditLoggedExercise" asp-route-id="@loggedExercise.Id" class="btn btn-sm btn-outline-primary flex-fill">
+                                                    <i class="fas fa-edit me-1"></i>
+                                                    Editar
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger flex-fill" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteLoggedExerciseModal"
+                                                        data-id="@loggedExercise.Id"
+                                                        data-name="@loggedExercise.Exercise.Name">
+                                                    <i class="fas fa-trash me-1"></i>
+                                                    Excluir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         }
@@ -288,3 +308,59 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteLoggedExerciseModal" tabindex="-1" aria-labelledby="deleteLoggedExerciseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="deleteLoggedExerciseModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">Tem certeza que deseja excluir o exercício:</p>
+                <p class="fw-bold mb-3" id="exerciseNameToDelete"></p>
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <small><strong>Atenção:</strong> Esta ação não pode ser desfeita!</small>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </button>
+                <form id="deleteLoggedExerciseForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Handle delete modal
+        const deleteModal = document.getElementById('deleteLoggedExerciseModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                
+                const form = document.getElementById('deleteLoggedExerciseForm');
+                const nameDisplay = document.getElementById('exerciseNameToDelete');
+                
+                form.action = '@Url.Action("DeleteLoggedExercise", "Training")/' + id;
+                nameDisplay.textContent = name;
+            });
+        }
+    </script>
+}
