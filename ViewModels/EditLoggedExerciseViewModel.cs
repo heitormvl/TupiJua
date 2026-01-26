@@ -1,0 +1,73 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TupiJua.ViewModels
+{
+    /// <summary>
+    /// Modelo de visualização para editar um exercício registrado em uma sessão de treino.
+    /// </summary>
+    public class EditLoggedExerciseViewModel
+    {
+        /// <summary>
+        /// Identificador do registro.
+        /// </summary>
+        [Required]
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Identificador da sessão de treino associada.
+        /// </summary>
+        [Required]
+        public int WorkoutSessionId { get; set; }
+
+        /// <summary>
+        /// Identificador do exercício registrado.
+        /// </summary>
+        [Required]
+        public int ExerciseId { get; set; }
+
+        /// <summary>
+        /// Quantidade de séries totais.
+        /// </summary>
+        [Required]
+        [Range(1, 100, ErrorMessage = "As séries devem ser entre {1} e {2}.")]
+        public int Sets { get; set; }
+
+        /// <summary>
+        /// Repetições: pode ser fixo (ex.: "12") ou faixa (ex.: "10-12").
+        /// </summary>
+        [Required]
+        [MaxLength(20)]
+        [RegularExpression(@"^\d+(\s*-\s*\d+)?$", ErrorMessage = "Deve ser um número (ex.: '12') ou faixa (ex.: '10-12').")]
+        public string Reps { get; set; } = null!;
+
+        /// <summary>
+        /// Carga utilizada (precision: 5,2).
+        /// </summary>
+        [Column(TypeName = "decimal(5,2)")]
+        [Range(0, 999.99, ErrorMessage = "A carga deve ser entre {1} e {2}.")]
+        public decimal Weight { get; set; }
+
+        /// <summary>
+        /// Tempo de descanso entre séries.
+        /// </summary>
+        [Range(0, 3600, ErrorMessage = "O descanso deve ser entre {1} e {2}.")]
+        public int RestTime { get; set; }
+
+        /// <summary>
+        /// Flag indicando se o tempo de descanso está em minutos (true) ou segundos (false).
+        /// </summary>
+        public bool RestInMinutes { get; set; } = false;
+
+        /// <summary>
+        /// Notas rápidas sobre a execução.
+        /// </summary>
+        [MaxLength(1000)]
+        public string? Observation { get; set; }
+
+        /// <summary>
+        /// Flag indicando se deve aumentar a carga no próximo treino.
+        /// </summary>
+        public bool ShouldIncreaseLoad { get; set; } = false;
+    }
+}

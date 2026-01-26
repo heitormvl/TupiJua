@@ -515,5 +515,106 @@ namespace TupiJua.Controllers
 
             return RedirectToAction("ViewWorkout", new { sessionId });
         }
+
+        /// <summary>
+        /// Exibe o formulário para editar um exercício já registrado.
+        /// </summary>
+        /// <param name="id">ID do LoggedExercise</param>
+        /// <returns>View para editar exercício</returns>
+        [HttpGet]
+        public async Task<IActionResult> EditLoggedExercise(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var loggedExercise = await _context.LoggedExercises
+                .Include(le => le.WorkoutSession)
+                .Include(le => le.Exercise)
+                .FirstOrDefaultAsync(le => le.Id == id && le.WorkoutSession.UserId == userId);
+
+            if (loggedExercise == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var model = new EditLoggedExerciseViewModel
+            {
+                Id = loggedExercise.Id,
+                WorkoutSessionId = loggedExercise.WorkoutSessionId,
+                ExerciseId = loggedExercise.ExerciseId,
+                Sets = loggedExercise.Sets,
+                Reps = loggedExercise.Reps,
+                Weight = loggedExercise.Weight,
+                RestTime = loggedExercise.RestTime,
+                RestInMinutes = loggedExercise.RestInMinutes,
+                Observation = loggedExercise.Observation,
+                ShouldIncreaseLoad = loggedExercise.ShouldIncreaseLoad
+            };
+
+            ViewBag.Exercise = loggedExercise.Exercise;
+            return View(model);
+        }
+
+        /// <summary>
+        /// Processa o formulário de edição de um exercício já registrado.
+        /// </summary>
+        /// <param name="model">Modelo de visualização contendo os dados do exercício</param>
+        /// <returns>Redireciona para ViewWorkout</returns>
+        [HttpPost]
+        public async Task<IActionResult> EditLoggedExercise(EditLoggedExerciseViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = _userManager.GetUserId(User);
+                var loggedExercise = await _context.LoggedExercises
+                    .Include(le => le.WorkoutSession)
+                    .FirstOrDefaultAsync(le => le.Id == model.Id && le.WorkoutSession.UserId == userId);
+
+                if (loggedExercise == null)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                loggedExercise.Sets = model.Sets;
+                loggedExercise.Reps = model.Reps;
+                loggedExercise.IntegerReps = CalculateIntegerReps(model.Reps);
+                loggedExercise.Weight = model.Weight;
+                loggedExercise.RestTime = model.RestTime;
+                loggedExercise.RestInMinutes = model.RestInMinutes;
+                loggedExercise.Observation = model.Observation;
+                loggedExercise.ShouldIncreaseLoad = model.ShouldIncreaseLoad;
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("ViewWorkout", new { sessionId = model.WorkoutSessionId });
+            }
+
+            var exercise = await _context.Exercises.FindAsync(model.ExerciseId);
+            ViewBag.Exercise = exercise;
+            return View(model);
+        }
+
+        /// <summary>
+        /// Exclui um exercício registrado de uma sessão de treino.
+        /// </summary>
+        /// <param name="id">ID do LoggedExercise</param>
+        /// <returns>Redireciona para ViewWorkout</returns>
+        [HttpPost]
+        public async Task<IActionResult> DeleteLoggedExercise(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var loggedExercise = await _context.LoggedExercises
+                .Include(le => le.WorkoutSession)
+                .FirstOrDefaultAsync(le => le.Id == id && le.WorkoutSession.UserId == userId);
+
+            if (loggedExercise == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var sessionId = loggedExercise.WorkoutSessionId;
+            _context.LoggedExercises.Remove(loggedExercise);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ViewWorkout", new { sessionId });
+        }
     }
 }
