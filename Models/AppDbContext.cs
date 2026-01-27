@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TupiJua.Models
 {
@@ -55,6 +56,39 @@ namespace TupiJua.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // 1. Tenta identificar o fuso de SP independente do SO
+            TimeZoneInfo saoPauloTimeZone;
+            try
+            {
+                // Tenta o nome Windows, se falhar tenta o nome IANA (Linux/macOS)
+                saoPauloTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                saoPauloTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
+            }
+
+            // 2. Criar o conversor tratando o Kind corretamente
+            // Importante: SpecifyKind evita que o .NET tente converter algo que ele já acha que é local
+            var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+                v => TimeZoneInfo.ConvertTimeToUtc(v, saoPauloTimeZone), // Para o Banco
+                v => TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(v, DateTimeKind.Utc), saoPauloTimeZone) // Para o App
+            );
+
+            // 3. Aplicação Global
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var properties = entityType.ClrType.GetProperties()
+                    .Where(p => p.PropertyType == typeof(DateTime) || p.PropertyType == typeof(DateTime?));
+
+                foreach (var property in properties)
+                {
+                    modelBuilder.Entity(entityType.Name)
+                        .Property(property.Name)
+                        .HasConversion(dateTimeConverter);
+                }
+            }
 
             // Configura relacionamentos e comportamentos de exclusão
             modelBuilder.Entity<WorkoutPlan>()
