@@ -25,13 +25,16 @@ jobs:
 
       - name: Get current date
         id: date
-        shell: bash
+        shell: pwsh
         run: |
-          CURRENT_DATETIME=$(date +'%Y.%m.%d.%H%M%S')
-          echo "Data capturada (Brasília): $CURRENT_DATETIME"
-          echo "date=$CURRENT_DATETIME" >> $GITHUB_OUTPUT
-        env:
-          TZ: 'America/Sao_Paulo'
+          # Define o fuso horário de Brasília explicitamente
+          $tz = [System.TimeZoneInfo]::FindSystemTimeZoneById("E. South America Standard Time")
+          $brasiliaTime = [System.TimeZoneInfo]::ConvertTimeFromUtc([System.DateTime]::UtcNow, $tz)
+          
+          $formattedDate = $brasiliaTime.ToString("yyyy.MM.dd")
+          
+          echo "Data capturada (Debug - Horario de Brasilia): $($brasiliaTime.ToString('yyyy.MM.dd HH:mm:ss'))"
+          echo "date=$formattedDate" >> $env:GITHUB_OUTPUT
 
       - name: AppSettings Variable Substitution
         uses: microsoft/variable-substitution@v1
