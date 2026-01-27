@@ -240,14 +240,14 @@ function setRestUnit(isMinutes) {
         // Convert from seconds to minutes
         restInMinutesInput.value = 'true';
         restTimeInput.value = Math.round(currentValue / 60);
-        restTimeInput.setAttribute('step', '1');
+        restTimeInput.step = 1;
         restUnitSeg.classList.remove('active');
         restUnitMin.classList.add('active');
     } else {
         // Convert from minutes to seconds
         restInMinutesInput.value = 'false';
         restTimeInput.value = currentValue * 60;
-        restTimeInput.setAttribute('step', '15');
+        restTimeInput.step = 15;
         restUnitMin.classList.remove('active');
         restUnitSeg.classList.add('active');
     }
@@ -267,11 +267,11 @@ function updateRestUnitToggle() {
     if (isMinutes) {
         restUnitSeg.classList.remove('active');
         restUnitMin.classList.add('active');
-        restTimeInput.setAttribute('step', '1');
+        restTimeInput.step = 1;
     } else {
         restUnitMin.classList.remove('active');
         restUnitSeg.classList.add('active');
-        restTimeInput.setAttribute('step', '15');
+        restTimeInput.step = 15;
     }
 }
 
