@@ -26,7 +26,10 @@ jobs:
       - name: Get current date
         id: date
         shell: bash
-        run: echo "date=$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
+        run: |
+          CURRENT_DATE=$(date +'%Y.%m.%d')
+          echo "Data capturada (Brasília): $CURRENT_DATE"
+          echo "date=$CURRENT_DATE" >> $GITHUB_OUTPUT
         env:
           TZ: 'America/Sao_Paulo'
 
