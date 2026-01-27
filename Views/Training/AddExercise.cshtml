@@ -197,7 +197,7 @@
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="RestTime" type="number" class="form-control form-control-lg text-center" 
-                                   id="RestTime" min="0" max="3600" step="15" value="60" required />
+                                   id="RestTime" min="0" max="3600" step="@(restInMinutes ? "1" : "15")" value="60" required />
                             <button type="button" class="btn-number-control" onclick="incrementRestTime()">
                                 <i class="fas fa-plus"></i>
                             </button>
