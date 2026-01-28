@@ -84,13 +84,13 @@ namespace TupiJua.Controllers
             {
                 return Json(new { hasWorkout = false });
             }
-            
+
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
-            
+
             var hasWorkout = await _context.WorkoutSessions
                 .AnyAsync(ws => ws.UserId == userId && ws.Date >= today && ws.Date < tomorrow);
-            
+
             return Json(new { hasWorkout });
         }
 
@@ -633,6 +633,24 @@ namespace TupiJua.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("ViewWorkout", new { sessionId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteWorkoutSession(int sessionId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var session = await _context.WorkoutSessions
+                .FirstOrDefaultAsync(ws => ws.Id == sessionId && ws.UserId == userId);
+
+            if (session == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            _context.WorkoutSessions.Remove(session);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
     }
 }
