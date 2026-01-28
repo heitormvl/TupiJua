@@ -72,7 +72,7 @@ namespace TupiJua.Models
             // 2. Criar o conversor tratando o Kind corretamente
             // Importante: SpecifyKind evita que o .NET tente converter algo que ele já acha que é local
             var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
-                v => TimeZoneInfo.ConvertTimeToUtc(v, saoPauloTimeZone), // Para o Banco
+                v => TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(v, DateTimeKind.Unspecified), saoPauloTimeZone), // Para o Banco
                 v => TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(v, DateTimeKind.Utc), saoPauloTimeZone) // Para o App
             );
 
