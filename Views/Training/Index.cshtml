@@ -188,6 +188,14 @@
                                             <i class="fas fa-eye me-1"></i>
                                             Detalhes
                                         </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteWorkoutModal"
+                                            data-id="@session.Id"
+                                            data-date="@session.Date.ToString("dd/MM/yyyy") às @session.Date.ToString("HH:mm")">
+                                            <i class="fas fa-trash me-1"></i>
+                                            Excluir
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -219,6 +227,59 @@
 
 <partial name="_MultipleWorkoutsModal" />
 
+<!-- Delete Workout Confirmation Modal -->
+<div class="modal fade" id="deleteWorkoutModal" tabindex="-1" aria-labelledby="deleteWorkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="deleteWorkoutModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">Tem certeza que deseja excluir o treino do dia:</p>
+                <p class="fw-bold mb-3" id="workoutDateToDelete"></p>
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <small><strong>Atenção:</strong> Esta ação não pode ser desfeita! Todos os exercícios registrados neste treino serão perdidos.</small>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </button>
+                <form id="deleteWorkoutForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/training.js"></script>
+    <script>
+        // Handle delete workout modal
+        const deleteWorkoutModal = document.getElementById('deleteWorkoutModal');
+        if (deleteWorkoutModal) {
+            deleteWorkoutModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const date = button.getAttribute('data-date');
+                
+                const form = document.getElementById('deleteWorkoutForm');
+                const dateDisplay = document.getElementById('workoutDateToDelete');
+                
+                form.action = '@Url.Action("DeleteWorkoutSession", "Training")?sessionId=' + id;
+                dateDisplay.textContent = date;
+            });
+        }
+    </script>
 }
