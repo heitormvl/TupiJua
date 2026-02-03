@@ -103,6 +103,9 @@
             @RenderBody()
         </main>
     </div>
+    
+    @await Component.InvokeAsync("ActiveSession")
+    
     <div class="pre-alpha-badge">
         @Configuration["AppSettings:BuildVersion"]
     </div>

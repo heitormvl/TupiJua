@@ -1,0 +1,48 @@
+@model TupiJua.Models.WorkoutSession
+
+<div class="active-session-card">
+    <div class="active-session-content">
+        <div class="active-session-info">
+            <div class="active-session-icon">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <div class="active-session-text">
+                <div class="active-session-title">
+                    @if (Model.WorkoutPlan != null)
+                    {
+                        <strong>@Model.WorkoutPlan.Name</strong>
+                    }
+                    else
+                    {
+                        <strong>Treino Livre</strong>
+                    }
+                    <span class="active-session-badge">em andamento</span>
+                </div>
+                <div class="active-session-subtitle">
+                    @if (Model.LoggedExercises.Any())
+                    {
+                        <span>@Model.LoggedExercises.Count exercício@(Model.LoggedExercises.Count != 1 ? "s" : "") registrado@(Model.LoggedExercises.Count != 1 ? "s" : "")</span>
+                    }
+                    else
+                    {
+                        <span>Nenhum exercício registrado ainda</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="active-session-actions">
+            <a asp-controller="Training" asp-action="AddExercise" asp-route-sessionId="@Model.Id" 
+               class="btn btn-sm btn-light me-2">
+                <i class="fas fa-plus"></i>
+            </a>
+            <a asp-controller="Training" asp-action="ViewWorkout" asp-route-sessionId="@Model.Id" 
+               class="btn btn-sm btn-primary">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.classList.add('has-active-session');
+</script>

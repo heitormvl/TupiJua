@@ -211,6 +211,14 @@ body {
   z-index: 9999;
   text-transform: uppercase;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+body.has-active-session .pre-alpha-badge {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes scaleIn {
@@ -1471,6 +1479,167 @@ body {
 
     .exercise-detail-name {
         font-size: 1.1rem;
+    }
+}
+
+/* ======================================
+   Active Session Card (Floating)
+   ====================================== */
+
+.active-session-card {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 2rem);
+    max-width: 600px;
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.75), rgba(84, 115, 255, 0.75));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    box-shadow: 0 -8px 32px rgba(13, 110, 253, 0.4), 
+                0 -2px 16px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: none;
+    z-index: 9998;
+    animation: slideUp 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
+    padding-bottom: 32px;
+}
+
+.active-session-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+}
+
+.active-session-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.active-session-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.active-session-text {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.active-session-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.active-session-badge {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.active-session-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+}
+
+.active-session-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.active-session-actions .btn {
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.active-session-actions .btn-light {
+    background: rgba(255, 255, 255, 0.9);
+    color: #0d6efd;
+    border: none;
+}
+
+.active-session-actions .btn-light:hover {
+    background: white;
+    transform: translateY(-2px);
+}
+
+.active-session-actions .btn-primary {
+    background: white;
+    color: #0d6efd;
+    border: none;
+}
+
+.active-session-actions .btn-primary:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@media (max-width: 576px) {
+    .active-session-card {
+        width: 100%;
+        border-radius: 0;
+    }
+
+    .active-session-content {
+        padding: 0.875rem 1rem;
+    }
+
+    .active-session-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+
+    .active-session-title {
+        font-size: 0.9rem;
+    }
+
+    .active-session-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .active-session-actions .btn {
+        padding: 0.625rem 0.875rem;
+        font-size: 1rem;
     }
 }
 
