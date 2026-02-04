@@ -1,7 +1,7 @@
 /**
  * RestTimer - Temporizador de descanso resiliente à suspensão do navegador
  * 
- * Usa performance.now() para cálculo baseado em timestamp final
+ * Usa Date.now() para cálculo baseado em timestamp final
  * Implementa Silent Audio Loop para manter execução ativa
  * Usa Web Audio API para notificação sonora
  */
