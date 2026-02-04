@@ -51,36 +51,35 @@ class RestTimer {
         if (!this.audioContext) return;
 
         try {
-            // Cria um oscillator silencioso
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
-            
             // Usa MediaStreamAudioDestinationNode para garantir silêncio real
             // sem conectar aos alto-falantes do dispositivo
             const silentDestination = this.audioContext.createMediaStreamDestination();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(silentDestination);
-            
-            // Silêncio real (gain=0) - não há risco de ser audível
-            gainNode.gain.value = 0;
-            
-            oscillator.start();
-            this.silentNode = oscillator;
+            this._setupOscillator(silentDestination, 0);
         } catch (e) {
-            // Fallback: se MediaStreamAudioDestinationNode não estiver disponível
-            // usa o método anterior com volume muito baixo
-            console.warn('MediaStreamAudioDestinationNode não disponível, usando fallback:', e);
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            gainNode.gain.value = 0.00001;
-            
-            oscillator.start();
-            this.silentNode = oscillator;
+            // Fallback: se MediaStreamAudioDestinationNode não estiver disponível,
+            // usa o método anterior com volume muito baixo (gain=0.00001).
+            // IMPORTANTE: Este fallback pode ser audível em alguns dispositivos/fones sensíveis.
+            console.warn('MediaStreamAudioDestinationNode não disponível, usando fallback com gain=0.00001:', e);
+            this._setupOscillator(this.audioContext.destination, 0.00001);
         }
+    }
+
+    /**
+     * Configura o oscillator silencioso com o destino e ganho especificados
+     * @param {AudioNode} destination - Nó de destino do áudio
+     * @param {number} gainValue - Valor do ganho (0 para silêncio real)
+     */
+    _setupOscillator(destination, gainValue) {
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(destination);
+        
+        gainNode.gain.value = gainValue;
+        
+        oscillator.start();
+        this.silentNode = oscillator;
     }
 
     /**
