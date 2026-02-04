@@ -68,7 +68,7 @@ class RestTimer {
     /**
      * Configura o oscillator silencioso com o destino e ganho especificados
      * @param {AudioNode} destination - Nó de destino do áudio
-     * @param {number} gainValue - Valor do ganho (0 para silêncio real)
+     * @param {number} gainValue - Valor do ganho (0 para silêncio real, 0.00001 para fallback)
      */
     _setupOscillator(destination, gainValue) {
         const oscillator = this.audioContext.createOscillator();
