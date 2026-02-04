@@ -8,10 +8,13 @@ class RestTimerUI {
         this.defaultSeconds = this.loadLastDuration();
         this.isExpanded = false;
         this.isActive = false;
+        this.lastSaveTime = 0; // Timestamp da última gravação no localStorage
+        this.saveThrottleMs = 1000; // Throttle de 1 segundo
         
         this.initializeUI();
         this.attachEventListeners();
         this.setupTimerCallbacks();
+        this.setupVisibilityListener();
         this.restoreActiveTimer();
     }
 
@@ -72,10 +75,19 @@ class RestTimerUI {
 
     /**
      * Salva estado do timer no localStorage
+     * @param {boolean} immediate - Se true, salva imediatamente ignorando throttle
      */
-    saveTimerState() {
+    saveTimerState(immediate = false) {
         if (!this.isActive) {
             localStorage.removeItem('restTimerState');
+            this.lastSaveTime = 0;
+            return;
+        }
+
+        const now = Date.now();
+        
+        // Se não é imediato, verifica throttle
+        if (!immediate && (now - this.lastSaveTime) < this.saveThrottleMs) {
             return;
         }
 
@@ -87,6 +99,19 @@ class RestTimerUI {
         };
 
         localStorage.setItem('restTimerState', JSON.stringify(state));
+        this.lastSaveTime = now;
+    }
+
+    /**
+     * Configura listener para salvar estado quando a visibilidade da página muda
+     */
+    setupVisibilityListener() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && this.isActive) {
+                // Salva imediatamente quando a aba fica oculta
+                this.saveTimerState(true);
+            }
+        });
     }
 
     /**
@@ -360,7 +385,7 @@ class RestTimerUI {
         document.getElementById('restTimerPill').classList.add('active');
         
         this.timer.start(seconds);
-        this.saveTimerState();
+        this.saveTimerState(true); // Salva imediatamente ao iniciar
     }
 
     /**
@@ -399,7 +424,7 @@ class RestTimerUI {
                 this.updatePauseBtnIcon(true);
             }
 
-            this.saveTimerState();
+            this.saveTimerState(true); // Salva imediatamente em pause/resume
         } catch (error) {
             // Mantém o estado visual atual em caso de erro ao retomar
             // para evitar indicar "rodando" quando o resume falhar.
@@ -440,9 +465,9 @@ class RestTimerUI {
         const progress = (remainingSeconds / totalSeconds) * 100;
         document.querySelector('.rest-timer-pill-progress').style.width = `${progress}%`;
         
-        // Atualiza localStorage periodicamente
+        // Salva estado com throttle (máximo 1x por segundo)
         if (this.isActive) {
-            this.saveTimerState();
+            this.saveTimerState(false);
         }
     }
 
