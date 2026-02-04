@@ -94,7 +94,18 @@ class RestTimerUI {
      */
     loadLastDuration() {
         const saved = this.getCookie('restTimerDuration');
-        return saved ? parseInt(saved) : 60;
+
+        if (!saved) {
+            return 60;
+        }
+
+        const parsed = parseInt(saved, 10);
+
+        if (!Number.isFinite(parsed) || parsed < 1) {
+            return 60;
+        }
+
+        return parsed;
     }
 
     /**
