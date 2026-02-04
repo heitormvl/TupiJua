@@ -1996,6 +1996,18 @@ body.has-active-session .pre-alpha-badge {
     }
 }
 
+/* Acessibilidade: respeita preferência por movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+    .rest-timer-completion-content {
+        animation: none;
+        transition: transform 0.1s ease;
+    }
+
+    .rest-timer-completion-header i {
+        animation: none;
+    }
+}
+
 /* Responsivo */
 @media (max-width: 576px) {
     .rest-timer-fab {
