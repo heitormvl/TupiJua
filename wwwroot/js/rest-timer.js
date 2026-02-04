@@ -213,6 +213,8 @@ class RestTimer {
             this.intervalId = null;
         }
         
+        this.stopSoundLoop();
+        
         this.endTime = null;
         this.remainingSeconds = 0;
         this.isPaused = false;
