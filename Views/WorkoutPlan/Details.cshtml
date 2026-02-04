@@ -1,0 +1,289 @@
+@model TupiJua.Models.WorkoutPlan
+
+@{
+    ViewData["Title"] = "Detalhes do Plano";
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row g-3 g-md-4">
+        <!-- Hero Section -->
+        <div class="col-12">
+            <div class="hero-card" style="position: relative;">
+                @if (Model.IsActive)
+                {
+                    <span class="badge bg-success d-none d-md-inline-flex" style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1rem; padding: 0.5rem 1rem; z-index: 10;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Ativo
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary d-none d-md-inline-flex" style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1rem; padding: 0.5rem 1rem; z-index: 10;">
+                        <i class="fas fa-pause-circle me-2"></i>
+                        Inativo
+                    </span>
+                }
+                <div class="hero-content">
+                    <h2 class="hero-title mb-2">
+                        <i class="fas fa-bookmark me-2"></i>
+                        @Model.Name
+                    </h2>
+                    <p class="hero-subtitle mb-0">
+                        Visualize todos os detalhes do seu plano de treino
+                    </p>
+                    <div class="d-flex d-md-none justify-content-center mt-3">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Ativo
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-pause-circle me-2"></i>
+                                Inativo
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="col-12">
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <div class="stat-card stat-card-1">
+                        <div class="stat-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">@Model.PlanExercises.Count</div>
+                            <div class="stat-label">@(Model.PlanExercises.Count == 1 ? "Exercício" : "Exercícios")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <div class="stat-card stat-card-2">
+                        <div class="stat-icon">
+                            <i class="fas fa-redo"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">@Model.PlanExercises.Sum(pe => pe.TargetSets)</div>
+                            <div class="stat-label">Séries totais</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <div class="stat-card stat-card-3">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">@Model.PlanExercises.Where(pe => pe.RecommendedRestTime > 0).Count()</div>
+                            <div class="stat-label">Com descanso definido</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercises List -->
+        <div class="col-12">
+            <div class="workout-plan-card">
+                <div class="plan-card-header">
+                    <h4 class="plan-name mb-3">
+                        <i class="fas fa-list-ol me-2"></i>
+                        Exercícios do Plano
+                    </h4>
+                </div>
+                    
+                @if (Model.PlanExercises.Any())
+                {
+                    <div class="plan-exercises-list">
+                        @foreach (var planExercise in Model.PlanExercises.OrderBy(pe => pe.Order))
+                        {
+                            <div class="exercise-detail-card mb-3">
+                                <div class="exercise-detail-header">
+                                    <span class="exercise-order">@planExercise.Order</span>
+                                    <div class="flex-grow-1">
+                                        <h5 class="mb-1">@planExercise.Exercise.Name</h5>
+                                        @if (planExercise.Exercise.ExerciseMuscleGroups.Any())
+                                        {
+                                            <p class="text-muted small mb-0">
+                                                <i class="fas fa-bullseye me-1"></i>
+                                                @string.Join(", ", planExercise.Exercise.ExerciseMuscleGroups.Select(emg => emg.MuscleGroup.Name))
+                                            </p>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row g-2 mt-3">
+                                    <div class="col-6 col-md-3">
+                                        <div class="exercise-stat-box">
+                                            <i class="fas fa-redo text-primary"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Séries</small>
+                                                <strong>@planExercise.TargetSets</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="exercise-stat-box">
+                                            <i class="fas fa-hashtag text-success"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Repetições</small>
+                                                <strong>@planExercise.TargetReps</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="exercise-stat-box">
+                                            <i class="fas fa-stopwatch text-warning"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Descanso</small>
+                                                <strong>
+                                                    @if (planExercise.RestInMinutes)
+                                                    {
+                                                        @($"{planExercise.RecommendedRestTime} min")
+                                                    }
+                                                    else
+                                                    {
+                                                        @($"{planExercise.RecommendedRestTime}s")
+                                                    }
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="exercise-stat-box">
+                                            <i class="fas fa-hashtag text-info"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Repetições</small>
+                                                <strong>@planExercise.TargetReps</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h5>Nenhum exercício neste plano</h5>
+                        <p class="text-muted mb-0">
+                            Adicione exercícios ao seu plano para começar a treinar!
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="col-12">
+            <div class="workout-plan-card">
+                <div class="plan-card-header">
+                    <h4 class="plan-name mb-3">
+                        <i class="fas fa-cog me-2"></i>
+                        Ações do Plano
+                    </h4>
+                </div>
+                <div class="plan-card-actions">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary flex-grow-1">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Plano
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePlanModal">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="col-12">
+            <div class="d-flex justify-content-between gap-2 flex-wrap">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Voltar
+                </a>
+                <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="workoutPlanId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-fire me-2"></i>
+                        Bora Treinar!
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Plan Confirmation Modal -->
+<div class="modal fade" id="deletePlanModal" tabindex="-1" aria-labelledby="deletePlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePlanModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o plano <strong>@Model.Name</strong>?</p>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Esta ação não pode ser desfeita!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Animate cards on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.workout-plan-card, .stat-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Animate exercise cards
+            const exerciseCards = document.querySelectorAll('.exercise-detail-card');
+            exerciseCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateX(0)';
+                }, 400 + (index * 100));
+            });
+        });
+    </script>
+}

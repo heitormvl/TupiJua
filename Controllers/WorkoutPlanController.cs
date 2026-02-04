@@ -37,6 +37,30 @@ namespace TupiJua.Controllers
         }
 
         /// <summary>
+        /// Exibe os detalhes de um plano de treino
+        /// </summary>
+        /// <param name="id">O ID do plano de treino</param>
+        /// <returns>Uma view com os detalhes do plano de treino</returns>
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var workoutPlan = await _context.WorkoutPlans
+                .Include(wp => wp.PlanExercises)
+                .ThenInclude(pe => pe.Exercise)
+                .ThenInclude(e => e.ExerciseMuscleGroups)
+                .ThenInclude(emg => emg.MuscleGroup)
+                .FirstOrDefaultAsync(wp => wp.Id == id && wp.UserId == userId);
+
+            if (workoutPlan == null)
+            {
+                return NotFound();
+            }
+
+            return View(workoutPlan);
+        }
+
+        /// <summary>
         /// Exibe o formulário para criação de um novo plano de treino
         /// </summary>
         /// <returns>Uma view com o formulário de criação</returns>

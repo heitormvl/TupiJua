@@ -158,6 +158,9 @@
                                         </button>
                                     </form>
                                     <div class="btn-group">
+                                        <a asp-controller="WorkoutPlan" asp-action="Details" asp-route-id="@plan.Id" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Ver Detalhes" aria-label="Ver Detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
                                         <a asp-controller="WorkoutPlan" asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Editar" aria-label="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>

@@ -34,6 +34,7 @@ namespace TupiJua.Controllers
                 .ToListAsync();
             var WorkoutPlans = await _context.WorkoutPlans
                 .Where(wp => wp.UserId == userId && wp.IsActive)
+                .Include(wp => wp.PlanExercises)
                 .ToListAsync();
             var workoutPlansModels = new List<WorkoutPlanViewModel>();
             foreach (var plan in WorkoutPlans)
@@ -41,7 +42,8 @@ namespace TupiJua.Controllers
                 workoutPlansModels.Add(new WorkoutPlanViewModel
                 {
                     Id = plan.Id,
-                    Name = plan.Name
+                    Name = plan.Name,
+                    ExerciseCount = plan.PlanExercises.Count
                 });
             }
             return View((sessions, workoutPlansModels));
