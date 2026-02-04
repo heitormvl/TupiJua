@@ -140,34 +140,34 @@ function displayLastExerciseInfo(data) {
     const restUnit = data.restInMinutes ? 'min' : 'seg';
     
     dataContainer.innerHTML = `
-        <div class="row g-2">
+        <div class="row g-3">
             <div class="col-6 col-sm-3">
-                <div class="last-exercise-stat">
-                    <small class="text-muted">Séries</small>
-                    <strong>${data.sets}</strong>
+                <div class="last-exercise-stat text-center">
+                    <small class="text-muted d-block mb-1">Séries</small>
+                    <strong class="text-success">${data.sets}</strong>
                 </div>
             </div>
             <div class="col-6 col-sm-3">
-                <div class="last-exercise-stat">
-                    <small class="text-muted">Reps</small>
-                    <strong>${data.reps}</strong>
+                <div class="last-exercise-stat text-center">
+                    <small class="text-muted d-block mb-1">Reps</small>
+                    <strong class="text-success">${data.reps}</strong>
                 </div>
             </div>
             <div class="col-6 col-sm-3">
-                <div class="last-exercise-stat">
-                    <small class="text-muted">Carga</small>
-                    <strong>${data.weight.toFixed(1)} kg</strong>
+                <div class="last-exercise-stat text-center">
+                    <small class="text-muted d-block mb-1">Carga</small>
+                    <strong class="text-success">${data.weight.toFixed(1)} kg</strong>
                 </div>
             </div>
             <div class="col-6 col-sm-3">
-                <div class="last-exercise-stat">
-                    <small class="text-muted">Descanso</small>
-                    <strong>${data.restTime} ${restUnit}</strong>
+                <div class="last-exercise-stat text-center">
+                    <small class="text-muted d-block mb-1">Descanso</small>
+                    <strong class="text-success">${data.restTime} ${restUnit}</strong>
                 </div>
             </div>
         </div>
-        ${data.observation ? `<p class="small text-muted mt-2 mb-0"><i class="fas fa-comment me-1"></i>${data.observation}</p>` : ''}
-        ${increaseFlag}
+        ${data.observation ? `<p class="small text-muted mt-3 mb-0 text-center"><i class="fas fa-comment me-1"></i>${data.observation}</p>` : ''}
+        ${increaseFlag ? `<div class="text-center mt-2">${increaseFlag}</div>` : ''}
     `;
     
     infoCard.style.display = 'none';
@@ -177,15 +177,46 @@ function displayLastExerciseInfo(data) {
     }, 100);
 }
 
-// Close last exercise info card
-function closeLastExerciseInfo() {
-    const infoCard = document.getElementById('lastExerciseInfo');
-    if (infoCard) {
-        infoCard.style.animation = 'slideUp 0.3s ease forwards';
+// Toggle card minimize/expand
+function toggleCardMinimize(cardId) {
+    const card = document.getElementById(cardId);
+    const icon = document.getElementById(`${cardId}-icon`);
+    const content = document.getElementById(`${cardId}-content`) || card.querySelector('.last-exercise-data');
+    
+    if (!card || !icon || !content) return;
+    
+    const isMinimized = content.classList.contains('minimized');
+    
+    if (isMinimized) {
+        // Expand
+        content.classList.remove('minimized');
+        content.style.maxHeight = content.scrollHeight + 'px';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+        
+        // Remove max-height after animation
         setTimeout(() => {
-            infoCard.style.display = 'none';
+            if (!content.classList.contains('minimized')) {
+                content.style.maxHeight = '';
+            }
         }, 300);
+    } else {
+        // Set max-height for animation
+        content.style.maxHeight = content.scrollHeight + 'px';
+        
+        // Force reflow
+        content.offsetHeight;
+        
+        // Minimize
+        content.classList.add('minimized');
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
     }
+}
+
+// Close last exercise info card (kept for backward compatibility)
+function closeLastExerciseInfo() {
+    toggleCardMinimize('lastExerciseInfo');
 }
 
 // Increment number input value
