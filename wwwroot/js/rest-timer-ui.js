@@ -368,17 +368,37 @@ class RestTimerUI {
     }
 
     /**
-     * Pausa/resume o timer
+     * Pausa ou continua o timer de forma assíncrona.
+     * Garante que o resume seja aguardado e evita cliques repetidos durante a transição.
+     * @returns {Promise<void>}
      */
-    togglePause() {
-        if (this.timer.isPausedState()) {
-            this.timer.resume();
-            this.updatePauseBtnIcon(false);
-        } else {
-            this.timer.pause();
-            this.updatePauseBtnIcon(true);
+    async togglePause() {
+        const pauseBtn = document.getElementById('restTimerPauseBtnPill');
+
+        if (pauseBtn) {
+            pauseBtn.disabled = true;
         }
-        this.saveTimerState();
+
+        try {
+            if (this.timer.isPausedState()) {
+                await this.timer.resume();
+                this.updatePauseBtnIcon(false);
+            } else {
+                this.timer.pause();
+                this.updatePauseBtnIcon(true);
+            }
+
+            this.saveTimerState();
+        } catch (error) {
+            // Mantém o estado visual atual em caso de erro ao retomar
+            // para evitar indicar "rodando" quando o resume falhar.
+            // eslint-disable-next-line no-console
+            console.error('Erro ao retomar o temporizador de descanso:', error);
+        } finally {
+            if (pauseBtn) {
+                pauseBtn.disabled = false;
+            }
+        }
     }
 
     /**
