@@ -21,17 +21,17 @@ class RestTimer {
         // Web Audio API para Silent Audio Loop e notificação
         this.audioContext = null;
         this.silentNode = null;
-        this.initAudioContext();
     }
 
     /**
-     * Inicializa o AudioContext e cria o Silent Audio Loop
+     * Inicializa o AudioContext (chamado sob demanda)
      */
     initAudioContext() {
+        if (this.audioContext) return; // Já inicializado
+        
         try {
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
             this.audioContext = new AudioContext();
-            this.createSilentLoop();
         } catch (e) {
             console.warn('Web Audio API não disponível:', e);
         }
@@ -48,7 +48,7 @@ class RestTimer {
      * audível em alguns dispositivos/fones sensíveis.
      */
     createSilentLoop() {
-        if (!this.audioContext) return;
+        if (!this.audioContext || this.silentNode !== null) return;
 
         // Feature detection: verifica se MediaStreamAudioDestinationNode está disponível
         if (typeof this.audioContext.createMediaStreamDestination === 'function') {
@@ -84,9 +84,25 @@ class RestTimer {
     }
 
     /**
+     * Para o loop de áudio silencioso
+     */
+    stopSilentLoop() {
+        if (this.silentNode) {
+            try {
+                this.silentNode.stop();
+            } catch (e) {
+                // Ignora InvalidStateError se o oscillator já foi parado
+            }
+            this.silentNode = null;
+        }
+    }
+
+    /**
      * Resume o AudioContext (necessário após interação do usuário)
      */
     async resumeAudioContext() {
+        this.initAudioContext();
+        
         if (this.audioContext && this.audioContext.state === 'suspended') {
             try {
                 await this.audioContext.resume();
@@ -174,6 +190,7 @@ class RestTimer {
         }
 
         await this.resumeAudioContext();
+        this.createSilentLoop(); // Inicia o loop silencioso apenas quando o timer inicia
 
         this.totalDuration = seconds;
         this.remainingSeconds = seconds;
@@ -204,6 +221,8 @@ class RestTimer {
             clearInterval(this.intervalId);
             this.intervalId = null;
         }
+        
+        this.stopSilentLoop(); // Para o loop silencioso ao pausar
     }
 
     /**
@@ -216,6 +235,7 @@ class RestTimer {
         this.isPaused = false;
 
         await this.resumeAudioContext();
+        this.createSilentLoop(); // Reinicia o loop silencioso ao resumir
 
         const now = Date.now();
         this.endTime = now + (this.pausedRemaining * 1000);
@@ -343,11 +363,7 @@ class RestTimer {
     destroy() {
         this.stop();
         this.stopSoundLoop();
-        
-        if (this.silentNode) {
-            this.silentNode.stop();
-            this.silentNode = null;
-        }
+        this.stopSilentLoop();
         
         if (this.audioContext) {
             this.audioContext.close();
