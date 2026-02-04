@@ -14,5 +14,10 @@
         /// Nome do plano de treino.
         /// </summary>
         public string Name { get; set; } = null!;
+
+        /// <summary>
+        /// Quantidade de exercícios no plano de treino.
+        /// </summary>
+        public int ExerciseCount { get; set; }
     }
 }

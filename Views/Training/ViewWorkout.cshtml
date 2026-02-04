@@ -27,43 +27,53 @@
     <div class="row justify-content-center">
         <div class="col-12 col-lg-10">
             <!-- Header Card -->
-            <div class="hero-card mb-4">
+            <div class="hero-card mb-4" style="position: relative;">
+                @if (Model.IsCompleted)
+                {
+                    <span class="badge bg-success d-none d-md-inline-flex" style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1rem; padding: 0.5rem 1rem; z-index: 10;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Concluído
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark d-none d-md-inline-flex" style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1rem; padding: 0.5rem 1rem; z-index: 10;">
+                        <i class="fas fa-clock me-2"></i>
+                        Em andamento
+                    </span>
+                }
                 <div class="hero-content">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                        <div>
-                            <h2 class="hero-title mb-2">
-                                <i class="fas fa-dumbbell me-2"></i>
-                                @if (Model.WorkoutPlan != null)
-                                {
-                                    <span>@Model.WorkoutPlan.Name</span>
-                                }
-                                else
-                                {
-                                    <span>Treino Livre</span>
-                                }
-                            </h2>
-                            <p class="hero-subtitle mb-0">
-                                <i class="fas fa-calendar me-2"></i>
-                                @Model.Date.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("pt-BR"))
-                                às @Model.Date.ToString("HH:mm")
-                            </p>
-                        </div>
-                        <div>
-                            @if (Model.IsCompleted)
-                            {
-                                <span class="badge bg-success" style="font-size: 1rem; padding: 0.5rem 1rem;">
-                                    <i class="fas fa-check-circle me-2"></i>
-                                    Concluído
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark" style="font-size: 1rem; padding: 0.5rem 1rem;">
-                                    <i class="fas fa-clock me-2"></i>
-                                    Em andamento
-                                </span>
-                            }
-                        </div>
+                    <h2 class="hero-title mb-2">
+                        <i class="fas fa-dumbbell me-2"></i>
+                        @if (Model.WorkoutPlan != null)
+                        {
+                            <span>@Model.WorkoutPlan.Name</span>
+                        }
+                        else
+                        {
+                            <span>Treino Livre</span>
+                        }
+                    </h2>
+                    <p class="hero-subtitle mb-0">
+                        <i class="fas fa-calendar me-2"></i>
+                        @Model.Date.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("pt-BR"))
+                        às @Model.Date.ToString("HH:mm")
+                    </p>
+                    <div class="d-flex d-md-none justify-content-center mt-3">
+                        @if (Model.IsCompleted)
+                        {
+                            <span class="badge bg-success" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Concluído
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-clock me-2"></i>
+                                Em andamento
+                            </span>
+                        }
                     </div>
                 </div>
             </div>

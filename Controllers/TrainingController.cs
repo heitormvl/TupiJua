@@ -34,6 +34,7 @@ namespace TupiJua.Controllers
                 .ToListAsync();
             var WorkoutPlans = await _context.WorkoutPlans
                 .Where(wp => wp.UserId == userId && wp.IsActive)
+                .Include(wp => wp.PlanExercises)
                 .ToListAsync();
             var workoutPlansModels = new List<WorkoutPlanViewModel>();
             foreach (var plan in WorkoutPlans)
@@ -41,7 +42,8 @@ namespace TupiJua.Controllers
                 workoutPlansModels.Add(new WorkoutPlanViewModel
                 {
                     Id = plan.Id,
-                    Name = plan.Name
+                    Name = plan.Name,
+                    ExerciseCount = plan.PlanExercises.Count
                 });
             }
             return View((sessions, workoutPlansModels));
@@ -343,6 +345,12 @@ namespace TupiJua.Controllers
                 return RedirectToAction("ExecutePlan", new { sessionId });
             }
 
+            // Buscar última execução do exercício
+            var lastLoggedExercise = await _context.LoggedExercises
+                .Where(le => le.ExerciseId == exerciseId && le.WorkoutSession.UserId == userId && !le.IsSkipped)
+                .OrderByDescending(le => le.WorkoutSession.Date)
+                .FirstOrDefaultAsync();
+
             var exercise = await _context.Exercises.FindAsync(exerciseId);
             ViewBag.Exercise = exercise;
             ViewBag.TargetSets = planExercise.TargetSets;
@@ -350,6 +358,21 @@ namespace TupiJua.Controllers
             ViewBag.RecommendedRestTime = planExercise.RecommendedRestTime;
             ViewBag.RestInMinutes = planExercise.RestInMinutes;
             ViewBag.FromPlan = true;
+
+            // Passar dados da última execução se existir
+            if (lastLoggedExercise != null)
+            {
+                ViewBag.LastSets = lastLoggedExercise.Sets;
+                ViewBag.LastReps = lastLoggedExercise.Reps;
+                ViewBag.LastWeight = lastLoggedExercise.Weight;
+                ViewBag.LastRestTime = lastLoggedExercise.RestTime;
+                ViewBag.LastRestInMinutes = lastLoggedExercise.RestInMinutes;
+                ViewBag.HasLastExecution = true;
+            }
+            else
+            {
+                ViewBag.HasLastExecution = false;
+            }
 
             var model = new LogExerciseViewModel
             {

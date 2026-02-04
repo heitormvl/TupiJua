@@ -9,6 +9,12 @@
     var targetReps = ViewBag.TargetReps as string;
     var recommendedRestTime = ViewBag.RecommendedRestTime as int? ?? 0;
     var restInMinutes = ViewBag.RestInMinutes as bool? ?? false;
+    var hasLastExecution = ViewBag.HasLastExecution as bool? ?? false;
+    var lastSets = ViewBag.LastSets as int? ?? 0;
+    var lastReps = ViewBag.LastReps as string;
+    var lastWeight = ViewBag.LastWeight as decimal? ?? 0;
+    var lastRestTime = ViewBag.LastRestTime as int? ?? 0;
+    var lastRestInMinutes = ViewBag.LastRestInMinutes as bool? ?? false;
 }
 
 <div class="container-fluid px-3 px-md-4 py-4">
@@ -25,56 +31,122 @@
 
             @if (fromPlan && exercise != null)
             {
-                <!-- Plan Target Info -->
-                <div class="last-exercise-card mb-4" style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(84, 115, 255, 0.1)); border-color: rgba(13, 110, 253, 0.3);">
-                    <div class="d-flex align-items-start">
-                        <div class="last-exercise-icon" style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(84, 115, 255, 0.2)); color: #0d6efd;">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-2" style="color: #0d6efd;">
-                                <i class="fas fa-clipboard-list me-2"></i>
-                                Meta do Plano: @exercise.Name
-                            </h6>
-                            <div class="row g-2">
-                                <div class="col-6 col-sm-3">
-                                    <div class="last-exercise-stat">
-                                        <small class="text-muted">Séries Alvo</small>
+                @if (hasLastExecution)
+                {
+                    <!-- Comparação: Meta do Plano vs Última Execução -->
+                    <div class="last-exercise-card mb-4" id="planComparisonCard">
+                        <h6 class="mb-3 text-center">
+                            <i class="fas fa-bullseye text-primary me-2"></i>
+                            Meta do Plano
+                            <span class="mx-2">+</span>
+                            <i class="fas fa-history text-success me-2"></i>
+                            Última Execução
+                        </h6>
+                        <div class="row g-3 card-minimize-content" id="planComparisonCard-content">
+                            <!-- Séries -->
+                            <div class="col-6 col-md-3">
+                                <div class="last-exercise-stat text-center">
+                                    <small class="text-muted d-block mb-1">Séries</small>
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
                                         <strong class="text-primary">@targetSets</strong>
+                                        <span class="text-muted">/</span>
+                                        <strong class="text-success">@lastSets</strong>
                                     </div>
                                 </div>
-                                <div class="col-6 col-sm-3">
-                                    <div class="last-exercise-stat">
-                                        <small class="text-muted">Reps Alvo</small>
+                            </div>
+                            <!-- Reps -->
+                            <div class="col-6 col-md-3">
+                                <div class="last-exercise-stat text-center">
+                                    <small class="text-muted d-block mb-1">Reps</small>
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
                                         <strong class="text-primary">@targetReps</strong>
+                                        <span class="text-muted">/</span>
+                                        <strong class="text-success">@lastReps</strong>
                                     </div>
                                 </div>
-                                @if (recommendedRestTime > 0)
-                                {
-                                    <div class="col-6 col-sm-3">
-                                        <div class="last-exercise-stat">
-                                            <small class="text-muted">Descanso</small>
-                                            <strong class="text-primary">@recommendedRestTime @(restInMinutes ? "min" : "seg")</strong>
-                                        </div>
+                            </div>
+                            <!-- Última Carga -->
+                            <div class="col-6 col-md-3">
+                                <div class="last-exercise-stat text-center">
+                                    <small class="text-muted d-block mb-1">Última Carga</small>
+                                    <strong class="text-success">@lastWeight kg</strong>
+                                </div>
+                            </div>
+                            <!-- Descanso -->
+                            <div class="col-6 col-md-3">
+                                <div class="last-exercise-stat text-center">
+                                    <small class="text-muted d-block mb-1">Descanso</small>
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <strong class="text-primary">@recommendedRestTime @(restInMinutes ? "min" : "seg")</strong>
+                                        <span class="text-muted">/</span>
+                                        <strong class="text-success">@lastRestTime @(lastRestInMinutes ? "min" : "seg")</strong>
                                     </div>
-                                }
+                                </div>
                             </div>
                         </div>
+                        <div class="text-center mt-2">
+                            <button type="button" class="btn btn-link text-muted p-0" 
+                                    onclick="toggleCardMinimize('planComparisonCard')" 
+                                    style="text-decoration: none; font-size: 1.25rem; transition: transform 0.3s ease;">
+                                <i class="fas fa-chevron-up" id="planComparisonCard-icon"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <!-- Apenas Meta do Plano -->
+                    <div class="last-exercise-card mb-4">
+                        <h6 class="mb-3 text-center">
+                            <i class="fas fa-bullseye text-primary me-2"></i>
+                            Meta do Plano
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-6 col-md-4">
+                                <div class="last-exercise-stat text-center">
+                                    <small class="text-muted">Séries</small>
+                                    <strong class="text-primary">@targetSets</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <div class="last-exercise-stat text-center">
+                                    <small class="text-muted">Reps</small>
+                                    <strong class="text-primary">@targetReps</strong>
+                                </div>
+                            </div>
+                            @if (recommendedRestTime > 0)
+                            {
+                                <div class="col-6 col-md-4">
+                                    <div class="last-exercise-stat text-center">
+                                        <small class="text-muted">Descanso</small>
+                                        <strong class="text-primary">@recommendedRestTime @(restInMinutes ? "min" : "seg")</strong>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="mt-3 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Primeira vez fazendo este exercício
+                            </small>
+                        </div>
+                    </div>
+                }
             }
 
             <!-- Last Exercise Info (will be populated by JS) -->
             <div id="lastExerciseInfo" class="last-exercise-card mb-4" style="display: none;">
-                <div class="d-flex align-items-start">
-                    <div class="last-exercise-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-2">Última vez que fez este exercício:</h6>
-                        <div id="lastExerciseData" class="last-exercise-data"></div>
-                    </div>
-                    <button type="button" class="btn-close btn-sm" onclick="closeLastExerciseInfo()"></button>
+                <h6 class="mb-3 text-center">
+                    <i class="fas fa-history text-success me-2"></i>
+                    Última vez que fez este exercício
+                </h6>
+                <div id="lastExerciseData" class="last-exercise-data card-minimize-content"></div>
+                <div class="text-center mt-2">
+                    <button type="button" class="btn btn-link text-muted p-0" 
+                            onclick="toggleCardMinimize('lastExerciseInfo')" 
+                            style="text-decoration: none; font-size: 1.25rem; transition: transform 0.3s ease;">
+                        <i class="fas fa-chevron-up" id="lastExerciseInfo-icon"></i>
+                    </button>
                 </div>
             </div>
 
@@ -292,4 +364,18 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/training.js"></script>
+    <style>
+        .card-minimize-content {
+            transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease;
+            overflow: hidden;
+            opacity: 1;
+        }
+        
+        .card-minimize-content.minimized {
+            max-height: 0 !important;
+            opacity: 0;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    </style>
 }

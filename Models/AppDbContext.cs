@@ -45,6 +45,11 @@ namespace TupiJua.Models
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
 
         /// <summary>
+        /// Obtém ou define o DbSet para entidades WorkoutPlanExercise.
+        /// </summary>
+        public DbSet<WorkoutPlanExercise> WorkoutPlanExercise { get; set; }
+
+        /// <summary>
         /// Obtém ou define o DbSet para entidades WorkoutSession.
         /// </summary>
         public DbSet<WorkoutSession> WorkoutSessions { get; set; }
