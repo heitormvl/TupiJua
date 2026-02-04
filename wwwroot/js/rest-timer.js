@@ -39,19 +39,45 @@ class RestTimer {
 
     /**
      * Cria um loop de áudio silencioso para manter o script ativo
+     * 
+     * Trade-off: Usa MediaStreamAudioDestinationNode para garantir silêncio total
+     * sem emitir áudio pelos alto-falantes. Isso mantém o AudioContext ativo
+     * evitando suspensão pelo navegador, mas consome recursos mesmo sem output audível.
+     * 
+     * Alternativa considerada: gain=0.00001 com destination direto, mas pode ser
+     * audível em alguns dispositivos/fones sensíveis.
      */
     createSilentLoop() {
         if (!this.audioContext) return;
 
-        // Cria um oscillator silencioso
+        // Feature detection: verifica se MediaStreamAudioDestinationNode está disponível
+        if (typeof this.audioContext.createMediaStreamDestination === 'function') {
+            // Usa MediaStreamAudioDestinationNode para garantir silêncio real
+            // sem conectar aos alto-falantes do dispositivo
+            const silentDestination = this.audioContext.createMediaStreamDestination();
+            this._setupOscillator(silentDestination, 0);
+        } else {
+            // Fallback: se MediaStreamAudioDestinationNode não estiver disponível,
+            // usa o método anterior com volume muito baixo (gain=0.00001).
+            // IMPORTANTE: Este fallback pode ser audível em alguns dispositivos/fones sensíveis.
+            console.warn('MediaStreamAudioDestinationNode não disponível, usando fallback com gain=0.00001');
+            this._setupOscillator(this.audioContext.destination, 0.00001);
+        }
+    }
+
+    /**
+     * Configura o oscillator silencioso com o destino e ganho especificados
+     * @param {AudioNode} destination - Nó de destino do áudio
+     * @param {number} gainValue - Valor do ganho (0 para silêncio real, 0.00001 para fallback)
+     */
+    _setupOscillator(destination, gainValue) {
         const oscillator = this.audioContext.createOscillator();
         const gainNode = this.audioContext.createGain();
         
         oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        gainNode.connect(destination);
         
-        // Volume extremamente baixo (praticamente silencioso)
-        gainNode.gain.value = 0.00001;
+        gainNode.gain.value = gainValue;
         
         oscillator.start();
         this.silentNode = oscillator;
