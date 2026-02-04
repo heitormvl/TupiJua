@@ -12,6 +12,81 @@ class RestTimerUI {
         this.initializeUI();
         this.attachEventListeners();
         this.setupTimerCallbacks();
+        this.restoreActiveTimer();
+    }
+
+    /**
+     * Restaura timer ativo do localStorage
+     */
+    restoreActiveTimer() {
+        const savedState = localStorage.getItem('restTimerState');
+        if (!savedState) return;
+
+        try {
+            const state = JSON.parse(savedState);
+            const now = Date.now();
+            
+            // Verifica se o timer ainda está válido
+            if (state.endTime && state.endTime > now) {
+                // Restaura o timer
+                this.isActive = true;
+                document.getElementById('restTimerBtn').style.display = 'none';
+                document.getElementById('restTimerPill').classList.add('active');
+                
+                // Calcula tempo restante
+                const remainingMs = state.endTime - now;
+                const remainingSeconds = Math.ceil(remainingMs / 1000);
+                
+                // Restaura no objeto timer
+                this.timer.endTime = state.endTime;
+                this.timer.totalDuration = state.totalDuration;
+                this.timer.remainingSeconds = remainingSeconds;
+                this.timer.isPaused = false;
+                
+                // Reinicia o loop
+                this.timer.tick();
+                this.timer.intervalId = setInterval(() => this.timer.tick(), 100);
+            } else if (state.isPaused && state.pausedRemaining > 0) {
+                // Restaura timer pausado
+                this.isActive = true;
+                document.getElementById('restTimerBtn').style.display = 'none';
+                document.getElementById('restTimerPill').classList.add('active');
+                
+                this.timer.isPaused = true;
+                this.timer.pausedRemaining = state.pausedRemaining;
+                this.timer.remainingSeconds = state.pausedRemaining;
+                this.timer.totalDuration = state.totalDuration;
+                
+                // Atualiza display
+                this.updatePillDisplay(state.pausedRemaining);
+                this.updatePauseBtnIcon(true);
+            } else {
+                // Timer expirado, limpa localStorage
+                localStorage.removeItem('restTimerState');
+            }
+        } catch (e) {
+            console.error('Erro ao restaurar timer:', e);
+            localStorage.removeItem('restTimerState');
+        }
+    }
+
+    /**
+     * Salva estado do timer no localStorage
+     */
+    saveTimerState() {
+        if (!this.isActive) {
+            localStorage.removeItem('restTimerState');
+            return;
+        }
+
+        const state = {
+            endTime: this.timer.endTime,
+            totalDuration: this.timer.totalDuration,
+            isPaused: this.timer.isPaused,
+            pausedRemaining: this.timer.pausedRemaining
+        };
+
+        localStorage.setItem('restTimerState', JSON.stringify(state));
     }
 
     /**
@@ -124,6 +199,51 @@ class RestTimerUI {
         const container = document.createElement('div');
         container.innerHTML = html;
         document.body.appendChild(container);
+
+        // Posiciona o botão conforme existência do card ativo
+        this.updateButtonPosition();
+        
+        // Observa mudanças no DOM para reposicionar quando necessário
+        this.observeActiveSessionCard();
+    }
+
+    /**
+     * Atualiza a posição do botão conforme a existência do card ativo
+     */
+    updateButtonPosition() {
+        const activeSessionCard = document.querySelector('.active-session-card');
+        const restTimerBtn = document.getElementById('restTimerBtn');
+        
+        if (!restTimerBtn) return;
+
+        if (activeSessionCard) {
+            // Move para dentro do card
+            restTimerBtn.classList.add('inside-active-session');
+            const actionsDiv = activeSessionCard.querySelector('.active-session-actions');
+            if (actionsDiv && !actionsDiv.contains(restTimerBtn)) {
+                actionsDiv.insertBefore(restTimerBtn, actionsDiv.firstChild);
+            }
+        } else {
+            // Volta para posição flutuante
+            restTimerBtn.classList.remove('inside-active-session');
+            if (restTimerBtn.parentElement.classList.contains('active-session-actions')) {
+                document.body.appendChild(restTimerBtn);
+            }
+        }
+    }
+
+    /**
+     * Observa mudanças no card de sessão ativa
+     */
+    observeActiveSessionCard() {
+        const observer = new MutationObserver(() => {
+            this.updateButtonPosition();
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
     }
 
     /**
@@ -229,6 +349,7 @@ class RestTimerUI {
         document.getElementById('restTimerPill').classList.add('active');
         
         this.timer.start(seconds);
+        this.saveTimerState();
     }
 
     /**
@@ -243,6 +364,7 @@ class RestTimerUI {
         document.getElementById('restTimerPill').classList.remove('active');
         
         this.updatePauseBtnIcon(false);
+        localStorage.removeItem('restTimerState');
     }
 
     /**
@@ -256,6 +378,7 @@ class RestTimerUI {
             this.timer.pause();
             this.updatePauseBtnIcon(true);
         }
+        this.saveTimerState();
     }
 
     /**
@@ -285,6 +408,11 @@ class RestTimerUI {
         const totalSeconds = this.timer.totalDuration;
         const progress = (remainingSeconds / totalSeconds) * 100;
         document.querySelector('.rest-timer-pill-progress').style.width = `${progress}%`;
+        
+        // Atualiza localStorage periodicamente
+        if (this.isActive) {
+            this.saveTimerState();
+        }
     }
 
     /**
@@ -312,6 +440,9 @@ class RestTimerUI {
 
         // Mostra alerta visual com dismiss
         this.showCompletionAlert();
+        
+        // Limpa estado salvo
+        localStorage.removeItem('restTimerState');
     }
 
     /**

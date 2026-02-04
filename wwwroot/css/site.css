@@ -1677,6 +1677,25 @@ body.has-active-session .pre-alpha-badge {
     transform: scale(0.95);
 }
 
+/* Botão dentro do card de sessão ativa */
+.rest-timer-fab.inside-active-session {
+    position: static;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    margin-right: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0d6efd;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+}
+
+.rest-timer-fab.inside-active-session:hover {
+    background: white;
+    color: #0d6efd;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+}
+
 /* Modal */
 .rest-timer-modal {
     position: fixed;

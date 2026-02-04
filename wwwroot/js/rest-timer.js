@@ -155,8 +155,8 @@ class RestTimer {
         this.pausedAt = null;
         this.pausedRemaining = 0;
         
-        // Define o tempo final baseado no timestamp atual
-        const now = performance.now();
+        // Define o tempo final baseado no timestamp absoluto
+        const now = Date.now();
         this.endTime = now + (seconds * 1000);
         
         // Inicia o loop de atualização
@@ -171,7 +171,7 @@ class RestTimer {
         if (!this.intervalId || this.isPaused) return;
 
         this.isPaused = true;
-        this.pausedAt = performance.now();
+        this.pausedAt = Date.now();
         this.pausedRemaining = this.remainingSeconds;
         
         if (this.intervalId) {
@@ -189,7 +189,7 @@ class RestTimer {
         await this.resumeAudioContext();
 
         this.isPaused = false;
-        const now = performance.now();
+        const now = Date.now();
         this.endTime = now + (this.pausedRemaining * 1000);
         
         this.tick();
@@ -218,7 +218,7 @@ class RestTimer {
     tick() {
         if (this.isPaused || !this.endTime) return;
 
-        const now = performance.now();
+        const now = Date.now();
         const remaining = this.endTime - now;
 
         if (remaining <= 0) {
