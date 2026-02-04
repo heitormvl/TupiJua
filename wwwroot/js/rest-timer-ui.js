@@ -538,9 +538,7 @@ class RestTimerUI {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.restTimerUI = new RestTimerUI();
-        RestTimerUI.requestNotificationPermission();
     });
 } else {
     window.restTimerUI = new RestTimerUI();
-    RestTimerUI.requestNotificationPermission();
 }
