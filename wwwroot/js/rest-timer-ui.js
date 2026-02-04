@@ -94,7 +94,18 @@ class RestTimerUI {
      */
     loadLastDuration() {
         const saved = this.getCookie('restTimerDuration');
-        return saved ? parseInt(saved) : 60;
+
+        if (!saved) {
+            return 60;
+        }
+
+        const parsed = parseInt(saved, 10);
+
+        if (!Number.isFinite(parsed) || parsed < 1) {
+            return 60;
+        }
+
+        return parsed;
     }
 
     /**
@@ -184,10 +195,10 @@ class RestTimerUI {
                     </span>
                     <span id="restTimerPillTime" class="rest-timer-pill-time">00:00</span>
                     <div class="rest-timer-pill-controls">
-                        <button id="restTimerPauseBtnPill" class="rest-timer-pill-btn" title="Pausar">
+                        <button id="restTimerPauseBtnPill" class="rest-timer-pill-btn" title="Pausar" aria-label="Pausar temporizador">
                             <i class="fas fa-pause"></i>
                         </button>
-                        <button id="restTimerStopBtnPill" class="rest-timer-pill-btn" title="Parar">
+                        <button id="restTimerStopBtnPill" class="rest-timer-pill-btn" title="Parar" aria-label="Parar temporizador">
                             <i class="fas fa-stop"></i>
                         </button>
                     </div>
@@ -368,17 +379,37 @@ class RestTimerUI {
     }
 
     /**
-     * Pausa/resume o timer
+     * Pausa ou continua o timer de forma assíncrona.
+     * Garante que o resume seja aguardado e evita cliques repetidos durante a transição.
+     * @returns {Promise<void>}
      */
-    togglePause() {
-        if (this.timer.isPausedState()) {
-            this.timer.resume();
-            this.updatePauseBtnIcon(false);
-        } else {
-            this.timer.pause();
-            this.updatePauseBtnIcon(true);
+    async togglePause() {
+        const pauseBtn = document.getElementById('restTimerPauseBtnPill');
+
+        if (pauseBtn) {
+            pauseBtn.disabled = true;
         }
-        this.saveTimerState();
+
+        try {
+            if (this.timer.isPausedState()) {
+                await this.timer.resume();
+                this.updatePauseBtnIcon(false);
+            } else {
+                this.timer.pause();
+                this.updatePauseBtnIcon(true);
+            }
+
+            this.saveTimerState();
+        } catch (error) {
+            // Mantém o estado visual atual em caso de erro ao retomar
+            // para evitar indicar "rodando" quando o resume falhar.
+            // eslint-disable-next-line no-console
+            console.error('Erro ao retomar o temporizador de descanso:', error);
+        } finally {
+            if (pauseBtn) {
+                pauseBtn.disabled = false;
+            }
+        }
     }
 
     /**
@@ -518,9 +549,7 @@ class RestTimerUI {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.restTimerUI = new RestTimerUI();
-        RestTimerUI.requestNotificationPermission();
     });
 } else {
     window.restTimerUI = new RestTimerUI();
-    RestTimerUI.requestNotificationPermission();
 }
