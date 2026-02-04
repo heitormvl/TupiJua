@@ -50,16 +50,17 @@ class RestTimer {
     createSilentLoop() {
         if (!this.audioContext) return;
 
-        try {
+        // Feature detection: verifica se MediaStreamAudioDestinationNode está disponível
+        if (typeof this.audioContext.createMediaStreamDestination === 'function') {
             // Usa MediaStreamAudioDestinationNode para garantir silêncio real
             // sem conectar aos alto-falantes do dispositivo
             const silentDestination = this.audioContext.createMediaStreamDestination();
             this._setupOscillator(silentDestination, 0);
-        } catch (e) {
+        } else {
             // Fallback: se MediaStreamAudioDestinationNode não estiver disponível,
             // usa o método anterior com volume muito baixo (gain=0.00001).
             // IMPORTANTE: Este fallback pode ser audível em alguns dispositivos/fones sensíveis.
-            console.warn('MediaStreamAudioDestinationNode não disponível, usando fallback com gain=0.00001:', e);
+            console.warn('MediaStreamAudioDestinationNode não disponível, usando fallback com gain=0.00001');
             this._setupOscillator(this.audioContext.destination, 0.00001);
         }
     }
