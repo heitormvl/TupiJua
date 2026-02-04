@@ -195,10 +195,10 @@ class RestTimerUI {
                     </span>
                     <span id="restTimerPillTime" class="rest-timer-pill-time">00:00</span>
                     <div class="rest-timer-pill-controls">
-                        <button id="restTimerPauseBtnPill" class="rest-timer-pill-btn" title="Pausar">
+                        <button id="restTimerPauseBtnPill" class="rest-timer-pill-btn" title="Pausar" aria-label="Pausar temporizador">
                             <i class="fas fa-pause"></i>
                         </button>
-                        <button id="restTimerStopBtnPill" class="rest-timer-pill-btn" title="Parar">
+                        <button id="restTimerStopBtnPill" class="rest-timer-pill-btn" title="Parar" aria-label="Parar temporizador">
                             <i class="fas fa-stop"></i>
                         </button>
                     </div>
