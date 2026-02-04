@@ -39,22 +39,48 @@ class RestTimer {
 
     /**
      * Cria um loop de áudio silencioso para manter o script ativo
+     * 
+     * Trade-off: Usa MediaStreamAudioDestinationNode para garantir silêncio total
+     * sem emitir áudio pelos alto-falantes. Isso mantém o AudioContext ativo
+     * evitando suspensão pelo navegador, mas consome recursos mesmo sem output audível.
+     * 
+     * Alternativa considerada: gain=0.00001 com destination direto, mas pode ser
+     * audível em alguns dispositivos/fones sensíveis.
      */
     createSilentLoop() {
         if (!this.audioContext) return;
 
-        // Cria um oscillator silencioso
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-        
-        // Volume extremamente baixo (praticamente silencioso)
-        gainNode.gain.value = 0.00001;
-        
-        oscillator.start();
-        this.silentNode = oscillator;
+        try {
+            // Cria um oscillator silencioso
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            // Usa MediaStreamAudioDestinationNode para garantir silêncio real
+            // sem conectar aos alto-falantes do dispositivo
+            const silentDestination = this.audioContext.createMediaStreamDestination();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(silentDestination);
+            
+            // Silêncio real (gain=0) - não há risco de ser audível
+            gainNode.gain.value = 0;
+            
+            oscillator.start();
+            this.silentNode = oscillator;
+        } catch (e) {
+            // Fallback: se MediaStreamAudioDestinationNode não estiver disponível
+            // usa o método anterior com volume muito baixo
+            console.warn('MediaStreamAudioDestinationNode não disponível, usando fallback:', e);
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            gainNode.gain.value = 0.00001;
+            
+            oscillator.start();
+            this.silentNode = oscillator;
+        }
     }
 
     /**
