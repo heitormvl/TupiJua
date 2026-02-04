@@ -41,7 +41,7 @@ class RestTimer {
      * Cria um loop de áudio silencioso para manter o script ativo
      */
     createSilentLoop() {
-        if (!this.audioContext || this.silentNode) return;
+        if (!this.audioContext || this.silentNode !== null) return;
 
         // Cria um oscillator silencioso
         const oscillator = this.audioContext.createOscillator();
@@ -65,7 +65,7 @@ class RestTimer {
             try {
                 this.silentNode.stop();
             } catch (e) {
-                // Ignora erro se já foi parado
+                // Ignora InvalidStateError se o oscillator já foi parado
             }
             this.silentNode = null;
         }
@@ -75,7 +75,7 @@ class RestTimer {
      * Resume o AudioContext (necessário após interação do usuário)
      */
     async resumeAudioContext() {
-        this.initAudioContext(); // Garante que o contexto foi criado
+        this.initAudioContext();
         
         if (this.audioContext && this.audioContext.state === 'suspended') {
             try {
