@@ -186,13 +186,21 @@ class RestTimer {
     async resume() {
         if (!this.isPaused) return;
 
+        // Marca como não pausado antes do await para evitar múltiplas reativações concorrentes
+        this.isPaused = false;
+
         await this.resumeAudioContext();
 
-        this.isPaused = false;
         const now = Date.now();
         this.endTime = now + (this.pausedRemaining * 1000);
         
         this.tick();
+
+        // Garante que não exista intervalo anterior ativo antes de criar um novo
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
         this.intervalId = setInterval(() => this.tick(), 100);
     }
 
