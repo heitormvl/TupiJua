@@ -231,6 +231,10 @@ class RestTimer {
 
         if (remaining <= 0) {
             this.remainingSeconds = 0;
+
+            if (this.onTickCallback) {
+                this.onTickCallback(this.remainingSeconds);
+            }
             this.complete();
             return;
         }
