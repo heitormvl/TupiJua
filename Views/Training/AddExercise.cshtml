@@ -212,7 +212,7 @@
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="Sets" type="number" class="form-control form-control-lg text-center" 
-                                   id="Sets" min="1" max="100" value="3" required />
+                                   id="Sets" min="1" max="100" required />
                             <button type="button" class="btn-number-control" onclick="incrementValue('Sets', 1)">
                                 <i class="fas fa-plus"></i>
                             </button>
@@ -249,7 +249,7 @@
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="Weight" type="number" class="form-control form-control-lg text-center" 
-                                   id="Weight" min="0" max="999.99" step="0.01" value="0" required />
+                                   id="Weight" min="0" max="999.99" step="0.01" required />
                             <button type="button" class="btn-number-control" onclick="incrementValue('Weight', 0.5)">
                                 <i class="fas fa-plus"></i>
                             </button>
@@ -269,7 +269,7 @@
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="RestTime" type="number" class="form-control form-control-lg text-center" 
-                                   id="RestTime" min="0" max="3600" step="@(restInMinutes ? "1" : "15")" value="60" required />
+                                   id="RestTime" min="0" max="3600" step="@(restInMinutes ? "1" : "15")" required />
                             <button type="button" class="btn-number-control" onclick="incrementRestTime()">
                                 <i class="fas fa-plus"></i>
                             </button>
@@ -284,7 +284,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" asp-for="RestInMinutes" id="RestInMinutes" value="false" />
+                        <input type="hidden" asp-for="RestInMinutes" id="RestInMinutes" />
                         <span asp-validation-for="RestTime" class="text-danger small"></span>
                     </div>
 

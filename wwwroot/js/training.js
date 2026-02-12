@@ -93,32 +93,30 @@ function loadLastExerciseData(exerciseId) {
             if (data) {
                 displayLastExerciseInfo(data);
                 
-                // Auto-fill form with last exercise data if ShouldIncreaseLoad is true
-                if (data.shouldIncreaseLoad) {
-                    document.getElementById('Sets').value = data.sets;
-                    document.getElementById('Reps').value = data.reps;
-                    
-                    // Suggest increased weight (5% increase or +0.5kg, whichever is greater)
-                    const suggestedWeight = Math.max(
-                        Math.round((data.weight * 1.05) * 2) / 2, // 5% increase, rounded to .5
-                        data.weight + 0.5
-                    );
-                    document.getElementById('Weight').value = suggestedWeight.toFixed(2);
-                    
-                    document.getElementById('RestTime').value = data.restTime;
+                // Only auto-fill form if current values are defaults/empty
+                const setsInput = document.getElementById('Sets');
+                const repsInput = document.getElementById('Reps');
+                const weightInput = document.getElementById('Weight');
+                const restTimeInput = document.getElementById('RestTime');
+                
+                // Check if values are at defaults (3, "10-15", 10, 60)
+                const isDefaultSets = !setsInput.value || setsInput.value === "3";
+                const isDefaultReps = !repsInput.value || repsInput.value === "10-15";
+                const isDefaultWeight = !weightInput.value || weightInput.value === "10" || weightInput.value === "10.00";
+                const isDefaultRest = !restTimeInput.value || restTimeInput.value === "60";
+                
+                // Only auto-fill if values are at defaults
+                if (isDefaultSets && isDefaultReps && isDefaultWeight && isDefaultRest) {
+                    setsInput.value = data.sets;
+                    repsInput.value = data.reps;
+                    weightInput.value = data.weight.toFixed(2);
+                    restTimeInput.value = data.restTime;
                     document.getElementById('RestInMinutes').value = data.restInMinutes;
                     updateRestUnitToggle();
-                    document.getElementById('ShouldIncreaseLoad').checked = true;
-                } else {
-                    // Just pre-fill with same values
-                    document.getElementById('Sets').value = data.sets;
-                    document.getElementById('Reps').value = data.reps;
-                    document.getElementById('Weight').value = data.weight.toFixed(2);
-                    document.getElementById('RestTime').value = data.restTime;
-                    document.getElementById('RestInMinutes').value = data.restInMinutes;
-                    updateRestUnitToggle();
-                    document.getElementById('ShouldIncreaseLoad').checked = false;
                 }
+                
+                // Always default to false, never auto-check
+                document.getElementById('ShouldIncreaseLoad').checked = false;
             }
         })
         .catch(error => {
