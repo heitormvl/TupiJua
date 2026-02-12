@@ -4,6 +4,12 @@
  * Training page functionality
  */
 
+// Default values for exercise execution
+const DEFAULT_SETS = 3;
+const DEFAULT_REPS = '10-15';
+const DEFAULT_WEIGHT = 10;
+const DEFAULT_REST_TIME = 60;
+
 // Initialize Training Index page
 function initTrainingIndex() {
     const heroCard = document.querySelector('.hero-card');
@@ -99,11 +105,11 @@ function loadLastExerciseData(exerciseId) {
                 const weightInput = document.getElementById('Weight');
                 const restTimeInput = document.getElementById('RestTime');
                 
-                // Check if values are at defaults (3, "10-15", 10, 60)
-                const isDefaultSets = !setsInput.value || setsInput.value === "3";
-                const isDefaultReps = !repsInput.value || repsInput.value === "10-15";
-                const isDefaultWeight = !weightInput.value || weightInput.value === "10" || weightInput.value === "10.00";
-                const isDefaultRest = !restTimeInput.value || restTimeInput.value === "60";
+                // Check if values are at defaults
+                const isDefaultSets = !setsInput.value || setsInput.value === String(DEFAULT_SETS);
+                const isDefaultReps = !repsInput.value || repsInput.value === DEFAULT_REPS;
+                const isDefaultWeight = !weightInput.value || weightInput.value === String(DEFAULT_WEIGHT) || weightInput.value === DEFAULT_WEIGHT.toFixed(2);
+                const isDefaultRest = !restTimeInput.value || restTimeInput.value === String(DEFAULT_REST_TIME);
                 
                 // Only auto-fill if values are at defaults
                 if (isDefaultSets && isDefaultReps && isDefaultWeight && isDefaultRest) {

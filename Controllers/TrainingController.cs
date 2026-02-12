@@ -13,6 +13,13 @@ namespace TupiJua.Controllers
         private readonly UserManager<User> _userManager;
         private readonly AppDbContext _context;
 
+        // Default values for exercise execution
+        private const int DEFAULT_SETS = 3;
+        private const string DEFAULT_REPS = "10-15";
+        private const decimal DEFAULT_WEIGHT = 10;
+        private const int DEFAULT_REST_TIME = 60;
+        private const bool DEFAULT_REST_IN_MINUTES = false;
+
         public TrainingController(UserManager<User> userManager, AppDbContext context)
         {
             _userManager = userManager;
@@ -165,30 +172,30 @@ namespace TupiJua.Controllers
                     if (planExercise != null)
                     {
                         model.Sets = planExercise.TargetSets;
-                        model.Reps = planExercise.TargetReps ?? "10-15";
-                        model.Weight = 10;
-                        model.RestTime = planExercise.RecommendedRestTime > 0 ? planExercise.RecommendedRestTime : 60;
+                        model.Reps = planExercise.TargetReps ?? DEFAULT_REPS;
+                        model.Weight = DEFAULT_WEIGHT;
+                        model.RestTime = planExercise.RecommendedRestTime > 0 ? planExercise.RecommendedRestTime : DEFAULT_REST_TIME;
                         model.RestInMinutes = planExercise.RestInMinutes;
                     }
                     else
                     {
                         // Priority 3: Use defaults
-                        model.Sets = 3;
-                        model.Reps = "10-15";
-                        model.Weight = 10;
-                        model.RestTime = 60;
-                        model.RestInMinutes = false;
+                        model.Sets = DEFAULT_SETS;
+                        model.Reps = DEFAULT_REPS;
+                        model.Weight = DEFAULT_WEIGHT;
+                        model.RestTime = DEFAULT_REST_TIME;
+                        model.RestInMinutes = DEFAULT_REST_IN_MINUTES;
                     }
                 }
             }
             else
             {
                 // No exercise selected yet, set defaults
-                model.Sets = 3;
-                model.Reps = "10-15";
-                model.Weight = 10;
-                model.RestTime = 60;
-                model.RestInMinutes = false;
+                model.Sets = DEFAULT_SETS;
+                model.Reps = DEFAULT_REPS;
+                model.Weight = DEFAULT_WEIGHT;
+                model.RestTime = DEFAULT_REST_TIME;
+                model.RestInMinutes = DEFAULT_REST_IN_MINUTES;
             }
 
             // Always default ShouldIncreaseLoad to false
@@ -454,9 +461,9 @@ namespace TupiJua.Controllers
             else
             {
                 model.Sets = planExercise.TargetSets;
-                model.Reps = planExercise.TargetReps ?? "10-15";
-                model.Weight = 10;
-                model.RestTime = planExercise.RecommendedRestTime > 0 ? planExercise.RecommendedRestTime : 60;
+                model.Reps = planExercise.TargetReps ?? DEFAULT_REPS;
+                model.Weight = DEFAULT_WEIGHT;
+                model.RestTime = planExercise.RecommendedRestTime > 0 ? planExercise.RecommendedRestTime : DEFAULT_REST_TIME;
                 model.RestInMinutes = planExercise.RestInMinutes;
             }
             
