@@ -212,7 +212,7 @@
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="Sets" type="number" class="form-control form-control-lg text-center" 
-                                   id="Sets" min="1" max="100" required />
+                                   id="Sets" min="1" max="100" placeholder="3" required />
                             <button type="button" class="btn-number-control" onclick="incrementValue('Sets', 1)">
                                 <i class="fas fa-plus"></i>
                             </button>
@@ -228,7 +228,7 @@
                         </label>
                         <div class="input-group input-group-lg">
                             <input asp-for="Reps" type="text" class="form-control" 
-                                   placeholder="Ex: 12 ou 10-12" id="Reps" required />
+                                   placeholder="10-15" id="Reps" required />
                             <span class="input-group-text">reps</span>
                         </div>
                         <small class="form-text text-muted">
@@ -249,7 +249,7 @@
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="Weight" type="number" class="form-control form-control-lg text-center" 
-                                   id="Weight" min="0" max="999.99" step="0.01" required />
+                                   id="Weight" min="0" max="999.99" step="0.01" placeholder="10" required />
                             <button type="button" class="btn-number-control" onclick="incrementValue('Weight', 0.5)">
                                 <i class="fas fa-plus"></i>
                             </button>
@@ -269,7 +269,7 @@
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="RestTime" type="number" class="form-control form-control-lg text-center" 
-                                   id="RestTime" min="0" max="3600" step="@(restInMinutes ? "1" : "15")" required />
+                                   id="RestTime" min="0" max="3600" step="@(restInMinutes ? "1" : "15")" placeholder="60" required />
                             <button type="button" class="btn-number-control" onclick="incrementRestTime()">
                                 <i class="fas fa-plus"></i>
                             </button>
