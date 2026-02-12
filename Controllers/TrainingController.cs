@@ -158,7 +158,7 @@ namespace TupiJua.Controllers
                 else
                 {
                     // Priority 2: Try to get from active workout plan
-                    var planExercise = await _context.WorkoutPlanExercises
+                    var planExercise = await _context.WorkoutPlanExercise
                         .Where(wpe => wpe.ExerciseId == exerciseId.Value && wpe.WorkoutPlan!.UserId == userId && wpe.WorkoutPlan.IsActive)
                         .FirstOrDefaultAsync();
 
