@@ -10,6 +10,11 @@ const DEFAULT_REPS = '10-15';
 const DEFAULT_WEIGHT = 10;
 const DEFAULT_REST_TIME = 60;
 
+// Helper to parse boolean-like values from inputs/attributes (handles "True"/"true"/true)
+function parseBool(value) {
+    return String(value).toLowerCase() === 'true';
+}
+
 // Initialize Training Index page
 function initTrainingIndex() {
     const heroCard = document.querySelector('.hero-card');
@@ -89,6 +94,9 @@ function initAddExercise() {
             section.style.transform = 'translateY(0)';
         }, index * 80);
     });
+
+    // Ensure rest unit toggle matches server-rendered model value on initial load
+    updateRestUnitToggle();
 }
 
 // Load last exercise data via AJAX
@@ -264,7 +272,7 @@ function setRestUnit(isMinutes) {
     
     if (!restInMinutesInput || !restUnitSeg || !restUnitMin || !restTimeInput) return;
     
-    const currentIsMinutes = restInMinutesInput.value === 'true';
+    const currentIsMinutes = parseBool(restInMinutesInput.value);
     
     // If already in the desired unit, do nothing
     if (currentIsMinutes === isMinutes) return;
@@ -297,7 +305,7 @@ function updateRestUnitToggle() {
     
     if (!restInMinutesInput || !restUnitSeg || !restUnitMin || !restTimeInput) return;
     
-    const isMinutes = restInMinutesInput.value === 'true';
+    const isMinutes = parseBool(restInMinutesInput.value);
     
     if (isMinutes) {
         restUnitSeg.classList.remove('active');
@@ -317,7 +325,7 @@ function incrementRestTime() {
     
     if (!restTimeInput || !restInMinutesInput) return;
     
-    const isMinutes = restInMinutesInput.value === 'true';
+    const isMinutes = parseBool(restInMinutesInput.value);
     const step = isMinutes ? 1 : 15;
     const currentValue = parseInt(restTimeInput.value) || 0;
     const maxValue = parseInt(restTimeInput.max) || 3600;
@@ -337,7 +345,7 @@ function decrementRestTime() {
     
     if (!restTimeInput || !restInMinutesInput) return;
     
-    const isMinutes = restInMinutesInput.value === 'true';
+    const isMinutes = parseBool(restInMinutesInput.value);
     const step = isMinutes ? 1 : 15;
     const currentValue = parseInt(restTimeInput.value) || 0;
     const minValue = parseInt(restTimeInput.min) || 0;

@@ -8,7 +8,7 @@
     var targetSets = ViewBag.TargetSets as int? ?? 0;
     var targetReps = ViewBag.TargetReps as string;
     var recommendedRestTime = ViewBag.RecommendedRestTime as int? ?? 0;
-    var restInMinutes = ViewBag.RestInMinutes as bool? ?? false;
+    var restInMinutes = Model.RestInMinutes;
     var hasLastExecution = ViewBag.HasLastExecution as bool? ?? false;
     var lastSets = ViewBag.LastSets as int? ?? 0;
     var lastReps = ViewBag.LastReps as string;
@@ -269,16 +269,16 @@
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input asp-for="RestTime" type="number" class="form-control form-control-lg text-center" 
-                                   id="RestTime" min="0" max="3600" step="@(restInMinutes ? "1" : "15")" placeholder="60" required />
+                                   id="RestTime" min="0" max="3600" step="@(Model.RestInMinutes ? "1" : "15")" placeholder="60" required />
                             <button type="button" class="btn-number-control" onclick="incrementRestTime()">
                                 <i class="fas fa-plus"></i>
                             </button>
                             <div class="input-group-text-addon" style="padding: 0; border: none; background: transparent;">
                                 <div class="btn-group btn-group-sm" role="group" style="box-shadow: none;">
-                                    <button type="button" class="btn btn-outline-primary active" id="restUnitSeg" onclick="setRestUnit(false)" style="border-radius: 0.25rem 0 0 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                            <button type="button" class="btn btn-outline-primary @(Model.RestInMinutes ? "" : "active")" id="restUnitSeg" onclick="setRestUnit(false)" style="border-radius: 0.25rem 0 0 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                                         seg
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary" id="restUnitMin" onclick="setRestUnit(true)" style="border-radius: 0 0.25rem 0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                    <button type="button" class="btn btn-outline-primary @(Model.RestInMinutes ? "active" : "")" id="restUnitMin" onclick="setRestUnit(true)" style="border-radius: 0 0.25rem 0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                                         min
                                     </button>
                                 </div>
