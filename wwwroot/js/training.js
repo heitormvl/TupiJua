@@ -4,6 +4,17 @@
  * Training page functionality
  */
 
+// Default values for exercise execution
+const DEFAULT_SETS = 3;
+const DEFAULT_REPS = '10-15';
+const DEFAULT_WEIGHT = 10;
+const DEFAULT_REST_TIME = 60;
+
+// Helper to parse boolean-like values from inputs/attributes (handles "True"/"true"/true)
+function parseBool(value) {
+    return String(value).toLowerCase() === 'true';
+}
+
 // Initialize Training Index page
 function initTrainingIndex() {
     const heroCard = document.querySelector('.hero-card');
@@ -83,6 +94,9 @@ function initAddExercise() {
             section.style.transform = 'translateY(0)';
         }, index * 80);
     });
+
+    // Ensure rest unit toggle matches server-rendered model value on initial load
+    updateRestUnitToggle();
 }
 
 // Load last exercise data via AJAX
@@ -93,32 +107,30 @@ function loadLastExerciseData(exerciseId) {
             if (data) {
                 displayLastExerciseInfo(data);
                 
-                // Auto-fill form with last exercise data if ShouldIncreaseLoad is true
-                if (data.shouldIncreaseLoad) {
-                    document.getElementById('Sets').value = data.sets;
-                    document.getElementById('Reps').value = data.reps;
-                    
-                    // Suggest increased weight (5% increase or +0.5kg, whichever is greater)
-                    const suggestedWeight = Math.max(
-                        Math.round((data.weight * 1.05) * 2) / 2, // 5% increase, rounded to .5
-                        data.weight + 0.5
-                    );
-                    document.getElementById('Weight').value = suggestedWeight.toFixed(2);
-                    
-                    document.getElementById('RestTime').value = data.restTime;
+                // Only auto-fill form if current values are defaults/empty
+                const setsInput = document.getElementById('Sets');
+                const repsInput = document.getElementById('Reps');
+                const weightInput = document.getElementById('Weight');
+                const restTimeInput = document.getElementById('RestTime');
+                
+                // Check if values are at defaults
+                const isDefaultSets = !setsInput.value || setsInput.value === String(DEFAULT_SETS);
+                const isDefaultReps = !repsInput.value || repsInput.value === DEFAULT_REPS;
+                const isDefaultWeight = !weightInput.value || weightInput.value === String(DEFAULT_WEIGHT) || weightInput.value === DEFAULT_WEIGHT.toFixed(2);
+                const isDefaultRest = !restTimeInput.value || restTimeInput.value === String(DEFAULT_REST_TIME);
+                
+                // Only auto-fill if values are at defaults
+                if (isDefaultSets && isDefaultReps && isDefaultWeight && isDefaultRest) {
+                    setsInput.value = data.sets;
+                    repsInput.value = data.reps;
+                    weightInput.value = data.weight.toFixed(2);
+                    restTimeInput.value = data.restTime;
                     document.getElementById('RestInMinutes').value = data.restInMinutes;
                     updateRestUnitToggle();
-                    document.getElementById('ShouldIncreaseLoad').checked = true;
-                } else {
-                    // Just pre-fill with same values
-                    document.getElementById('Sets').value = data.sets;
-                    document.getElementById('Reps').value = data.reps;
-                    document.getElementById('Weight').value = data.weight.toFixed(2);
-                    document.getElementById('RestTime').value = data.restTime;
-                    document.getElementById('RestInMinutes').value = data.restInMinutes;
-                    updateRestUnitToggle();
-                    document.getElementById('ShouldIncreaseLoad').checked = false;
                 }
+                
+                // Always default to false, never auto-check
+                document.getElementById('ShouldIncreaseLoad').checked = false;
             }
         })
         .catch(error => {
@@ -260,7 +272,7 @@ function setRestUnit(isMinutes) {
     
     if (!restInMinutesInput || !restUnitSeg || !restUnitMin || !restTimeInput) return;
     
-    const currentIsMinutes = restInMinutesInput.value === 'true';
+    const currentIsMinutes = parseBool(restInMinutesInput.value);
     
     // If already in the desired unit, do nothing
     if (currentIsMinutes === isMinutes) return;
@@ -293,7 +305,7 @@ function updateRestUnitToggle() {
     
     if (!restInMinutesInput || !restUnitSeg || !restUnitMin || !restTimeInput) return;
     
-    const isMinutes = restInMinutesInput.value === 'true';
+    const isMinutes = parseBool(restInMinutesInput.value);
     
     if (isMinutes) {
         restUnitSeg.classList.remove('active');
@@ -313,7 +325,7 @@ function incrementRestTime() {
     
     if (!restTimeInput || !restInMinutesInput) return;
     
-    const isMinutes = restInMinutesInput.value === 'true';
+    const isMinutes = parseBool(restInMinutesInput.value);
     const step = isMinutes ? 1 : 15;
     const currentValue = parseInt(restTimeInput.value) || 0;
     const maxValue = parseInt(restTimeInput.max) || 3600;
@@ -333,7 +345,7 @@ function decrementRestTime() {
     
     if (!restTimeInput || !restInMinutesInput) return;
     
-    const isMinutes = restInMinutesInput.value === 'true';
+    const isMinutes = parseBool(restInMinutesInput.value);
     const step = isMinutes ? 1 : 15;
     const currentValue = parseInt(restTimeInput.value) || 0;
     const minValue = parseInt(restTimeInput.min) || 0;

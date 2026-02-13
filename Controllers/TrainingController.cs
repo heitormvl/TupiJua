@@ -13,6 +13,13 @@ namespace TupiJua.Controllers
         private readonly UserManager<User> _userManager;
         private readonly AppDbContext _context;
 
+        // Default values for exercise execution
+        private const int DEFAULT_SETS = 3;
+        private const string DEFAULT_REPS = "10-15";
+        private const decimal DEFAULT_WEIGHT = 10;
+        private const int DEFAULT_REST_TIME = 60;
+        private const bool DEFAULT_REST_IN_MINUTES = false;
+
         public TrainingController(UserManager<User> userManager, AppDbContext context)
         {
             _userManager = userManager;
@@ -119,9 +126,10 @@ namespace TupiJua.Controllers
         /// Exibe o formulário para adicionar um exercício a uma sessão de treino.
         /// </summary>
         /// <param name="sessionId">ID da sessão de treino</param>
+        /// <param name="exerciseId">ID do exercício (opcional)</param>
         /// <returns>View para adicionar exercício</returns>
         [HttpGet]
-        public async Task<IActionResult> AddExercise(int sessionId)
+        public async Task<IActionResult> AddExercise(int sessionId, int? exerciseId = null)
         {
             ViewBag.Exercises = await _context.Exercises
                 .Include(e => e.ExerciseMuscleGroups)
@@ -133,6 +141,66 @@ namespace TupiJua.Controllers
             {
                 WorkoutSessionId = sessionId
             };
+
+            // If exerciseId is provided, try to pre-populate with last execution or plan values
+            if (exerciseId.HasValue)
+            {
+                var userId = _userManager.GetUserId(User);
+                model.ExerciseId = exerciseId.Value;
+
+                // Priority 1: Try to get last execution
+                var lastLoggedExercise = await _context.LoggedExercises
+                    .Where(le => le.ExerciseId == exerciseId.Value && le.WorkoutSession.UserId == userId && !le.IsSkipped)
+                    .OrderByDescending(le => le.WorkoutSession.Date)
+                    .FirstOrDefaultAsync();
+
+                if (lastLoggedExercise != null)
+                {
+                    model.Sets = lastLoggedExercise.Sets;
+                    model.Reps = lastLoggedExercise.Reps;
+                    model.Weight = lastLoggedExercise.Weight;
+                    model.RestTime = lastLoggedExercise.RestTime;
+                    model.RestInMinutes = lastLoggedExercise.RestInMinutes;
+                }
+                else
+                {
+                    // Priority 2: Try to get from active workout plan
+                    var planExercise = await _context.WorkoutPlanExercise
+                        .Where(wpe => wpe.ExerciseId == exerciseId.Value && wpe.WorkoutPlan!.UserId == userId && wpe.WorkoutPlan.IsActive)
+                        .FirstOrDefaultAsync();
+
+                    if (planExercise != null)
+                    {
+                        model.Sets = planExercise.TargetSets;
+                        model.Reps = planExercise.TargetReps ?? DEFAULT_REPS;
+                        model.Weight = DEFAULT_WEIGHT;
+                        model.RestTime = planExercise.RecommendedRestTime > 0 ? planExercise.RecommendedRestTime : DEFAULT_REST_TIME;
+                        model.RestInMinutes = planExercise.RestInMinutes;
+                    }
+                    else
+                    {
+                        // Priority 3: Use defaults
+                        model.Sets = DEFAULT_SETS;
+                        model.Reps = DEFAULT_REPS;
+                        model.Weight = DEFAULT_WEIGHT;
+                        model.RestTime = DEFAULT_REST_TIME;
+                        model.RestInMinutes = DEFAULT_REST_IN_MINUTES;
+                    }
+                }
+            }
+            else
+            {
+                // No exercise selected yet, set defaults
+                model.Sets = DEFAULT_SETS;
+                model.Reps = DEFAULT_REPS;
+                model.Weight = DEFAULT_WEIGHT;
+                model.RestTime = DEFAULT_REST_TIME;
+                model.RestInMinutes = DEFAULT_REST_IN_MINUTES;
+            }
+
+            // Always default ShouldIncreaseLoad to false
+            model.ShouldIncreaseLoad = false;
+
             return View(model);
         }
 
@@ -377,12 +445,30 @@ namespace TupiJua.Controllers
             var model = new LogExerciseViewModel
             {
                 WorkoutSessionId = sessionId,
-                ExerciseId = exerciseId,
-                Sets = planExercise.TargetSets,
-                Reps = planExercise.TargetReps ?? "12",
-                RestTime = planExercise.RecommendedRestTime > 0 ? planExercise.RecommendedRestTime : 60,
-                RestInMinutes = planExercise.RestInMinutes
+                ExerciseId = exerciseId
             };
+
+            // Priority 1: Use last execution values if available
+            if (lastLoggedExercise != null)
+            {
+                model.Sets = lastLoggedExercise.Sets;
+                model.Reps = lastLoggedExercise.Reps;
+                model.Weight = lastLoggedExercise.Weight;
+                model.RestTime = lastLoggedExercise.RestTime;
+                model.RestInMinutes = lastLoggedExercise.RestInMinutes;
+            }
+            // Priority 2: Use plan target values
+            else
+            {
+                model.Sets = planExercise.TargetSets;
+                model.Reps = planExercise.TargetReps ?? DEFAULT_REPS;
+                model.Weight = DEFAULT_WEIGHT;
+                model.RestTime = planExercise.RecommendedRestTime > 0 ? planExercise.RecommendedRestTime : DEFAULT_REST_TIME;
+                model.RestInMinutes = planExercise.RestInMinutes;
+            }
+            
+            // Always default ShouldIncreaseLoad to false
+            model.ShouldIncreaseLoad = false;
 
             return View("AddExercise", model);
         }
