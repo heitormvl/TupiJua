@@ -495,9 +495,9 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
             <div style="display:flex;align-items:center;gap:10px;">
                 <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);">
-                    <span style="color:white;font-size:16px;font-weight:bold;">T</span>
+                    <span style="color:white;font-size:16px;font-weight:bold;">@(Model?.User?.UserName?.Length > 0 ? Model.User.UserName.Substring(0,1).ToUpper() : "?")</span>
                 </div>
-                <span style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:600;letter-spacing:1px;">TupiJua</span>
+                <span style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:600;letter-spacing:1px;">@(Model?.User?.UserName ?? "Usuário")</span>
             </div>
             <span id="imgDate" style="color:rgba(255,255,255,0.7);font-size:12px;">@Model.Date.ToString("dd/MM/yyyy")</span>
         </div>
