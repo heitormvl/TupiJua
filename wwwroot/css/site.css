@@ -701,13 +701,13 @@ body.has-active-session .pre-alpha-badge {
   padding: 1rem;
 }
 
-.form-check-input {
+.form-switch .form-check-input {
   width: 3rem;
   height: 1.5rem;
   cursor: pointer;
 }
 
-.form-check-input:checked {
+.form-switch .form-check-input:checked {
   background-color: #198754;
   border-color: #198754;
 }

@@ -138,9 +138,157 @@ function initUserProfile() {
     }
 }
 
+// View Workout Page
+function initViewWorkout() {
+    // ── Delete modal ────────────────────────────────────────────────────
+    const deleteModal = document.getElementById('deleteLoggedExerciseModal');
+    if (!deleteModal) return; // Exit if not on ViewWorkout page
+
+    const deleteForm = document.getElementById('deleteLoggedExerciseForm');
+    const deleteBaseUrl = deleteForm?.dataset.deleteUrl ?? '';
+
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+
+        deleteForm.action = deleteBaseUrl + '/' + id;
+        document.getElementById('exerciseNameToDelete').textContent = name;
+    });
+
+    // ── Share feature ────────────────────────────────────────────────────
+    const shareNameModal = document.getElementById('shareNameModal');
+    if (!shareNameModal) return;
+
+    const planName = shareNameModal.dataset.planName || null;
+
+    // Radio option highlighting
+    shareNameModal.querySelectorAll('input[name="shareNameOption"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            shareNameModal.querySelectorAll('.share-name-option').forEach(opt => {
+                opt.style.borderColor = '';
+                opt.style.background = '';
+            });
+            const selected = shareNameModal.querySelector('input[name="shareNameOption"]:checked');
+            if (selected) {
+                const label = selected.closest('.share-name-option');
+                label.style.borderColor = '#0d6efd';
+                label.style.background = 'rgba(13,110,253,0.06)';
+            }
+
+            const isCustom = document.getElementById('radioNameCustom')?.checked;
+            const wrapper = document.getElementById('customNameWrapper');
+            if (wrapper) {
+                wrapper.classList.toggle('is-visible', isCustom);
+                if (isCustom) setTimeout(() => document.getElementById('customShareName')?.focus(), 200);
+            }
+        });
+    });
+
+    // Highlight the initially checked option
+    const initialChecked = shareNameModal.querySelector('input[name="shareNameOption"]:checked');
+    if (initialChecked) {
+        const label = initialChecked.closest('.share-name-option');
+        if (label) { label.style.borderColor = '#0d6efd'; label.style.background = 'rgba(13,110,253,0.06)'; }
+    }
+
+    // Whole option card toggles the radio
+    shareNameModal.querySelectorAll('.share-name-option').forEach(card => {
+        card.addEventListener('click', function (e) {
+            if (e.target.tagName !== 'INPUT') {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+            }
+        });
+    });
+
+    // ── Generate image ───────────────────────────────────────────────────
+    let capturedBlob = null;
+    let capturedDataUrl = null;
+
+    document.getElementById('btnGenerateImage')?.addEventListener('click', () => {
+        const selectedOption = shareNameModal.querySelector('input[name="shareNameOption"]:checked');
+        let name;
+        if (selectedOption && selectedOption.value === 'plan') {
+            name = planName || 'Treino Livre';
+        } else {
+            name = (document.getElementById('customShareName')?.value?.trim()) || 'Treino Livre';
+        }
+
+        const nameEl = document.getElementById('imgWorkoutName');
+        if (nameEl) nameEl.textContent = name;
+
+        const nameModalInstance = bootstrap.Modal.getInstance(shareNameModal);
+        const imgModal = new bootstrap.Modal(document.getElementById('shareImageModal'));
+        nameModalInstance?.hide();
+
+        document.getElementById('generatingSpinner').style.display = '';
+        document.getElementById('generatedImageWrapper').style.display = 'none';
+        document.getElementById('btnDownloadImage').style.display = 'none';
+        document.getElementById('btnShareImage').style.display = 'none';
+
+        setTimeout(() => imgModal.show(), 300);
+
+        setTimeout(() => {
+            const tpl = document.getElementById('workoutImageTemplate');
+            html2canvas(tpl, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: null,
+                width: 540,
+                height: 720,
+                logging: false
+            }).then(canvas => {
+                capturedDataUrl = canvas.toDataURL('image/png');
+                document.getElementById('generatedImage').src = capturedDataUrl;
+
+                document.getElementById('generatingSpinner').style.display = 'none';
+                document.getElementById('generatedImageWrapper').style.display = '';
+                document.getElementById('btnDownloadImage').style.display = '';
+
+                if (navigator.share && navigator.canShare) {
+                    canvas.toBlob(blob => {
+                        capturedBlob = blob;
+                        const file = new File([blob], 'treino-tupijua.png', { type: 'image/png' });
+                        if (navigator.canShare({ files: [file] })) {
+                            document.getElementById('btnShareImage').style.display = '';
+                        }
+                    }, 'image/png');
+                }
+            }).catch(err => {
+                console.error('html2canvas error:', err);
+                document.getElementById('generatingSpinner').innerHTML =
+                    '<p class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>Erro ao gerar a imagem.</p>';
+            });
+        }, 600);
+    });
+
+    // Download
+    document.getElementById('btnDownloadImage')?.addEventListener('click', () => {
+        if (!capturedDataUrl) return;
+        const a = document.createElement('a');
+        a.href = capturedDataUrl;
+        a.download = 'treino-tupijua.png';
+        a.click();
+    });
+
+    // Share via Web Share API
+    document.getElementById('btnShareImage')?.addEventListener('click', async () => {
+        if (!capturedBlob) return;
+        const file = new File([capturedBlob], 'treino-tupijua.png', { type: 'image/png' });
+        try {
+            await navigator.share({ files: [file], title: 'Meu treino no TupiJua' });
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error('Share error:', err);
+        }
+    });
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     initRegisterForm();
     initLoginForm();
     initUserProfile();
+    initViewWorkout();
 });

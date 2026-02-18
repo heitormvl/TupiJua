@@ -66,6 +66,7 @@ namespace TupiJua.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var session = await _context.WorkoutSessions
+                .Include(ws => ws.User)
                 .Include(ws => ws.WorkoutPlan)
                 .Include(ws => ws.LoggedExercises)
                 .ThenInclude(le => le.Exercise)
