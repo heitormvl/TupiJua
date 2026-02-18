@@ -115,6 +115,55 @@
     <script src="~/js/rest-timer.js" asp-append-version="true"></script>
     <script src="~/js/rest-timer-ui.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLower() ?? "";
+    }
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <nav class="bottom-nav" aria-label="Navegação principal">
+            <a class="bottom-nav-item @(currentController == "home" ? "active" : "")" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-home"></i>
+                <span>Início</span>
+            </a>
+            <a class="bottom-nav-item @(currentController == "training" ? "active" : "")" asp-controller="Training" asp-action="Index">
+                <i class="fas fa-dumbbell"></i>
+                <span>Treinos</span>
+            </a>
+            <a class="bottom-nav-item @(currentController == "workoutplan" ? "active" : "")" asp-controller="WorkoutPlan" asp-action="Index">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Planos</span>
+            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a class="bottom-nav-item @(currentController == "admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">
+                    <i class="fas fa-cog"></i>
+                    <span>Admin</span>
+                </a>
+            }
+            <a class="bottom-nav-item @(currentController == "user" ? "active" : "")" asp-controller="User" asp-action="Index">
+                <i class="fas fa-user"></i>
+                <span>Conta</span>
+            </a>
+        </nav>
+    }
+    else
+    {
+        <nav class="bottom-nav" aria-label="Navegação">
+            <a class="bottom-nav-item @(currentController == "home" ? "active" : "")" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-home"></i>
+                <span>Início</span>
+            </a>
+            <a class="bottom-nav-item @(currentController == "user" && ViewContext.RouteData.Values["action"]?.ToString()?.ToLower() == "login" ? "active" : "")" asp-controller="User" asp-action="Login">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login</span>
+            </a>
+            <a class="bottom-nav-item @(currentController == "user" && ViewContext.RouteData.Values["action"]?.ToString()?.ToLower() == "register" ? "active" : "")" asp-controller="User" asp-action="Register">
+                <i class="fas fa-user-plus"></i>
+                <span>Registrar</span>
+            </a>
+        </nav>
+    }
 </body>
 
 </html>
