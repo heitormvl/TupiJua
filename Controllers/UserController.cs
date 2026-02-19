@@ -43,42 +43,43 @@ namespace TupiJua.Controllers
             return View(model);
         }
 
+        // Desativado no Alpha
         /// <summary>
         /// Página de registro de novo usuário
         /// </summary>
         /// <returns>View para registro de usuário</returns>
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Register() => View();
+        // [HttpGet]
+        // [AllowAnonymous]
+        // public IActionResult Register() => View();
 
         /// <summary>
         /// Registra um novo usuário
         /// </summary>
         /// <param name="model">Modelo com os dados do usuário a ser registrado</param>
         /// <returns>Redireciona para a página inicial em caso de sucesso ou retorna a view com erros</returns>
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = new User { UserName = model.Username, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
+        // [HttpPost]
+        // [AllowAnonymous]
+        // public async Task<IActionResult> Register(RegisterViewModel model)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         var user = new User { UserName = model.Username, Email = model.Email };
+        //         var result = await _userManager.CreateAsync(user, model.Password);
 
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
+        //         if (result.Succeeded)
+        //         {
+        //             await _signInManager.SignInAsync(user, isPersistent: false);
+        //             return RedirectToAction("Index", "Home");
+        //         }
 
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
+        //         foreach (var error in result.Errors)
+        //         {
+        //             ModelState.AddModelError(string.Empty, error.Description);
+        //         }
+        //     }
 
-            return View(model);
-        }
+        //     return View(model);
+        // }
 
         /// <summary>
         /// Página de login do usuário
