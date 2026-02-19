@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TupiJua.Models;
@@ -10,10 +11,14 @@ namespace TupiJua.Controllers
     public class AdminController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public AdminController(AppDbContext context)
+        public AdminController(AppDbContext context, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -390,6 +395,52 @@ namespace TupiJua.Controllers
 
             TempData["SuccessMessage"] = $"Exercício '{exercise.Name}' excluído com sucesso!";
             return RedirectToAction(nameof(Exercises));
+        }
+
+        #endregion
+
+        #region Alpha User Registration
+
+        /// <summary>
+        /// Registra um novo usuário Alpha mediante autenticação do administrador.
+        /// </summary>
+        /// <param name="adminUser">Nome de usuário do administrador.</param>
+        /// <param name="adminPwd">Senha do administrador.</param>
+        /// <param name="newUserName">Nome de usuário do novo usuário.</param>
+        /// <param name="newUserMail">Email do novo usuário.</param>
+        /// <param name="newUserPwd">Senha do novo usuário.</param>
+        /// <returns>
+        /// Confirmação com nome, email e senha do usuário criado em caso de sucesso,
+        /// ou mensagem de erro caso as credenciais do administrador sejam inválidas.
+        /// </returns>
+        [HttpPost]
+        [AllowAnonymous]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> RegisterAlphaUser(string adminUser, string adminPwd, string newUserName, string newUserMail, string newUserPwd)
+        {
+            var admin = await _userManager.FindByNameAsync(adminUser)
+                ?? (adminUser.Contains('@') ? await _userManager.FindByEmailAsync(adminUser) : null);
+
+            if (admin == null || !await _userManager.IsInRoleAsync(admin, "Admin"))
+            {
+                return Unauthorized("Credenciais de administrador inválidas.");
+            }
+
+            var checkPassword = await _signInManager.CheckPasswordSignInAsync(admin, adminPwd, false);
+            if (!checkPassword.Succeeded)
+            {
+                return Unauthorized("Credenciais de administrador inválidas.");
+            }
+
+            var newUser = new User { UserName = newUserName, Email = newUserMail };
+            var result = await _userManager.CreateAsync(newUser, newUserPwd);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors.Select(e => e.Description));
+            }
+
+            return Ok(new { username = newUserName, email = newUserMail, password = newUserPwd });
         }
 
         #endregion

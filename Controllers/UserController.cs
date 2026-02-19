@@ -43,43 +43,49 @@ namespace TupiJua.Controllers
             return View(model);
         }
 
-        // Desativado no Alpha
+        // Desativado no Alpha (acesso direto pela view)
         /// <summary>
-        /// Página de registro de novo usuário
+        /// Registra um novo usuário.
         /// </summary>
-        /// <returns>View para registro de usuário</returns>
-        // [HttpGet]
-        // [AllowAnonymous]
-        // public IActionResult Register() => View();
+        /// <param name="model">Modelo com os dados do usuário a ser registrado.</param>
+        /// <param name="registerAlphaUser">
+        /// Se <c>true</c>, indica que o registro foi iniciado pelo endpoint administrativo.
+        /// Neste caso, o método retorna uma confirmação JSON com nome, email e senha do usuário criado,
+        /// em vez de redirecionar para a view.
+        /// </param>
+        /// <returns>
+        /// Quando <paramref name="registerAlphaUser"/> for <c>true</c>, retorna <see cref="OkObjectResult"/> com os dados do usuário criado.
+        /// Caso contrário, redireciona para a página inicial.
+        /// </returns>
+        [HttpPost]
+        [AllowAnonymous]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model, bool registerAlphaUser = false)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new User { UserName = model.Username, Email = model.Email };
+                var result = await _userManager.CreateAsync(user, model.Password);
 
-        /// <summary>
-        /// Registra um novo usuário
-        /// </summary>
-        /// <param name="model">Modelo com os dados do usuário a ser registrado</param>
-        /// <returns>Redireciona para a página inicial em caso de sucesso ou retorna a view com erros</returns>
-        // [HttpPost]
-        // [AllowAnonymous]
-        // public async Task<IActionResult> Register(RegisterViewModel model)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         var user = new User { UserName = model.Username, Email = model.Email };
-        //         var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    if (registerAlphaUser)
+                    {
+                        return Ok(new { username = model.Username, email = model.Email, password = model.Password });
+                    }
 
-        //         if (result.Succeeded)
-        //         {
-        //             await _signInManager.SignInAsync(user, isPersistent: false);
-        //             return RedirectToAction("Index", "Home");
-        //         }
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Index", "Home");
+                }
 
-        //         foreach (var error in result.Errors)
-        //         {
-        //             ModelState.AddModelError(string.Empty, error.Description);
-        //         }
-        //     }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
 
-        //     return View(model);
-        // }
+            return View(model);
+        }
 
         /// <summary>
         /// Página de login do usuário
