@@ -41,7 +41,7 @@ jobs:
         with:
           files: '**/appsettings.json'
         env:
-          AppSettings.BuildVersion: "Pre-Alpha ${{ steps.date.outputs.date }}-${{ github.run_number }}"
+          AppSettings.BuildVersion: "Alpha ${{ steps.date.outputs.date }}-${{ github.run_number }}"
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -82,4 +82,5 @@ jobs:
           app-name: 'tupijua'
           slot-name: 'Production'
           package: .
+
           
