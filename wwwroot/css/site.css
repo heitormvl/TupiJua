@@ -305,8 +305,9 @@ body.has-active-session .pre-alpha-badge {
 
 .btn-cta:hover {
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-  color: #0d6efd;
+  box-shadow: 0 12px 30px rgba(255, 255, 255, 0.25);
+  background: #0d6efd;
+  color: white;
 }
 
 .btn-cta:active {
