@@ -1346,6 +1346,241 @@ body.has-active-session .pre-alpha-badge {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* ============================================================
+   EXERCISE PICKER
+   ============================================================ */
+
+.exercise-picker-wrapper {
+  position: relative;
+}
+
+/* The original <select> is hidden but stays in the DOM for form validation */
+.exercise-picker-hidden-select {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -1;
+}
+
+/* Trigger button — mimics a form-select */
+.exercise-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  min-height: 48px;
+  background-color: var(--tj-input-bg);
+  border: 1.5px solid var(--tj-input-border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  color: var(--tj-text);
+}
+
+.exercise-picker-trigger:hover,
+.exercise-picker-trigger:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
+}
+
+.exercise-picker-trigger.is-open {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
+}
+
+.picker-dumbbell-icon {
+  color: var(--tj-text-muted);
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.picker-display-text {
+  flex: 1;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker-placeholder {
+  color: var(--tj-text-muted);
+}
+
+.picker-chevron {
+  color: var(--tj-text-muted);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.picker-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* Dropdown panel */
+.exercise-picker-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: var(--tj-bg-card);
+  border: 1.5px solid var(--tj-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 32px var(--tj-shadow-lg);
+  z-index: 1050;
+  overflow: hidden;
+  animation: ep-fade-in 0.12s ease;
+}
+
+@keyframes ep-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Search row */
+.picker-search-wrap {
+  position: relative;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--tj-border);
+}
+
+.picker-search-icon {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--tj-text-muted);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.picker-search-input {
+  width: 100%;
+  padding: 0.45rem 0.75rem 0.45rem 2.1rem;
+  background-color: var(--tj-input-bg);
+  border: 1px solid var(--tj-input-border);
+  border-radius: 0.375rem;
+  color: var(--tj-text);
+  font-size: 0.9rem;
+}
+
+.picker-search-input::placeholder {
+  color: var(--tj-text-muted);
+}
+
+.picker-search-input:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Muscle group tag row */
+.picker-muscle-tags {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--tj-border);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.picker-muscle-tags::-webkit-scrollbar {
+  display: none;
+}
+
+.picker-tag {
+  flex-shrink: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  border: 1.5px solid var(--tj-border);
+  background-color: transparent;
+  color: var(--tj-text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.picker-tag:hover {
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+.picker-tag.active {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+
+/* Exercise list */
+.picker-exercises-list {
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tj-border) transparent;
+}
+
+.picker-exercise-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--tj-border);
+  transition: background-color 0.1s ease;
+}
+
+.picker-exercise-item:last-child {
+  border-bottom: none;
+}
+
+.picker-exercise-item:hover {
+  background-color: rgba(13, 110, 253, 0.06);
+}
+
+.picker-exercise-item.selected {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.picker-exercise-name {
+  font-size: 0.9rem;
+  color: var(--tj-text);
+  flex: 1;
+}
+
+.picker-exercise-item.selected .picker-exercise-name {
+  color: #0d6efd;
+  font-weight: 600;
+}
+
+.picker-exercise-category {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  color: var(--tj-text-muted);
+  background-color: var(--tj-bg-secondary);
+  border-radius: 1rem;
+  padding: 0.1rem 0.5rem;
+  white-space: nowrap;
+}
+
+.picker-empty-state {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--tj-text-muted);
+  font-size: 0.875rem;
+}
+
 /* Plans Carousel (mobile) */
 @media (max-width: 991.98px) {
   .plans-carousel-row {

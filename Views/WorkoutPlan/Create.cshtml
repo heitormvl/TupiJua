@@ -97,6 +97,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/exercise-helpers.js"></script>
+    <script src="~/js/exercise-picker.js"></script>
     
     <script>
         let exerciseCounter = 0;
@@ -231,6 +232,10 @@
             `;
 
             container.appendChild(exerciseCard);
+
+            // Initialize exercise picker on the newly added select
+            const newSelectEl = document.getElementById(`exercise-${exerciseCounter}`);
+            if (newSelectEl) initExercisePicker(newSelectEl, exercisesList);
             
             // Animate card appearance
             setTimeout(() => {
