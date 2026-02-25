@@ -243,15 +243,19 @@
         }
 
         // Patch para notificar a página ao trocar o tema
-        const _original = window.ThemeManager.applyTheme;
-        window.ThemeManager.applyTheme = function (theme) {
-            _original(theme);
-            syncProfileButtons(theme);
-        };
+        if (window.ThemeManager && typeof window.ThemeManager.applyTheme === 'function') {
+            const _original = window.ThemeManager.applyTheme;
+            window.ThemeManager.applyTheme = function (theme) {
+                _original(theme);
+                syncProfileButtons(theme);
+            };
+        }
 
-        document.addEventListener('DOMContentLoaded', () =>
-            syncProfileButtons(ThemeManager.getCurrentTheme())
-        );
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.ThemeManager && typeof window.ThemeManager.getCurrentTheme === 'function') {
+                syncProfileButtons(window.ThemeManager.getCurrentTheme());
+            }
+        });
     })();
 </script>
 }
