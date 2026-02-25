@@ -16,6 +16,7 @@
   --tj-input-border:  #ced4da;
   --tj-shadow:        rgba(0, 0, 0, 0.08);
   --tj-shadow-lg:     rgba(0, 0, 0, 0.15);
+  --tj-primary:       #0d6efd;
 }
 
 [data-theme="dark"] {
@@ -31,6 +32,7 @@
   --tj-input-border:  #4b5563;
   --tj-shadow:        rgba(0, 0, 0, 0.35);
   --tj-shadow-lg:     rgba(0, 0, 0, 0.5);
+  --tj-primary:       #6ea8fe;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,6 +49,7 @@
     --tj-input-border:  #4b5563;
     --tj-shadow:        rgba(0, 0, 0, 0.35);
     --tj-shadow-lg:     rgba(0, 0, 0, 0.5);
+    --tj-primary:       #6ea8fe;
   }
 }
 
@@ -104,7 +107,7 @@ body {
 .form-control:focus,
 .form-select:focus {
   background-color: var(--tj-input-bg) !important;
-  border-color: #0d6efd !important;
+  border-color: var(--tj-primary) !important;
   color: var(--tj-text) !important;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.2) !important;
 }
@@ -116,7 +119,7 @@ body {
 }
 
 .input-group:focus-within .input-group-text {
-  border-color: #0d6efd !important;
+  border-color: var(--tj-primary) !important;
   background-color: rgba(13, 110, 253, 0.08) !important;
 }
 
@@ -205,6 +208,32 @@ body {
 /* Badges */
 .badge.bg-light {
   color: var(--tj-text) !important;
+}
+
+/* btn-outline-primary: use --tj-primary so dark mode gets the accessible lighter shade */
+.btn-outline-primary {
+  --bs-btn-color: var(--tj-primary);
+  --bs-btn-border-color: var(--tj-primary);
+  --bs-btn-hover-bg: var(--tj-primary);
+  --bs-btn-hover-border-color: var(--tj-primary);
+  --bs-btn-active-bg: var(--tj-primary);
+  --bs-btn-active-border-color: var(--tj-primary);
+}
+
+[data-theme="dark"] .btn-outline-primary,
+[data-theme="dark"] .btn-outline-primary:hover,
+[data-theme="dark"] .btn-outline-primary:active {
+  --bs-btn-hover-color: #000;
+  --bs-btn-active-color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] .btn-outline-primary,
+  [data-theme="system"] .btn-outline-primary:hover,
+  [data-theme="system"] .btn-outline-primary:active {
+    --bs-btn-hover-color: #000;
+    --bs-btn-active-color: #000;
+  }
 }
 
 /* ============================================================
@@ -326,12 +355,12 @@ body {
 }
 
 .form-control:focus {
-  border-color: #0d6efd;
+  border-color: var(--tj-primary);
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
 
 .input-group:focus-within .input-group-text {
-  border-color: #0d6efd;
+  border-color: var(--tj-primary);
   background-color: #e7f1ff;
 }
 
@@ -525,7 +554,7 @@ body.has-active-session .pre-alpha-badge {
 }
 
 .profile-progress-card .btn-light {
-  color: #0d6efd;
+  color: var(--tj-primary);
 }
 
 /* ======================================
@@ -564,7 +593,7 @@ body.has-active-session .pre-alpha-badge {
 
 .btn-cta {
   background: white;
-  color: #0d6efd;
+  color: var(--tj-primary);
   border: none;
   padding: 1rem 2.5rem;
   font-size: 1.25rem;
@@ -600,7 +629,7 @@ body.has-active-session .pre-alpha-badge {
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
   font-weight: 500;
-  color: #0d6efd;
+  color: var(--tj-primary);
   transition: all 0.3s ease;
 }
 
@@ -825,7 +854,7 @@ body.has-active-session .pre-alpha-badge {
   align-items: center;
   gap: 0.3rem;
   background: rgba(13, 110, 253, 0.08);
-  color: #0d6efd;
+  color: var(--tj-primary);
   padding: 0.25rem 0.625rem;
   border-radius: 999px;
   font-size: 0.8rem;
@@ -950,7 +979,7 @@ body.has-active-session .pre-alpha-badge {
   height: 50px;
   border: 2px solid #0d6efd;
   background-color: var(--tj-bg-card);
-  color: #0d6efd;
+  color: var(--tj-primary);
   border-radius: 0.75rem;
   display: flex;
   align-items: center;
@@ -980,7 +1009,7 @@ body.has-active-session .pre-alpha-badge {
 }
 
 .number-input-group .form-control:focus {
-  border-color: #0d6efd;
+  border-color: var(--tj-primary);
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
 
@@ -1134,7 +1163,7 @@ body.has-active-session .pre-alpha-badge {
 }
 
 .plan-name {
-  color: #0d6efd;
+  color: var(--tj-primary);
   font-weight: 700;
   font-size: 1.15rem;
   margin: 0;
@@ -1235,7 +1264,7 @@ body.has-active-session .pre-alpha-badge {
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
   font-weight: 600;
-  color: #0d6efd;
+  color: var(--tj-primary);
 }
 
 /* Plan Card Actions */
@@ -1300,7 +1329,7 @@ body.has-active-session .pre-alpha-badge {
 .exercise-field-order {
   display: flex;
   align-items: center;
-  color: #0d6efd;
+  color: var(--tj-primary);
   font-size: 1.1rem;
 }
 
@@ -1315,7 +1344,7 @@ body.has-active-session .pre-alpha-badge {
 }
 
 .exercise-select:focus {
-  border-color: #0d6efd;
+  border-color: var(--tj-primary);
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
 
@@ -1431,7 +1460,7 @@ body.has-active-session .pre-alpha-badge {
   height: 50px;
   border-radius: 0.75rem;
   background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(84, 115, 255, 0.1));
-  color: #0d6efd;
+  color: var(--tj-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1754,7 +1783,7 @@ body.has-active-session .pre-alpha-badge {
 }
 
 .primary-check:checked ~ .primary-label {
-    color: #0d6efd;
+    color: var(--tj-primary);
     font-weight: 600;
 }
 
@@ -1991,7 +2020,7 @@ body.has-active-session .pre-alpha-badge {
 
 .active-session-actions .btn-light {
     background: rgba(255, 255, 255, 0.9);
-    color: #0d6efd;
+    color: var(--tj-primary);
     border: none;
 }
 
@@ -2002,7 +2031,7 @@ body.has-active-session .pre-alpha-badge {
 
 .active-session-actions .btn-primary {
     background: white;
-    color: #0d6efd;
+    color: var(--tj-primary);
     border: none;
 }
 
@@ -2094,13 +2123,13 @@ body.has-active-session .pre-alpha-badge {
     font-size: 1.2rem;
     margin-right: 8px;
     background: rgba(255, 255, 255, 0.9);
-    color: #0d6efd;
+    color: var(--tj-primary);
     box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
 }
 
 .rest-timer-fab.inside-active-session:hover {
     background: white;
-    color: #0d6efd;
+    color: var(--tj-primary);
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
 }
@@ -2154,7 +2183,7 @@ body.has-active-session .pre-alpha-badge {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #0d6efd;
+    color: var(--tj-primary);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -2567,7 +2596,7 @@ body.has-active-session .pre-alpha-badge {
 }
 
 .bottom-nav-item.active {
-    color: #0d6efd;
+    color: var(--tj-primary);
 }
 
 .bottom-nav-item.active i {
