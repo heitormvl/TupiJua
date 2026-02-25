@@ -27,7 +27,8 @@
     function setCookie(name, value) {
         const expires = new Date();
         expires.setFullYear(expires.getFullYear() + 1);
-        document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+        const secureFlag = (window.location && window.location.protocol === 'https:') ? '; Secure' : '';
+        document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${secureFlag}`;
     }
 
     /**
