@@ -66,34 +66,26 @@
                     </h5>
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
-                            <div class="admin-action-card">
+                            <a asp-action="MuscleGroups" class="admin-action-card">
                                 <div class="admin-action-icon bg-primary">
                                     <i class="fas fa-layer-group"></i>
                                 </div>
                                 <div class="admin-action-content">
                                     <h6>Grupos Musculares</h6>
-                                    <p class="text-muted mb-3">Adicione e edite grupos musculares como Peitoral, Costas, etc.</p>
-                                    <a asp-action="MuscleGroups" class="btn btn-primary">
-                                        <i class="fas fa-arrow-right me-2"></i>
-                                        Gerenciar Grupos
-                                    </a>
                                 </div>
-                            </div>
+                                <i class="fas fa-chevron-right text-muted ms-auto"></i>
+                            </a>
                         </div>
                         <div class="col-12 col-md-6">
-                            <div class="admin-action-card">
+                            <a asp-action="Exercises" class="admin-action-card">
                                 <div class="admin-action-icon bg-success">
                                     <i class="fas fa-dumbbell"></i>
                                 </div>
                                 <div class="admin-action-content">
                                     <h6>Exercícios</h6>
-                                    <p class="text-muted mb-3">Cadastre novos exercícios e associe com grupos musculares.</p>
-                                    <a asp-action="Exercises" class="btn btn-success">
-                                        <i class="fas fa-arrow-right me-2"></i>
-                                        Gerenciar Exercícios
-                                    </a>
                                 </div>
-                            </div>
+                                <i class="fas fa-chevron-right text-muted ms-auto"></i>
+                            </a>
                         </div>
                     </div>
                 </div>

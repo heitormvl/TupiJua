@@ -129,11 +129,11 @@
 
                 @if (Model.sessions.Any())
                 {
-                    var sessionsToShow = Model.sessions.Take(5);
-
                     <div class="timeline">
-                        @foreach (var session in sessionsToShow)
+                        @for (var i = 0; i < Model.sessions.Count; i++)
                         {
+                            var session = Model.sessions[i];
+                            var isExtra = i >= 5;
                             var hasProgressFlag = session.LoggedExercises.Any(le => le.Observation?.Contains("aumentar") ==
                             true);
                             var exerciseNames = string.Join(", ", session.LoggedExercises.Select(le =>
@@ -143,19 +143,17 @@
                                 exerciseNames += $" +{session.LoggedExercises.Count - 3}";
                             }
 
-                            <div class="timeline-item">
+                            <div class="timeline-item @(isExtra ? "d-none extra-session" : "")">
                                 <div class="timeline-marker"></div>
                                 <div class="workout-card">
                                     <div class="workout-header">
                                         <div>
-                                            <h5 class="workout-date">
-                                                @session.Date.ToString("dd 'de' MMM", new
-                                                System.Globalization.CultureInfo("pt-BR"))
-                                    </h5>
-                                    <p class="workout-time text-muted mb-0">
-                                        <i class="fas fa-clock me-1"></i>
-                                        @session.Date.ToString("HH:mm")
-                                    </p>
+                                            <h5 class="workout-date mb-0">
+                                                @session.Date.ToString("dd 'de' MMM", new System.Globalization.CultureInfo("pt-BR"))
+                                                <small class="workout-time text-muted fw-normal ms-2">
+                                                    <i class="fas fa-clock me-1"></i>@session.Date.ToString("HH:mm")
+                                                </small>
+                                            </h5>
                                 </div>
                                 @if (hasProgressFlag)
                                         {
@@ -167,7 +165,6 @@
                                     </div>
                                     <div class="workout-body">
                                         <p class="workout-exercises">
-                                            <i class="fas fa-dumbbell me-2 text-primary"></i>
                                             @exerciseNames
                                         </p>
                                         <div class="workout-stats">
@@ -183,7 +180,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="workout-footer">
+                                    <div class="workout-footer justify-content-center">
                                         <button class="btn btn-sm btn-outline-primary"
                                             onclick="viewWorkoutDetails(@session.Id)">
                                             <i class="fas fa-eye me-1"></i>
@@ -206,7 +203,7 @@
                     @if (Model.sessions.Count > 5)
                     {
                         <div class="text-center mt-4">
-                            <button class="btn btn-outline-secondary">
+                            <button id="showMoreBtn" class="btn btn-outline-secondary">
                                 <i class="fas fa-chevron-down me-2"></i>
                                 Ver Mais
                             </button>
@@ -319,6 +316,18 @@
                 document.getElementById('planExercisesCount').textContent = planExercises;
                 document.getElementById('modalPlanId').value = planId;
                 document.getElementById('viewPlanDetailsLink').href = '@Url.Action("Details", "WorkoutPlan")?id=' + planId;
+            });
+        }
+
+        // Handle "Ver Mais" button (expand 5 at a time)
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', function () {
+                const hidden = Array.from(document.querySelectorAll('.extra-session.d-none'));
+                hidden.slice(0, 5).forEach(el => el.classList.remove('d-none'));
+                if (document.querySelectorAll('.extra-session.d-none').length === 0) {
+                    this.style.display = 'none';
+                }
             });
         }
 

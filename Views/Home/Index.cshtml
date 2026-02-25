@@ -35,34 +35,33 @@
                             <h5 class="mb-0">
                                 <i class="fas fa-clipboard-list me-2"></i>
                                 Meus Planos Ativos
+                                <span class="badge bg-primary ms-2" style="font-size: 0.75rem; vertical-align: middle;">@Model.activePlans.Count</span>
                             </h5>
                             <a asp-controller="WorkoutPlan" asp-action="Index" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-cog me-1"></i>
                                 Gerenciar
                             </a>
                         </div>
-                        <div class="row g-3">
+                        <div class="row g-3 plans-carousel-row">
                             @foreach (var plan in Model.activePlans)
                             {
-                                <div class="col-12 col-lg-6">
+                                var totalSets = plan.PlanExercises.Sum(pe => pe.TargetSets);
+                                <div class="col-12 col-lg-6 plans-carousel-col">
                                     <div class="workout-plan-card">
                                         <div class="plan-card-header">
-                                            <h4 class="plan-name mb-2">
-                                                <i class="fas fa-bookmark me-2"></i>
-                                                @plan.Name
+                                            <h4 class="plan-name">
+                                                <i class="fas fa-bookmark me-2"></i>@plan.Name
                                             </h4>
                                             <div class="plan-stats">
                                                 <div class="stat-item">
-                                                    <i class="fas fa-list-ol me-2"></i>
-                                                    <span>@plan.PlanExercises.Count @(plan.PlanExercises.Count == 1 ? "exercício" :
-                                                                                                    "exercícios")</span>
+                                                    <i class="fas fa-list-ol me-1"></i>
+                                                    @plan.PlanExercises.Count @(plan.PlanExercises.Count == 1 ? "exercício" : "exercícios")
                                                 </div>
                                                 @if (plan.PlanExercises.Any())
                                                 {
-                                                    var totalSets = plan.PlanExercises.Sum(pe => pe.TargetSets);
                                                     <div class="stat-item">
-                                                        <i class="fas fa-redo me-2"></i>
-                                                        <span>@totalSets @(totalSets == 1 ? "série" : "séries")</span>
+                                                        <i class="fas fa-redo me-1"></i>
+                                                        @totalSets @(totalSets == 1 ? "série" : "séries")
                                                     </div>
                                                 }
                                             </div>
@@ -70,11 +69,10 @@
 
                                         @if (plan.PlanExercises.Any())
                                         {
-                                            <div class="plan-exercises-list mt-3">
-                                                <h6 class="exercises-title">
-                                                    <i class="fas fa-dumbbell me-2"></i>
-                                                    Exercícios
-                                                </h6>
+                                            <div class="plan-exercises-list">
+                                                <p class="exercises-title">
+                                                    <i class="fas fa-dumbbell me-1"></i>Exercícios
+                                                </p>
                                                 <ul class="exercises-list">
                                                     @foreach (var pe in plan.PlanExercises.OrderBy(p => p.Order).Take(3))
                                                     {
@@ -82,20 +80,18 @@
                                                             <span class="exercise-order">@pe.Order</span>
                                                             <div class="exercise-details">
                                                                 <strong>@(pe.Exercise?.Name ?? "Exercício removido")</strong>
-                                                                <small class="text-muted">
-                                                                    @pe.TargetSets×@pe.TargetReps
-                                                                </small>
+                                                                <small>@pe.TargetSets×@pe.TargetReps</small>
                                                             </div>
                                                         </li>
                                                     }
                                                     @if (plan.PlanExercises.Count > 3)
                                                     {
                                                         <li class="exercise-item">
-                                                            <span class="exercise-order">
+                                                            <span class="exercise-order" style="background: var(--tj-bg-secondary); color: var(--tj-text-muted);">
                                                                 <i class="fas fa-ellipsis-h"></i>
                                                             </span>
                                                             <div class="exercise-details">
-                                                                <small class="text-muted">
+                                                                <small style="background: none; color: var(--tj-text-muted); padding: 0; font-weight: 500;">
                                                                     +@(plan.PlanExercises.Count - 3) exercício@(plan.PlanExercises.Count - 3 > 1 ? "s" : "")
                                                                 </small>
                                                             </div>
@@ -105,15 +101,14 @@
                                             </div>
                                         }
 
-                                        <div class="plan-card-actions mt-3">
-                                            <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="m-0">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="workoutPlanId" value="@plan.Id" />
-                                            <button type="submit" class="btn btn-primary btn-lg w-100">
-                                                <i class="fas fa-play me-2"></i>
-                                                Executar Plano
-                                            </button>
-                                        </form>
+                                        <div class="plan-card-actions">
+                                            <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="m-0 w-100">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="workoutPlanId" value="@plan.Id" />
+                                                <button type="submit" class="btn btn-primary w-100">
+                                                    <i class="fas fa-play me-2"></i>Executar Plano
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -161,59 +156,60 @@
                         <div class="timeline">
                             @foreach (var session in Model.recentSessions)
                             {
-                                var hasProgressFlag = session.LoggedExercises.Any(le => le.Observation?.Contains("aumentar") ==
-                                true);
-                                var exerciseNames = string.Join(", ", session.LoggedExercises.Select(le => le.Exercise?.Name ??
-                                "Exercício removido").Take(3));
-                                if (session.LoggedExercises.Count > 3)
-                                {
-                                    exerciseNames += $" +{session.LoggedExercises.Count - 3}";
-                                }
+                                var hasProgressFlag = session.LoggedExercises.Any(le => le.Observation?.Contains("aumentar") == true);
+                                var exerciseCount = session.LoggedExercises.Count;
+                                var totalSetsSession = session.LoggedExercises.Sum(le => le.Sets);
+                                var exerciseNames = string.Join(", ", session.LoggedExercises
+                                    .Select(le => le.Exercise?.Name ?? "Exercício removido").Take(3));
+                                if (exerciseCount > 3)
+                                    exerciseNames += $" +{exerciseCount - 3}";
 
                                 <div class="timeline-item visible">
                                     <div class="timeline-marker"></div>
                                     <div class="workout-card">
                                         <div class="workout-header">
                                             <div>
-                                                <h5 class="workout-date">
-                                                    @session.Date.ToString("dd 'de' MMM", new
-                                                    System.Globalization.CultureInfo("pt-BR"))
-                                    </h5>
-                                    <p class="workout-time text-muted mb-0">
-                                        <i class="fas fa-clock me-1"></i>
-                                        @session.Date.ToString("HH:mm")
-                                    </p>
-                                </div>
-                                @if (hasProgressFlag)
-                                            {
-                                                <span class="badge bg-warning text-dark">
-                                                    <i class="fas fa-arrow-up me-1"></i>
-                                                    Progressão
-                                                </span>
-                                            }
+                                                <p class="workout-date mb-0">
+                                                    @session.Date.ToString("dd 'de' MMM", new System.Globalization.CultureInfo("pt-BR"))
+                                                </p>
+                                                <p class="workout-time mb-0">
+                                                    <i class="fas fa-clock me-1"></i>@session.Date.ToString("HH:mm")
+                                                </p>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if (hasProgressFlag)
+                                                {
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fas fa-arrow-up me-1"></i>Progressão
+                                                    </span>
+                                                }
+                                                @if (session.IsCompleted)
+                                                {
+                                                    <span class="badge" style="background: rgba(25,135,84,0.12); color: #198754;">
+                                                        <i class="fas fa-check me-1"></i>Concluído
+                                                    </span>
+                                                }
+                                            </div>
                                         </div>
                                         <div class="workout-body">
                                             @if (!string.IsNullOrEmpty(session.WorkoutPlan?.Name))
                                             {
-                                                <p class="mb-2">
-                                                    <i class="fas fa-bookmark me-2 text-primary"></i>
-                                                    <strong>@session.WorkoutPlan.Name</strong>
+                                                <p class="workout-plan-name">
+                                                    <i class="fas fa-bookmark text-primary"></i>@session.WorkoutPlan.Name
                                                 </p>
                                             }
                                             <p class="workout-exercises">
-                                                <i class="fas fa-dumbbell me-2 text-primary"></i>
-                                                @exerciseNames
+                                                <i class="fas fa-dumbbell text-primary flex-shrink-0"></i>
+                                                <span>@(string.IsNullOrWhiteSpace(exerciseNames) ? "Nenhum exercício registrado" : exerciseNames)</span>
                                             </p>
                                             <div class="workout-stats">
                                                 <span class="stat-badge">
-                                                    <i class="fas fa-list-ol me-1"></i>
-                                                    @session.LoggedExercises.Count exercício@(session.LoggedExercises.Count != 1 ?
-                                                    "s" : "")
+                                                    <i class="fas fa-list-ol"></i>
+                                                    @exerciseCount exercício@(exerciseCount != 1 ? "s" : "")
                                                 </span>
                                                 <span class="stat-badge">
-                                                    <i class="fas fa-redo me-1"></i>
-                                                    @session.LoggedExercises.Sum(le => le.Sets)
-                                                    série@(session.LoggedExercises.Sum(le => le.Sets) != 1 ? "s" : "")
+                                                    <i class="fas fa-redo"></i>
+                                                    @totalSetsSession série@(totalSetsSession != 1 ? "s" : "")
                                                 </span>
                                             </div>
                                         </div>
