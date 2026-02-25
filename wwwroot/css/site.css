@@ -614,6 +614,16 @@ body.has-active-session .pre-alpha-badge {
   transform: translateY(-1px) scale(0.98);
 }
 
+[data-theme="dark"] .btn-cta {
+  color: #0d6efd;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] .btn-cta {
+    color: #0d6efd;
+  }
+}
+
 /* Workout Plans Section */
 .workout-plans-card {
   background-color: var(--tj-bg-secondary);
