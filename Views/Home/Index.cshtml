@@ -106,11 +106,14 @@
                                         }
 
                                         <div class="plan-card-actions mt-3">
-                                            <a asp-controller="Training" asp-action="ExecutePlan" asp-route-planId="@plan.Id"
-                                                class="btn btn-primary btn-lg w-100">
+                                            <form asp-controller="Training" asp-action="StartTrainingFromPlan" method="post" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="workoutPlanId" value="@plan.Id" />
+                                            <button type="submit" class="btn btn-primary btn-lg w-100">
                                                 <i class="fas fa-play me-2"></i>
                                                 Executar Plano
-                                            </a>
+                                            </button>
+                                        </form>
                                         </div>
                                     </div>
                                 </div>

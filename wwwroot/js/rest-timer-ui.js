@@ -350,7 +350,11 @@ class RestTimerUI {
         
         if (this.isExpanded) {
             modal.classList.add('show');
-            document.getElementById('restTimerInput').focus();
+            // Ao abrir o modal, o foco vai diretamente para o botão iniciar em vez do input
+            const startBtn = document.getElementById('restTimerStartBtn');
+            if (startBtn) {
+                startBtn.focus();
+            }
         } else {
             modal.classList.remove('show');
         }
