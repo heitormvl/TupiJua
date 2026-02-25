@@ -9,6 +9,7 @@
     if (Model.Height.HasValue) profileFieldCompleted++;
     if (Model.BirthDate.HasValue) profileFieldCompleted++;
     var profileProgressPercent = profileFieldCompleted * 20;
+    var currentTheme = TupiJua.Helpers.ThemeHelper.GetThemeFromCookie(Context.Request);
 }
 
 <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
@@ -165,21 +166,21 @@
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <button type="button"
-                                        class="theme-option-btn @(TupiJua.Helpers.ThemeHelper.GetThemeFromCookie(Context.Request) == "light" ? "active" : "")"
+                                        class="theme-option-btn @(currentTheme == "light" ? "active" : "")"
                                         data-theme-value="light"
                                         onclick="ThemeManager.applyTheme('light')"
                                         title="Claro" aria-label="Tema claro">
                                     <i class="fas fa-sun"></i>
                                 </button>
                                 <button type="button"
-                                        class="theme-option-btn @(TupiJua.Helpers.ThemeHelper.GetThemeFromCookie(Context.Request) == "system" ? "active" : "")"
+                                        class="theme-option-btn @(currentTheme == "system" ? "active" : "")"
                                         data-theme-value="system"
                                         onclick="ThemeManager.applyTheme('system')"
                                         title="Sistema" aria-label="Tema do sistema">
                                     <i class="fas fa-circle-half-stroke"></i>
                                 </button>
                                 <button type="button"
-                                        class="theme-option-btn @(TupiJua.Helpers.ThemeHelper.GetThemeFromCookie(Context.Request) == "dark" ? "active" : "")"
+                                        class="theme-option-btn @(currentTheme == "dark" ? "active" : "")"
                                         data-theme-value="dark"
                                         onclick="ThemeManager.applyTheme('dark')"
                                         title="Escuro" aria-label="Tema escuro">
