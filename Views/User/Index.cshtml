@@ -151,6 +151,44 @@
                         </div>
                     </div>
 
+                    <!-- Theme Preference -->
+                    <div class="theme-preference-card mb-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-wrapper">
+                                    <i id="themeIconProfile" class="fas fa-circle-half-stroke text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="fw-semibold mb-0">Aparência</p>
+                                    <p class="text-muted small mb-0" id="themeLabel">Tema do sistema</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button"
+                                        class="theme-option-btn @(TupiJua.Helpers.ThemeHelper.GetThemeFromCookie(Context.Request) == "light" ? "active" : "")"
+                                        data-theme-value="light"
+                                        onclick="ThemeManager.applyTheme('light')"
+                                        title="Claro" aria-label="Tema claro">
+                                    <i class="fas fa-sun"></i>
+                                </button>
+                                <button type="button"
+                                        class="theme-option-btn @(TupiJua.Helpers.ThemeHelper.GetThemeFromCookie(Context.Request) == "system" ? "active" : "")"
+                                        data-theme-value="system"
+                                        onclick="ThemeManager.applyTheme('system')"
+                                        title="Sistema" aria-label="Tema do sistema">
+                                    <i class="fas fa-circle-half-stroke"></i>
+                                </button>
+                                <button type="button"
+                                        class="theme-option-btn @(TupiJua.Helpers.ThemeHelper.GetThemeFromCookie(Context.Request) == "dark" ? "active" : "")"
+                                        data-theme-value="dark"
+                                        onclick="ThemeManager.applyTheme('dark')"
+                                        title="Escuro" aria-label="Tema escuro">
+                                    <i class="fas fa-moon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Edit Button -->
                     <div class="d-flex justify-content-center mb-3">
                         <a asp-action="Edit" class="btn btn-primary btn-lg rounded-3">
@@ -177,3 +215,43 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    (function () {
+        const THEME_LABELS = {
+            light:  'Tema claro',
+            dark:   'Tema escuro',
+            system: 'Tema do sistema'
+        };
+        const THEME_ICONS = {
+            light:  'fa-sun',
+            dark:   'fa-moon',
+            system: 'fa-circle-half-stroke'
+        };
+
+        function syncProfileButtons(theme) {
+            document.querySelectorAll('.theme-option-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.themeValue === theme);
+            });
+
+            const label = document.getElementById('themeLabel');
+            if (label) label.textContent = THEME_LABELS[theme] ?? THEME_LABELS.system;
+
+            const icon = document.getElementById('themeIconProfile');
+            if (icon) icon.className = `fas ${THEME_ICONS[theme] ?? THEME_ICONS.system} text-primary`;
+        }
+
+        // Patch para notificar a página ao trocar o tema
+        const _original = window.ThemeManager.applyTheme;
+        window.ThemeManager.applyTheme = function (theme) {
+            _original(theme);
+            syncProfileButtons(theme);
+        };
+
+        document.addEventListener('DOMContentLoaded', () =>
+            syncProfileButtons(ThemeManager.getCurrentTheme())
+        );
+    })();
+</script>
+}

@@ -1,14 +1,16 @@
 ﻿@using Microsoft.Extensions.Configuration
+@using TupiJua.Helpers
 @inject IConfiguration Configuration
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR" data-theme="@ThemeHelper.GetThemeFromCookie(Context.Request)">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TupiJua</title>
     <script type="importmap"></script>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TupiJua.styles.css" asp-append-version="true" />
@@ -62,7 +64,16 @@
                             }
                         </ul>
                         <ul
-                            class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap">
+                            class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap align-items-center gap-1">
+                            <li class="nav-item">
+                                <button id="themeToggleBtn"
+                                        class="btn btn-link nav-link theme-toggle-btn"
+                                        onclick="ThemeManager.cycleTheme()"
+                                        title="Tema do sistema"
+                                        aria-label="Tema do sistema">
+                                    <i id="themeIcon" class="fas fa-circle-half-stroke"></i>
+                                </button>
+                            </li>
                             <li class="nav-item">
                                 <a class="btn btn-outline-primary mb-2 mb-md-0 me-2" asp-controller="User"
                                     asp-action="Index">
@@ -81,7 +92,16 @@
                     else
                     {
                         <ul
-                            class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap">
+                            class="navbar-nav ms-md-auto justify-content-center justify-content-md-start flex-row flex-wrap align-items-center gap-1">
+                            <li class="nav-item">
+                                <button id="themeToggleBtn"
+                                        class="btn btn-link nav-link theme-toggle-btn"
+                                        onclick="ThemeManager.cycleTheme()"
+                                        title="Tema do sistema"
+                                        aria-label="Tema do sistema">
+                                    <i id="themeIcon" class="fas fa-circle-half-stroke"></i>
+                                </button>
+                            </li>
                             <li class="nav-item">
                                 <a class="btn btn-primary mb-2 mb-md-0 me-2" asp-controller="User" asp-action="Login">
                                     <i class="fas fa-sign-in-alt"></i> Login
