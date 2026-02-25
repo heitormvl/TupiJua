@@ -4,7 +4,7 @@
     ViewData["Title"] = "Meus Treinos";
     var totalThisMonth = Model.sessions.Count(s => s.Date.Month == DateTime.Now.Month && s.Date.Year == DateTime.Now.Year);
     var lastSession = Model.sessions.FirstOrDefault();
-    var daysAgo = lastSession != null ? (DateTime.Now - lastSession.Date).Days : 0;
+    var daysAgo = lastSession != null ? (DateTime.Today.DayOfYear - lastSession.Date.DayOfYear) : 0;
 }
 
 <div class="container-fluid px-3 px-md-4 py-4">
@@ -44,12 +44,9 @@
                             <div class="col-12 col-md-6 col-lg-4">
                                 <div class="plan-badge">
                                     <button type="button"
-                                        class="btn btn-link text-decoration-none text-reset d-flex align-items-center w-100 p-0"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#workoutPlanModal"
-                                        data-plan-id="@plan.Id"
-                                        data-plan-name="@plan.Name"
-                                        data-plan-exercises="@plan.ExerciseCount">
+                                            class="btn btn-link text-decoration-none text-reset d-flex align-items-center w-100 p-0"
+                                            data-bs-toggle="modal" data-bs-target="#workoutPlanModal" data-plan-id="@plan.Id"
+                                            data-plan-name="@plan.Name" data-plan-exercises="@plan.ExerciseCount">
                                         <i class="fas fa-bookmark me-2"></i>
                                         @plan.Name
                                     </button>
@@ -61,182 +58,232 @@
             </div>
         }
 
-        <!-- Stats Cards -->
+        <!-- Calendar + KPIs Row -->
         <div class="col-12">
-            <div class="row g-3">
-                <!-- Total Workouts -->
-                <div class="col-12 col-md-4">
-                    <div class="stat-card stat-card-1">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">@totalThisMonth</div>
-                            <div class="stat-label">Treinos este mês</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="row g-3 align-items-stretch">
 
-                <!-- Last Workout -->
-                <div class="col-12 col-md-4">
-                    <div class="stat-card stat-card-2">
-                        <div class="stat-icon">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <div class="stat-content">
-                            @if (lastSession != null)
-                            {
-                                <div class="stat-value">Há @daysAgo dia@(daysAgo != 1 ? "s" : "")</div>
-                                <div class="stat-label">Último treino</div>
-                            }
-                            else
-                            {
-                                <div class="stat-value">--</div>
-                                <div class="stat-label">Nenhum treino ainda</div>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Frequency/Streak -->
-                <div class="col-12 col-md-4">
-                    <div class="stat-card stat-card-3">
-                        <div class="stat-icon">
-                            <i class="fas fa-fire-alt"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">
-                                @{
-                                    var streak = daysAgo <= 2 && totalThisMonth >= 3 ? "Alto" : daysAgo <= 5 &&
-                                    totalThisMonth >= 2 ? "Médio" : "Baixo";
-                                }
-                                @streak
-                            </div>
-                            <div class="stat-label">Frequência</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Attendance Calendar -->
-        <div class="col-12">
-            <div class="attendance-calendar-card">
-                <h4 class="section-title mb-3">
-                    <i class="fas fa-calendar-check me-2"></i>
-                    Frequência Mensal
-                </h4>
-                <div class="calendar-nav">
-                    <button id="calPrevBtn" aria-label="Mês anterior"><i class="fas fa-chevron-left"></i></button>
-                    <span class="calendar-month-label" id="calMonthLabel"></span>
-                    <button id="calNextBtn" aria-label="Próximo mês"><i class="fas fa-chevron-right"></i></button>
-                </div>
-                <div class="calendar-grid" id="calGrid"></div>
-            </div>
-        </div>
-
-        <!-- Workout History -->
-        <div class="col-12">
-            <div class="history-section">
-                <h4 class="section-title mb-4">
-                    <i class="fas fa-history me-2"></i>
-                    Histórico de Treinos
-                </h4>
-
-                @if (Model.sessions.Any())
-                {
-                    <div class="timeline">
-                        @for (var i = 0; i < Model.sessions.Count; i++)
-                        {
-                            var session = Model.sessions[i];
-                            var isExtra = i >= 5;
-                            var hasProgressFlag = session.LoggedExercises.Any(le => le.Observation?.Contains("aumentar") ==
-                            true);
-                            var exerciseNames = string.Join(", ", session.LoggedExercises.Select(le =>
-                            le.Exercise.Name).Take(3));
-                            if (session.LoggedExercises.Count > 3)
-                            {
-                                exerciseNames += $" +{session.LoggedExercises.Count - 3}";
-                            }
-
-                            <div class="timeline-item @(isExtra ? "d-none extra-session" : "")">
-                                <div class="timeline-marker"></div>
-                                <div class="workout-card">
-                                    <div class="workout-header">
-                                        <div>
-                                            <h5 class="workout-date mb-0">
-                                                @session.Date.ToString("dd 'de' MMM", new System.Globalization.CultureInfo("pt-BR"))
-                                                <small class="workout-time text-muted fw-normal ms-2">
-                                                    <i class="fas fa-clock me-1"></i>@session.Date.ToString("HH:mm")
-                                                </small>
-                                            </h5>
+                <!-- Stats Cards — mobile: row of 3 above calendar; desktop: stacked on the right -->
+                <div class="col-12 col-md-6 order-1 order-md-2">
+                    <div class="row g-2 h-100">
+                        <!-- Total Workouts -->
+                        <div class="col-4 col-md-12 d-flex">
+                            <div class="stat-card-wrap w-100">
+                                <div class="stat-icon stat-card-1">
+                                    <i class="fas fa-chart-line"></i>
                                 </div>
-                                @if (hasProgressFlag)
+                                <div class="stat-card stat-card-1 w-100 flex-fill">
+                                    <div class="stat-content">
+                                        <div class="stat-value">@totalThisMonth</div>
+                                        <div class="stat-label">Treinos este mês</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Last Workout -->
+                        <div class="col-4 col-md-12 d-flex">
+                            <div class="stat-card-wrap w-100">
+                                <div class="stat-icon stat-card-2">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="stat-card stat-card-2 w-100 flex-fill">
+                                    <div class="stat-content">
+                                        @if (lastSession != null)
                                         {
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="fas fa-arrow-up me-1"></i>
-                                                Progressão
-                                            </span>
+                                            @if (daysAgo == 0)
+                                            {
+                                                <div class="stat-value">Hoje</div>
+                                            }
+                                            else if (daysAgo == 1)
+                                            {
+                                                <div class="stat-value">Ontem</div>
+                                            }
+                                            else
+                                            {
+                                                <div class="stat-value">Há @daysAgo dia@(daysAgo != 1 ? "s" : "")</div>
+                                            }
+                                            <div class="stat-label">Último treino</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="stat-value">--</div>
+                                            <div class="stat-label">Nenhum treino ainda</div>
                                         }
                                     </div>
-                                    <div class="workout-body">
-                                        <p class="workout-exercises">
-                                            @exerciseNames
-                                        </p>
-                                        <div class="workout-stats">
-                                            <span class="stat-badge">
-                                                <i class="fas fa-list-ol me-1"></i>
-                                                @session.LoggedExercises.Count exercício@(session.LoggedExercises.Count != 1 ?
-                                                "s" : "")
-                                            </span>
-                                            <span class="stat-badge">
-                                                <i class="fas fa-redo me-1"></i>
-                                                @session.LoggedExercises.Sum(le => le.Sets)
-                                                série@(session.LoggedExercises.Sum(le => le.Sets) != 1 ? "s" : "")
-                                            </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Frequency/Streak -->
+                        <div class="col-4 col-md-12 d-flex">
+                            <div class="stat-card-wrap w-100">
+                                <div class="stat-icon stat-card-3">
+                                    <i class="fas fa-fire-alt"></i>
+                                </div>
+                                <div class="stat-card stat-card-3 w-100 flex-fill">
+                                    <div class="stat-content">
+                                        <div class="stat-value">
+                                            @{
+                                                // 1. Configurações de Meta (Ex: 3 treinos/semana)
+                                                double metaSemanal = 3.0;
+                                                int diaAtual = DateTime.Now.Day;
+                                                double metaProporcional = (diaAtual / 7.0) * metaSemanal;
+                                                double consistencia = metaProporcional > 0 ? (totalThisMonth /
+                                                                                        metaProporcional) : 1.0;
+
+                                                // 2. Definição do Status Curto
+                                                string status;
+                                                bool treinouRecentemente = daysAgo <= 3;
+
+                                                if (!treinouRecentemente)
+                                                {
+                                                    status = "Inativo";
+                                                }
+                                                else if (consistencia >= 0.9 || totalThisMonth >= 12)
+                                                {
+                                                    status = "Focado";
+                                                }
+                                                else if (consistencia >= 0.5)
+                                                {
+                                                    status = "Bom";
+                                                }
+                                                else
+                                                {
+                                                    status = "Baixo";
+                                                }
+                                            }
+                                            @status
                                         </div>
-                                    </div>
-                                    <div class="workout-footer justify-content-center">
-                                        <button class="btn btn-sm btn-outline-primary"
-                                            onclick="viewWorkoutDetails(@session.Id)">
-                                            <i class="fas fa-eye me-1"></i>
-                                            Detalhes
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteWorkoutModal"
-                                            data-id="@session.Id"
-                                            data-date="@session.Date.ToString("dd/MM/yyyy") às @session.Date.ToString("HH:mm")">
-                                            <i class="fas fa-trash me-1"></i>
-                                            Excluir
-                                        </button>
+                                        <div class="stat-label">Frequência</div>
                                     </div>
                                 </div>
                             </div>
-                        }
-                    </div>
-
-                    @if (Model.sessions.Count > 5)
-                    {
-                        <div class="text-center mt-4">
-                            <button id="showMoreBtn" class="btn btn-outline-secondary">
-                                <i class="fas fa-chevron-down me-2"></i>
-                                Ver Mais
-                            </button>
                         </div>
-                    }
-                }
-                else
-                {
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-list"></i>
-                        <h5>Nenhum treino registrado ainda</h5>
-                        <p>Comece agora e acompanhe sua evolução!</p>
                     </div>
-                }
+                </div>
+
+                <!-- Attendance Calendar -->
+                <div class="col-12 col-md-6 order-2 order-md-1">
+                    <div class="attendance-calendar-card h-100">
+                        <h4 class="section-title mb-3">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Frequência Mensal
+                        </h4>
+                        <div class="calendar-nav">
+                            <button id="calPrevBtn" aria-label="Mês anterior"><i
+                                class="fas fa-chevron-left"></i></button>
+                                <span class="calendar-month-label" id="calMonthLabel"></span>
+                                <button id="calNextBtn" aria-label="Próximo mês"><i
+                                    class="fas fa-chevron-right"></i></button>
+                                </div>
+                                <div class="calendar-grid" id="calGrid"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Workout History -->
+                <div class="col-12">
+                    <div class="history-section">
+                        <h4 class="section-title mb-4">
+                            <i class="fas fa-history me-2"></i>
+                            Histórico de Treinos
+                        </h4>
+
+                        @if (Model.sessions.Any())
+                        {
+                            <div class="timeline">
+                                @for (var i = 0; i < Model.sessions.Count; i++)
+                                {
+                                    var session = Model.sessions[i];
+                                    var isExtra = i >= 5;
+                                    var hasProgressFlag = session.LoggedExercises.Any(le => le.Observation?.Contains("aumentar") ==
+                                    true);
+                                    var exerciseNames = string.Join(", ", session.LoggedExercises.Select(le =>
+                                    le.Exercise.Name).Take(3));
+                                    if (session.LoggedExercises.Count > 3)
+                                    {
+                                        exerciseNames += $" +{session.LoggedExercises.Count - 3}";
+                                    }
+
+                                    <div class="timeline-item @(isExtra ? "d-none extra-session" : "")">
+                                        <div class="timeline-marker"></div>
+                                        <div class="workout-card">
+                                            <div class="workout-header">
+                                                <div>
+                                                    <h5 class="workout-date mb-0">
+                                                        @session.Date.ToString("dd 'de' MMM", new
+                                                System.Globalization.CultureInfo("pt-BR"))
+                                                        <small class="workout-time text-muted fw-normal ms-2">
+                                                            <i class="fas fa-clock me-1"></i>@session.Date.ToString("HH:mm")
+                                                        </small>
+                                                    </h5>
+                                                </div>
+                                                @if (hasProgressFlag)
+                                                {
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fas fa-arrow-up me-1"></i>
+                                                        Progressão
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="workout-body">
+                                                <p class="workout-exercises">
+                                                    @exerciseNames
+                                                </p>
+                                                <div class="workout-stats">
+                                                    <span class="stat-badge">
+                                                        <i class="fas fa-list-ol me-1"></i>
+                                                        @session.LoggedExercises.Count exercício@(session.LoggedExercises.Count != 1 ?
+                                                        "s" : "")
+                            </span>
+                            <span class="stat-badge">
+                                <i class="fas fa-redo me-1"></i>
+                                @session.LoggedExercises.Sum(le => le.Sets)
+                                série@(session.LoggedExercises.Sum(le => le.Sets) != 1 ? "s" : "")
+                            </span>
+                        </div>
+                    </div>
+                    <div class="workout-footer justify-content-center">
+                        <button class="btn btn-sm btn-outline-primary"
+                                onclick="viewWorkoutDetails(@session.Id)">
+                            <i class="fas fa-eye me-1"></i>
+                            Detalhes
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteWorkoutModal" data-id="@session.Id"
+                                data-date="@session.Date.ToString("dd/MM/yyyy") às @session.Date.ToString("HH:mm")">
+                            <i class="fas fa-trash me-1"></i>
+                            Excluir
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
+        }
     </div>
+
+    @if (Model.sessions.Count > 5)
+    {
+        <div class="text-center mt-4">
+            <button id="showMoreBtn" class="btn btn-outline-secondary">
+                <i class="fas fa-chevron-down me-2"></i>
+                Ver Mais
+            </button>
+        </div>
+    }
+}
+                else
+{
+    <div class="empty-state">
+        <i class="fas fa-clipboard-list"></i>
+        <h5>Nenhum treino registrado ainda</h5>
+        <p>Comece agora e acompanhe sua evolução!</p>
+    </div>
+}
+</div>
+</div>
+</div>
 </div>
 
 <partial name="_MultipleWorkoutsModal" />
@@ -259,7 +306,8 @@
                 </p>
                 <div class="row g-2">
                     <div class="col-6">
-                        <a id="viewPlanDetailsLink" class="btn btn-outline-primary btn-lg w-100 text-center d-inline-block">
+                        <a id="viewPlanDetailsLink"
+                               class="btn btn-outline-primary btn-lg w-100 text-center d-inline-block">
                             <i class="fas fa-eye me-2"></i>
                             Ver Detalhes
                         </a>
@@ -281,7 +329,8 @@
 </div>
 
 <!-- Delete Workout Confirmation Modal -->
-<div class="modal fade" id="deleteWorkoutModal" tabindex="-1" aria-labelledby="deleteWorkoutModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteWorkoutModal" tabindex="-1" aria-labelledby="deleteWorkoutModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header border-0 pb-0">
@@ -296,139 +345,140 @@
                 <p class="fw-bold mb-3" id="workoutDateToDelete"></p>
                 <div class="alert alert-warning mb-0">
                     <i class="fas fa-info-circle me-2"></i>
-                    <small><strong>Atenção:</strong> Esta ação não pode ser desfeita! Todos os exercícios registrados neste treino serão perdidos.</small>
+                    <small><strong>Atenção:</strong> Esta ação não pode ser desfeita! Todos os exercícios registrados
+                        neste treino serão perdidos.</small>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>
-                    Cancelar
-                </button>
-                <form id="deleteWorkoutForm" method="post" style="display: inline;">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash me-2"></i>
-                        Excluir
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Cancelar
                     </button>
-                </form>
+                    <form id="deleteWorkoutForm" method="post" style="display: inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>
+                            Excluir
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <script src="~/js/training.js"></script>
-    <script>
-        // Attendance Calendar
-        const workoutDates = @Html.Raw(
-            System.Text.Json.JsonSerializer.Serialize(
-                Model.sessions
-                    .Where(s => s.IsCompleted)
-                    .Select(s => s.Date.ToString("yyyy-MM-dd"))
-                    .Distinct()
-                    .ToList()
-            )
-        );
-        const workoutDateSet = new Set(workoutDates);
+    @section Scripts {
+        <script src="~/js/training.js"></script>
+        <script>
+                        // Attendance Calendar
+                        const workoutDates = @Html.Raw(
+                                                                        System.Text.Json.JsonSerializer.Serialize(
+                                                                                        Model.sessions
+                                                                                                        .Where(s => s.IsCompleted)
+                                                                                                        .Select(s => s.Date.ToString("yyyy-MM-dd"))
+                                                                                                        .Distinct()
+                                                                                                        .ToList()
+                                                                        )
+                                                        );
+                        const workoutDateSet = new Set(workoutDates);
 
-        const dayHeaders = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-        let calYear = new Date().getFullYear();
-        let calMonth = new Date().getMonth(); // 0-indexed
+                        const dayHeaders = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+                        let calYear = new Date().getFullYear();
+                        let calMonth = new Date().getMonth(); // 0-indexed
 
-        function renderCalendar() {
-            const today = new Date();
-            const firstDay = new Date(calYear, calMonth, 1).getDay();
-            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-            const monthName = new Date(calYear, calMonth, 1)
-                .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                        function renderCalendar() {
+                            const today = new Date();
+                            const firstDay = new Date(calYear, calMonth, 1).getDay();
+                            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+                            const monthName = new Date(calYear, calMonth, 1)
+                                .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
-            document.getElementById('calMonthLabel').textContent = monthName;
+                            document.getElementById('calMonthLabel').textContent = monthName;
 
-            const grid = document.getElementById('calGrid');
-            grid.innerHTML = '';
+                            const grid = document.getElementById('calGrid');
+                            grid.innerHTML = '';
 
-            // Day headers
-            dayHeaders.forEach(h => {
-                const el = document.createElement('div');
-                el.className = 'calendar-day-header';
-                el.textContent = h;
-                grid.appendChild(el);
-            });
+                            // Day headers
+                            dayHeaders.forEach(h => {
+                                const el = document.createElement('div');
+                                el.className = 'calendar-day-header';
+                                el.textContent = h;
+                                grid.appendChild(el);
+                            });
 
-            // Empty cells before 1st
-            for (let i = 0; i < firstDay; i++) {
-                const el = document.createElement('div');
-                el.className = 'calendar-day empty';
-                grid.appendChild(el);
-            }
+                            // Empty cells before 1st
+                            for (let i = 0; i < firstDay; i++) {
+                                const el = document.createElement('div');
+                                el.className = 'calendar-day empty';
+                                grid.appendChild(el);
+                            }
 
-            // Days
-            for (let d = 1; d <= daysInMonth; d++) {
-                const el = document.createElement('div');
-                const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
-                const hasWorkout = workoutDateSet.has(dateStr);
-                el.className = 'calendar-day' + (hasWorkout ? ' has-workout' : '') + (isToday ? ' today' : '');
-                el.textContent = d;
-                grid.appendChild(el);
-            }
-        }
+                            // Days
+                            for (let d = 1; d <= daysInMonth; d++) {
+                                const el = document.createElement('div');
+                                const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                                const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
+                                const hasWorkout = workoutDateSet.has(dateStr);
+                                el.className = 'calendar-day' + (hasWorkout ? ' has-workout' : '') + (isToday ? ' today' : '');
+                                el.textContent = d;
+                                grid.appendChild(el);
+                            }
+                        }
 
-        document.getElementById('calPrevBtn').addEventListener('click', () => {
-            calMonth--;
-            if (calMonth < 0) { calMonth = 11; calYear--; }
-            renderCalendar();
-        });
+                        document.getElementById('calPrevBtn').addEventListener('click', () => {
+                            calMonth--;
+                            if (calMonth < 0) { calMonth = 11; calYear--; }
+                            renderCalendar();
+                        });
 
-        document.getElementById('calNextBtn').addEventListener('click', () => {
-            calMonth++;
-            if (calMonth > 11) { calMonth = 0; calYear++; }
-            renderCalendar();
-        });
+                        document.getElementById('calNextBtn').addEventListener('click', () => {
+                            calMonth++;
+                            if (calMonth > 11) { calMonth = 0; calYear++; }
+                            renderCalendar();
+                        });
 
-        renderCalendar();
-        // Handle workout plan modal
-        const workoutPlanModal = document.getElementById('workoutPlanModal');
-        if (workoutPlanModal) {
-            workoutPlanModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const planId = button.getAttribute('data-plan-id');
-                const planName = button.getAttribute('data-plan-name');
-                const planExercises = button.getAttribute('data-plan-exercises');
-                
-                document.getElementById('planNameDisplay').textContent = planName;
-                document.getElementById('planExercisesCount').textContent = planExercises;
-                document.getElementById('modalPlanId').value = planId;
-                document.getElementById('viewPlanDetailsLink').href = '@Url.Action("Details", "WorkoutPlan")?id=' + planId;
-            });
-        }
+                        renderCalendar();
+                        // Handle workout plan modal
+                        const workoutPlanModal = document.getElementById('workoutPlanModal');
+                        if (workoutPlanModal) {
+                            workoutPlanModal.addEventListener('show.bs.modal', function (event) {
+                                const button = event.relatedTarget;
+                                const planId = button.getAttribute('data-plan-id');
+                                const planName = button.getAttribute('data-plan-name');
+                                const planExercises = button.getAttribute('data-plan-exercises');
 
-        // Handle "Ver Mais" button (expand 5 at a time)
-        const showMoreBtn = document.getElementById('showMoreBtn');
-        if (showMoreBtn) {
-            showMoreBtn.addEventListener('click', function () {
-                const hidden = Array.from(document.querySelectorAll('.extra-session.d-none'));
-                hidden.slice(0, 5).forEach(el => el.classList.remove('d-none'));
-                if (document.querySelectorAll('.extra-session.d-none').length === 0) {
-                    this.style.display = 'none';
-                }
-            });
-        }
+                                document.getElementById('planNameDisplay').textContent = planName;
+                                document.getElementById('planExercisesCount').textContent = planExercises;
+                                document.getElementById('modalPlanId').value = planId;
+                                document.getElementById('viewPlanDetailsLink').href = '@Url.Action("Details", "WorkoutPlan")?id=' + planId;
+                            });
+                        }
 
-        // Handle delete workout modal
-        const deleteWorkoutModal = document.getElementById('deleteWorkoutModal');
-        if (deleteWorkoutModal) {
-            deleteWorkoutModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const id = button.getAttribute('data-id');
-                const date = button.getAttribute('data-date');
-                
-                const form = document.getElementById('deleteWorkoutForm');
-                const dateDisplay = document.getElementById('workoutDateToDelete');
-                
-                form.action = '@Url.Action("DeleteWorkoutSession", "Training")?sessionId=' + id;
-                dateDisplay.textContent = date;
-            });
-        }
-    </script>
-}
+                        // Handle "Ver Mais" button (expand 5 at a time)
+                        const showMoreBtn = document.getElementById('showMoreBtn');
+                        if (showMoreBtn) {
+                            showMoreBtn.addEventListener('click', function () {
+                                const hidden = Array.from(document.querySelectorAll('.extra-session.d-none'));
+                                hidden.slice(0, 5).forEach(el => el.classList.remove('d-none'));
+                                if (document.querySelectorAll('.extra-session.d-none').length === 0) {
+                                    this.style.display = 'none';
+                                }
+                            });
+                        }
+
+                        // Handle delete workout modal
+                        const deleteWorkoutModal = document.getElementById('deleteWorkoutModal');
+                        if (deleteWorkoutModal) {
+                            deleteWorkoutModal.addEventListener('show.bs.modal', function (event) {
+                                const button = event.relatedTarget;
+                                const id = button.getAttribute('data-id');
+                                const date = button.getAttribute('data-date');
+
+                                const form = document.getElementById('deleteWorkoutForm');
+                                const dateDisplay = document.getElementById('workoutDateToDelete');
+
+                                form.action = '@Url.Action("DeleteWorkoutSession", "Training")?sessionId=' + id;
+                                dateDisplay.textContent = date;
+                            });
+                        }
+        </script>
+    }
