@@ -6,11 +6,20 @@
 (function () {
     'use strict';
 
-    /** @type {string} Nome do cookie de tema. */
-    const COOKIE_NAME = 'tupiJua_theme';
+    /** @type {string} Nome do cookie de tema obtido do servidor (data-theme-cookie-name), com fallback. */
+    const COOKIE_NAME = document.documentElement.getAttribute('data-theme-cookie-name') || 'tupiJua_theme';
 
-    /** @type {string[]} Temas válidos. */
-    const VALID_THEMES = ['light', 'dark', 'system'];
+    /** @type {string[]} Temas válidos obtidos do servidor (data-valid-themes), com fallback. */
+    const VALID_THEMES = (function () {
+        const fromDom = document.documentElement.getAttribute('data-valid-themes');
+        if (!fromDom) {
+            return ['light', 'dark', 'system'];
+        }
+        return fromDom
+            .split(',')
+            .map(function (theme) { return theme.trim(); })
+            .filter(function (theme) { return theme.length > 0; });
+    })();
 
     /** @type {Record<string, {icon: string, label: string}>} Metadados por tema. */
     const THEME_META = {
