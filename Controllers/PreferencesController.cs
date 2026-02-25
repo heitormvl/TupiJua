@@ -28,7 +28,8 @@ public class PreferencesController : Controller
             IsEssential = true,
             SameSite = SameSiteMode.Lax,
             HttpOnly = false,
-            Secure = Request.IsHttps
+            Secure = Request.IsHttps,
+            Path = "/"
         });
 
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
