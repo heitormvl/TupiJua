@@ -1,21 +1,30 @@
 {
+  "id": "/",
   "short_name": "TupiJua",
-  "name": "TupiJua",
+  "name": "TupiJua – Seu Diário de Treino",
+  "description": "Registre seus treinos, acompanhe sua evolução e siga seus planos de treino offline.",
+  "categories": ["health", "fitness", "sports"],
   "icons": [
     {
       "src": "/images/android-chrome-192x192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "/images/android-chrome-512x512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "/",
-  "background_color": "#ffffff",
-  "display": "standalone",
   "scope": "/",
-  "theme_color": "#3498db"
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#ffffff",
+  "theme_color": "#3498db",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "prefer_related_applications": false
 }
