@@ -804,7 +804,7 @@ body.has-active-session .pre-alpha-badge {
 .calendar-nav button:hover {
   background: rgba(13, 110, 253, 0.1);
   border-color: rgba(13, 110, 253, 0.4);
-  color: #0d6efd;
+  color: var(--tj-primary);
 }
 
 .calendar-month-label {
@@ -845,7 +845,7 @@ body.has-active-session .pre-alpha-badge {
 
 .calendar-day.has-workout {
   background: rgba(13, 110, 253, 0.2);
-  color: #0d6efd;
+  color: var(--tj-primary);
   font-weight: 700;
   position: relative;
 }
@@ -859,17 +859,17 @@ body.has-active-session .pre-alpha-badge {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #0d6efd;
+  background: var(--tj-primary);
 }
 
 .calendar-day.today {
-  border: 2px solid #0d6efd;
-  color: #0d6efd;
+  border: 2px solid var(--tj-primary);
+  color: var(--tj-primary);
   font-weight: 700;
 }
 
 .calendar-day.today.has-workout {
-  background: #0d6efd;
+  background: var(--tj-primary);
   color: white;
 }
 
