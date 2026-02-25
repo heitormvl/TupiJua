@@ -119,6 +119,22 @@
             </div>
         </div>
 
+        <!-- Attendance Calendar -->
+        <div class="col-12">
+            <div class="attendance-calendar-card">
+                <h4 class="section-title mb-3">
+                    <i class="fas fa-calendar-check me-2"></i>
+                    Frequência Mensal
+                </h4>
+                <div class="calendar-nav">
+                    <button id="calPrevBtn" aria-label="Mês anterior"><i class="fas fa-chevron-left"></i></button>
+                    <span class="calendar-month-label" id="calMonthLabel"></span>
+                    <button id="calNextBtn" aria-label="Próximo mês"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="calendar-grid" id="calGrid"></div>
+            </div>
+        </div>
+
         <!-- Workout History -->
         <div class="col-12">
             <div class="history-section">
@@ -303,6 +319,74 @@
 @section Scripts {
     <script src="~/js/training.js"></script>
     <script>
+        // Attendance Calendar
+        const workoutDates = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                Model.sessions
+                    .Where(s => s.IsCompleted)
+                    .Select(s => s.Date.ToString("yyyy-MM-dd"))
+                    .Distinct()
+                    .ToList()
+            )
+        );
+        const workoutDateSet = new Set(workoutDates);
+
+        const dayHeaders = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        let calYear = new Date().getFullYear();
+        let calMonth = new Date().getMonth(); // 0-indexed
+
+        function renderCalendar() {
+            const today = new Date();
+            const firstDay = new Date(calYear, calMonth, 1).getDay();
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            const monthName = new Date(calYear, calMonth, 1)
+                .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+            document.getElementById('calMonthLabel').textContent = monthName;
+
+            const grid = document.getElementById('calGrid');
+            grid.innerHTML = '';
+
+            // Day headers
+            dayHeaders.forEach(h => {
+                const el = document.createElement('div');
+                el.className = 'calendar-day-header';
+                el.textContent = h;
+                grid.appendChild(el);
+            });
+
+            // Empty cells before 1st
+            for (let i = 0; i < firstDay; i++) {
+                const el = document.createElement('div');
+                el.className = 'calendar-day empty';
+                grid.appendChild(el);
+            }
+
+            // Days
+            for (let d = 1; d <= daysInMonth; d++) {
+                const el = document.createElement('div');
+                const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
+                const hasWorkout = workoutDateSet.has(dateStr);
+                el.className = 'calendar-day' + (hasWorkout ? ' has-workout' : '') + (isToday ? ' today' : '');
+                el.textContent = d;
+                grid.appendChild(el);
+            }
+        }
+
+        document.getElementById('calPrevBtn').addEventListener('click', () => {
+            calMonth--;
+            if (calMonth < 0) { calMonth = 11; calYear--; }
+            renderCalendar();
+        });
+
+        document.getElementById('calNextBtn').addEventListener('click', () => {
+            calMonth++;
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            renderCalendar();
+        });
+
+        renderCalendar();
         // Handle workout plan modal
         const workoutPlanModal = document.getElementById('workoutPlanModal');
         if (workoutPlanModal) {
