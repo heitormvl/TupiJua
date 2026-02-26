@@ -67,94 +67,87 @@
                     <div class="row g-2 h-100">
                         <!-- Total Workouts -->
                         <div class="col-4 col-md-12 d-flex">
-                            <div class="stat-card-wrap w-100">
-                                <div class="stat-icon stat-card-1">
+                            <div class="stat-card stat-card-1 w-100">
+                                <div class="stat-icon">
                                     <i class="fas fa-chart-line"></i>
                                 </div>
-                                <div class="stat-card stat-card-1 w-100 flex-fill">
-                                    <div class="stat-content">
-                                        <div class="stat-value">@totalThisMonth</div>
-                                        <div class="stat-label">Treinos este mês</div>
-                                    </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Treinos este mês</div>
+                                    <div class="stat-value">@totalThisMonth</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Last Workout -->
                         <div class="col-4 col-md-12 d-flex">
-                            <div class="stat-card-wrap w-100">
-                                <div class="stat-icon stat-card-2">
+                            <div class="stat-card stat-card-2 w-100">
+                                <div class="stat-icon">
                                     <i class="fas fa-calendar-alt"></i>
                                 </div>
-                                <div class="stat-card stat-card-2 w-100 flex-fill">
-                                    <div class="stat-content">
-                                        @if (lastSession != null)
+                                <div class="stat-content">
+                                    <div class="stat-label">Último treino</div>
+                                    @if (lastSession != null)
+                                    {
+                                        @if (daysAgo == 0)
                                         {
-                                            @if (daysAgo == 0)
-                                            {
-                                                <div class="stat-value">Hoje</div>
-                                            }
-                                            else if (daysAgo == 1)
-                                            {
-                                                <div class="stat-value">Ontem</div>
-                                            }
-                                            else
-                                            {
-                                                <div class="stat-value">Há @daysAgo dia@(daysAgo != 1 ? "s" : "")</div>
-                                            }
-                                            <div class="stat-label">Último treino</div>
+                                            <div class="stat-value">Hoje</div>
+                                        }
+                                        else if (daysAgo == 1)
+                                        {
+                                            <div class="stat-value">Ontem</div>
                                         }
                                         else
                                         {
-                                            <div class="stat-value">--</div>
-                                            <div class="stat-label">Nenhum treino ainda</div>
+                                            <div class="stat-value">Há @daysAgo dia@(daysAgo != 1 ? "s" : "")</div>
                                         }
-                                    </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="stat-value">--</div>
+                                    }
                                 </div>
                             </div>
                         </div>
 
                         <!-- Frequency/Streak -->
                         <div class="col-4 col-md-12 d-flex">
-                            <div class="stat-card-wrap w-100">
-                                <div class="stat-icon stat-card-3">
+                            <div class="stat-card stat-card-3 w-100">
+                                <div class="stat-icon">
                                     <i class="fas fa-fire-alt"></i>
                                 </div>
-                                <div class="stat-card stat-card-3 w-100 flex-fill">
-                                    <div class="stat-content">
-                                        <div class="stat-value">
-                                            @{
-                                                // 1. Configurações de Meta (Ex: 3 treinos/semana)
-                                                double metaSemanal = 3.0;
-                                                int diaAtual = DateTime.Now.Day;
-                                                double metaProporcional = (diaAtual / 7.0) * metaSemanal;
-                                                double consistencia = metaProporcional > 0 ? (totalThisMonth /
-                                                                                        metaProporcional) : 1.0;
+                                <div class="stat-content">
+                                    <div class="stat-label">Frequência</div>
+                                    <div class="stat-value">
+                                        @{
+                                            // 1. Configurações de Meta (Ex: 3 treinos/semana)
+                                            double metaSemanal = 3.0;
+                                            int diaAtual = DateTime.Now.Day;
+                                            double metaProporcional = (diaAtual / 7.0) * metaSemanal;
+                                            double consistencia = metaProporcional > 0 ? (totalThisMonth /
+                                                                                    metaProporcional) : 1.0;
 
-                                                // 2. Definição do Status Curto
-                                                string status;
-                                                bool treinouRecentemente = daysAgo <= 3;
+                                            // 2. Definição do Status Curto
+                                            string status;
+                                            bool treinouRecentemente = daysAgo <= 3;
 
-                                                if (!treinouRecentemente)
-                                                {
-                                                    status = "Inativo";
-                                                }
-                                                else if (consistencia >= 0.9 || totalThisMonth >= 12)
-                                                {
-                                                    status = "Focado";
-                                                }
-                                                else if (consistencia >= 0.5)
-                                                {
-                                                    status = "Bom";
-                                                }
-                                                else
-                                                {
-                                                    status = "Baixo";
-                                                }
+                                            if (!treinouRecentemente)
+                                            {
+                                                status = "Inativo";
                                             }
-                                            @status
-                                        </div>
-                                        <div class="stat-label">Frequência</div>
+                                            else if (consistencia >= 0.9 || totalThisMonth >= 12)
+                                            {
+                                                status = "Focado";
+                                            }
+                                            else if (consistencia >= 0.5)
+                                            {
+                                                status = "Bom";
+                                            }
+                                            else
+                                            {
+                                                status = "Baixo";
+                                            }
+                                        }
+                                        @status
                                     </div>
                                 </div>
                             </div>
