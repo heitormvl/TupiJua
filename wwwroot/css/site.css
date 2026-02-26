@@ -1423,17 +1423,14 @@ body.has-active-session .pre-alpha-badge {
   transform: rotate(180deg);
 }
 
-/* Dropdown panel */
+/* Dropdown panel — renderizado como portal no <body> para escapar de qualquer stacking context */
 .exercise-picker-panel {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
+  position: fixed;
   background-color: var(--tj-bg-card);
   border: 1.5px solid var(--tj-border);
   border-radius: 0.5rem;
   box-shadow: 0 8px 32px var(--tj-shadow-lg);
-  z-index: 1050;
+  z-index: 9999;
   overflow: hidden;
   animation: ep-fade-in 0.12s ease;
 }

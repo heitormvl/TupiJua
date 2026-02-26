@@ -13,6 +13,8 @@ class ExercisePicker {
         this.activeFilter = '';
         this.searchText = '';
         this.isOpen = false;
+        this._scrollHandler = null;
+        this._resizeHandler = null;
 
         this._init();
     }
@@ -47,36 +49,65 @@ class ExercisePicker {
             `<button type="button" class="picker-tag" data-filter="${_epEscape(cat)}">${_epEscape(cat)}</button>`
         ).join('');
 
-        wrapper.insertAdjacentHTML('afterbegin', `
+        // Trigger fica dentro do wrapper (no fluxo normal do documento)
+        wrapper.insertAdjacentHTML('beforeend', `
             <div class="exercise-picker-ui">
                 <div class="exercise-picker-trigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
                     <i class="fas fa-dumbbell picker-dumbbell-icon"></i>
                     <span class="picker-display-text picker-placeholder">Selecione um exercício</span>
                     <i class="fas fa-chevron-down picker-chevron"></i>
                 </div>
-                <div class="exercise-picker-panel" style="display:none">
-                    <div class="picker-search-wrap">
-                        <i class="fas fa-search picker-search-icon"></i>
-                        <input type="text" class="picker-search-input" placeholder="Buscar exercício..." autocomplete="off">
-                    </div>
-                    <div class="picker-muscle-tags">
-                        <button type="button" class="picker-tag active" data-filter="">Todos</button>
-                        ${tagsHtml}
-                    </div>
-                    <div class="picker-exercises-list" role="listbox">
-                        ${this._buildListHTML()}
-                    </div>
-                </div>
             </div>
         `);
 
+        // Painel é renderizado como portal no <body> para escapar de qualquer stacking context
+        const panelEl = document.createElement('div');
+        panelEl.className = 'exercise-picker-panel';
+        panelEl.style.display = 'none';
+        panelEl.innerHTML = `
+            <div class="picker-search-wrap">
+                <i class="fas fa-search picker-search-icon"></i>
+                <input type="text" class="picker-search-input" placeholder="Buscar exercício..." autocomplete="off">
+            </div>
+            <div class="picker-muscle-tags">
+                <button type="button" class="picker-tag active" data-filter="">Todos</button>
+                ${tagsHtml}
+            </div>
+            <div class="picker-exercises-list" role="listbox">
+                ${this._buildListHTML()}
+            </div>
+        `;
+        document.body.appendChild(panelEl);
+
         this.wrapper = wrapper;
         this.trigger = wrapper.querySelector('.exercise-picker-trigger');
-        this.panel = wrapper.querySelector('.exercise-picker-panel');
-        this.searchInput = wrapper.querySelector('.picker-search-input');
-        this.listEl = wrapper.querySelector('.picker-exercises-list');
+        this.panel = panelEl;
+        this.searchInput = panelEl.querySelector('.picker-search-input');
+        this.listEl = panelEl.querySelector('.picker-exercises-list');
         this.displayText = wrapper.querySelector('.picker-display-text');
         this.chevron = wrapper.querySelector('.picker-chevron');
+    }
+
+    /**
+     * Posiciona o painel com base na posição atual do trigger (fixed + getBoundingClientRect).
+     * @private
+     */
+    _positionPanel() {
+        const rect = this.trigger.getBoundingClientRect();
+        const panelHeight = this.panel.offsetHeight;
+        const viewportHeight = window.innerHeight;
+        const spaceBelow = viewportHeight - rect.bottom;
+        const spaceAbove = rect.top;
+
+        // Abre para cima se não houver espaço suficiente abaixo
+        if (spaceBelow < panelHeight + 8 && spaceAbove > spaceBelow) {
+            this.panel.style.top = `${rect.top - panelHeight - 4}px`;
+        } else {
+            this.panel.style.top = `${rect.bottom + 4}px`;
+        }
+
+        this.panel.style.left = `${rect.left}px`;
+        this.panel.style.width = `${rect.width}px`;
     }
 
     /** @private */
@@ -95,7 +126,11 @@ class ExercisePicker {
             items = items.filter(ex => ex.Name.toLowerCase().includes(q));
         }
 
-        items = [...items].sort((a, b) => a.Name.localeCompare(b.Name));
+        items = [...items].sort((a, b) => {
+            const catA = (a.MuscleGroups.find(mg => mg.IsPrimary) || {}).Name || '';
+            const catB = (b.MuscleGroups.find(mg => mg.IsPrimary) || {}).Name || '';
+            return catA.localeCompare(catB) || a.Name.localeCompare(b.Name);
+        });
 
         if (!items.length) {
             return '<div class="picker-empty-state"><i class="fas fa-search me-2"></i>Nenhum exercício encontrado</div>';
@@ -134,9 +169,9 @@ class ExercisePicker {
             this._refreshList();
         });
 
-        this.wrapper.querySelectorAll('.picker-muscle-tags .picker-tag').forEach(btn => {
+        this.panel.querySelectorAll('.picker-muscle-tags .picker-tag').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.wrapper.querySelectorAll('.picker-muscle-tags .picker-tag')
+                this.panel.querySelectorAll('.picker-muscle-tags .picker-tag')
                     .forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.activeFilter = btn.dataset.filter;
@@ -144,8 +179,11 @@ class ExercisePicker {
             });
         });
 
+        // Fecha ao clicar fora do trigger ou do painel (que agora está no body)
         document.addEventListener('click', e => {
-            if (this.isOpen && !this.wrapper.contains(e.target)) this.close();
+            if (this.isOpen && !this.wrapper.contains(e.target) && !this.panel.contains(e.target)) {
+                this.close();
+            }
         });
 
         this._bindListItemEvents();
@@ -184,7 +222,18 @@ class ExercisePicker {
         this.trigger.classList.add('is-open');
         this.trigger.setAttribute('aria-expanded', 'true');
         this.chevron.classList.add('rotated');
-        requestAnimationFrame(() => this.searchInput.focus());
+
+        // Posiciona após o painel ser visível para obter offsetHeight correto
+        requestAnimationFrame(() => {
+            this._positionPanel();
+            this.searchInput.focus();
+        });
+
+        // Reposiciona ao rolar ou redimensionar
+        this._scrollHandler = () => this._positionPanel();
+        this._resizeHandler = () => this._positionPanel();
+        window.addEventListener('scroll', this._scrollHandler, true);
+        window.addEventListener('resize', this._resizeHandler);
     }
 
     /** Fecha o painel de seleção. */
@@ -194,6 +243,16 @@ class ExercisePicker {
         this.trigger.classList.remove('is-open');
         this.trigger.setAttribute('aria-expanded', 'false');
         this.chevron.classList.remove('rotated');
+
+        // Remove listeners de reposicionamento
+        if (this._scrollHandler) {
+            window.removeEventListener('scroll', this._scrollHandler, true);
+            this._scrollHandler = null;
+        }
+        if (this._resizeHandler) {
+            window.removeEventListener('resize', this._resizeHandler);
+            this._resizeHandler = null;
+        }
     }
 
     /** Alterna o painel de seleção. */
