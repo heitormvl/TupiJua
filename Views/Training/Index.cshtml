@@ -2,9 +2,9 @@
 
 @{
     ViewData["Title"] = "Meus Treinos";
-    var totalThisMonth = Model.sessions.Count(s => s.Date.Month == DateTime.Now.Month && s.Date.Year == DateTime.Now.Year);
+    var totalThisMonth = Model.sessions.Count(s => s.Date.Month == DateTimeHelper.Now.Month && s.Date.Year == DateTimeHelper.Now.Year);
     var lastSession = Model.sessions.FirstOrDefault();
-    var daysAgo = lastSession != null ? (DateTime.Today.DayOfYear - lastSession.Date.DayOfYear) : 0;
+    var daysAgo = lastSession != null ? (DateTimeHelper.Today.DayOfYear - lastSession.Date.DayOfYear) : 0;
 }
 
 <div class="container-fluid px-3 px-md-4 py-4">
@@ -121,7 +121,7 @@
                                         @{
                                             // 1. Configurações de Meta (Ex: 3 treinos/semana)
                                             double metaSemanal = 3.0;
-                                            int diaAtual = DateTime.Now.Day;
+                                            int diaAtual = DateTimeHelper.Now.Day;
                                             double metaProporcional = (diaAtual / 7.0) * metaSemanal;
                                             double consistencia = metaProporcional > 0 ? (totalThisMonth /
                                                                                     metaProporcional) : 1.0;

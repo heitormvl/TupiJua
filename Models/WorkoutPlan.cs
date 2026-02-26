@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TupiJua.Helpers;
 
 namespace TupiJua.Models
 {
@@ -39,11 +40,10 @@ namespace TupiJua.Models
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// Data e hora de criação do plano.
+        /// Data e hora de criação do plano com informação de fuso horário.
         /// </summary>
-        [Column(TypeName = "datetime")]
-        [DataType(DataType.DateTime)]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [Column(TypeName = "datetimeoffset")]
+        public DateTimeOffset CreatedAt { get; set; } = DateTimeHelper.Now;
 
         /// <summary>
         /// Sessões de treino associadas ao plano.

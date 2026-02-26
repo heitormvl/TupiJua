@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TupiJua.Helpers;
 using TupiJua.Models;
 using TupiJua.ViewModels;
 
@@ -95,7 +96,7 @@ namespace TupiJua.Controllers
                 return Json(new { hasWorkout = false });
             }
 
-            var today = DateTime.Today;
+            var today = DateTimeHelper.Today;
             var tomorrow = today.AddDays(1);
 
             var hasWorkout = await _context.WorkoutSessions

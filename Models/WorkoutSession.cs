@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TupiJua.Helpers;
 
 namespace TupiJua.Models
 {
@@ -39,11 +40,10 @@ namespace TupiJua.Models
         public virtual WorkoutPlan? WorkoutPlan { get; set; }
 
         /// <summary>
-        /// Data e hora da sessão.
+        /// Data e hora da sessão com informação de fuso horário.
         /// </summary>
-        [Column(TypeName = "datetime")]
-        [DataType(DataType.DateTime)]
-        public DateTime Date { get; set; } = DateTime.Now;
+        [Column(TypeName = "datetimeoffset")]
+        public DateTimeOffset Date { get; set; } = DateTimeHelper.Now;
 
         /// <summary>
         /// Duração total da sessão em minutos.

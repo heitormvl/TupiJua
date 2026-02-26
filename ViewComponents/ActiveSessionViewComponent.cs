@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TupiJua.Helpers;
 using TupiJua.Models;
 
 namespace TupiJua.ViewComponents
@@ -36,7 +37,7 @@ namespace TupiJua.ViewComponents
                 return Content(string.Empty);
             }
 
-            var today = DateTime.Today;
+            var today = DateTimeHelper.Today;
             var tomorrow = today.AddDays(1);
 
             // Busca a sessão não concluída mais recente do dia atual

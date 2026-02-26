@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TupiJua.Helpers;
 using TupiJua.Models;
 
 namespace TupiJua.Services
@@ -56,14 +57,14 @@ namespace TupiJua.Services
         /// <param name="cancellationToken">Token de cancelamento.</param>
         private async Task RunCleanupAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Iniciando limpeza de sessões de treino às {Time}.", DateTime.Now);
+            _logger.LogInformation("Iniciando limpeza de sessões de treino às {Time}.", DateTimeHelper.Now);
 
             try
             {
                 using var scope = _scopeFactory.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                var cutoff = DateTime.Now.AddHours(-24);
+                var cutoff = DateTimeHelper.Now.AddHours(-24);
 
                 var staleSessions = await db.WorkoutSessions
                     .Include(s => s.LoggedExercises)
@@ -105,8 +106,8 @@ namespace TupiJua.Services
         /// <returns>Um <see cref="TimeSpan"/> representando o atraso até 00:00 do dia seguinte.</returns>
         private static TimeSpan CalculateDelayUntilMidnight()
         {
-            var now = DateTime.Now;
-            var nextMidnight = now.Date.AddDays(1);
+            var now = DateTimeHelper.Now;
+            var nextMidnight = DateTimeHelper.Today.AddDays(1);
             return nextMidnight - now;
         }
     }
