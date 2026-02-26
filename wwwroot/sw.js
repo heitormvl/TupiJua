@@ -1,5 +1,5 @@
 /** @type {string} Versão do cache – incrementar ao alterar arquivos cacheados */
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const STATIC_CACHE = `tupijua-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `tupijua-dynamic-${CACHE_VERSION}`;
 
