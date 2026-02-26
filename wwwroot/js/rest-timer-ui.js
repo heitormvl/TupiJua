@@ -381,8 +381,11 @@ class RestTimerUI {
             return;
         }
 
-        // Solicita permissão de notificação antes de iniciar, de forma não-bloqueante
-        RestTimerUI.requestNotificationPermission();
+        // Solicita permissão de notificação antes de iniciar, de forma não-bloqueante e com tratamento de erro explícito
+        RestTimerUI.requestNotificationPermission()
+            .catch(() => {
+                // Falha ao solicitar permissão não deve bloquear o timer
+            });
 
         this.saveDuration(seconds);
         this.closeModal();
@@ -503,7 +506,11 @@ class RestTimerUI {
 
             if (window.swRegistration) {
                 // Preferível: via SW – funciona mesmo com o app em segundo plano
-                window.swRegistration.showNotification('TupiJua – Descanso Completo! 💪', notifOptions);
+                window.swRegistration.showNotification('TupiJua – Descanso Completo! 💪', notifOptions)
+                    .catch(() => {
+                        // Fallback: notificação direta se showNotification falhar
+                        new Notification('TupiJua – Descanso Completo! 💪', notifOptions);
+                    });
             } else {
                 new Notification('TupiJua – Descanso Completo! 💪', notifOptions);
             }

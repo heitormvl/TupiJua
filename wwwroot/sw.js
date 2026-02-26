@@ -21,9 +21,6 @@ const STATIC_ASSETS = [
   "/manifest.json"
 ];
 
-/** Rotas HTML que devem ser cacheadas dinamicamente (Network-first) */
-const HTML_ROUTES = ["/", "/WorkoutPlan", "/Training", "/Home", "/User"];
-
 // ---------------------------------------------------------------------------
 // Instalação – pré-cacheia ativos estáticos
 // ---------------------------------------------------------------------------
@@ -65,13 +62,19 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
 
   const isHtmlRequest = request.headers.get("Accept")?.includes("text/html");
+  const isStaticDestination = ["script", "style", "image", "font"].includes(request.destination);
+  const isStaticAssetPath = STATIC_ASSETS.includes(url.pathname);
 
   if (isHtmlRequest) {
     // Estratégia Network-first para páginas HTML
     event.respondWith(networkFirstWithOfflineFallback(request));
-  } else {
-    // Estratégia Cache-first para ativos estáticos
+  } else if (isStaticDestination || isStaticAssetPath) {
+    // Estratégia Cache-first apenas para ativos estáticos (script/style/image/font e arquivos pré-cacheados)
     event.respondWith(cacheFirstWithNetworkFallback(request));
+  } else {
+    // Para requisições dinâmicas (XHR/fetch, JSON, APIs), não usar cache-first
+    // para evitar servir dados desatualizados ou sensíveis após logout
+    event.respondWith(fetch(request));
   }
 });
 
@@ -103,7 +106,8 @@ async function networkFirstWithOfflineFallback(request) {
  * @returns {Promise<Response>}
  */
 async function cacheFirstWithNetworkFallback(request) {
-  const cached = await caches.match(request);
+  // ignoreSearch: true garante match mesmo com query strings de asp-append-version (?v=...)
+  const cached = await caches.match(request, { ignoreSearch: true });
   if (cached) return cached;
 
   try {
@@ -157,13 +161,14 @@ self.addEventListener("notificationclick", event => {
   event.notification.close();
 
   const targetUrl = event.notification.data?.url || "/";
+  const normalizedTargetUrl = new URL(targetUrl, self.location.origin).href;
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true })
       .then(clientList => {
-        const existing = clientList.find(c => c.url === targetUrl && "focus" in c);
+        const existing = clientList.find(c => c.url === normalizedTargetUrl && "focus" in c);
         if (existing) return existing.focus();
-        return self.clients.openWindow(targetUrl);
+        return self.clients.openWindow(normalizedTargetUrl);
       })
   );
 });
