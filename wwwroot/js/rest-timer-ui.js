@@ -197,8 +197,8 @@ class RestTimerUI {
                                placeholder="Segundos">
                         <div class="rest-timer-presets">
                             <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="30">30s</button>
-                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="60">1min</button>
-                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="90">1:30</button>
+                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="60">60s</button>
+                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="90">90s</button>
                             <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="120">2min</button>
                             <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="180">3min</button>
                         </div>
