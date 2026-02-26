@@ -383,8 +383,8 @@ class RestTimerUI {
 
         // Solicita permissão de notificação antes de iniciar, de forma não-bloqueante e com tratamento de erro explícito
         RestTimerUI.requestNotificationPermission()
-            .catch(() => {
-                // Falha ao solicitar permissão não deve bloquear o timer
+            .catch((error) => {
+                console.warn('Falha ao solicitar permissão de notificação:', error);
             });
 
         this.saveDuration(seconds);
@@ -507,8 +507,8 @@ class RestTimerUI {
             if (window.swRegistration) {
                 // Preferível: via SW – funciona mesmo com o app em segundo plano
                 window.swRegistration.showNotification('TupiJua – Descanso Completo! 💪', notifOptions)
-                    .catch(() => {
-                        // Fallback: notificação direta se showNotification falhar
+                    .catch((error) => {
+                        console.warn('swRegistration.showNotification falhou, usando fallback:', error);
                         new Notification('TupiJua – Descanso Completo! 💪', notifOptions);
                     });
             } else {

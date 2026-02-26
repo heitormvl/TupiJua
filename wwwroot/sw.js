@@ -74,7 +74,14 @@ self.addEventListener("fetch", event => {
   } else {
     // Para requisições dinâmicas (XHR/fetch, JSON, APIs), não usar cache-first
     // para evitar servir dados desatualizados ou sensíveis após logout
-    event.respondWith(fetch(request));
+    event.respondWith(
+      fetch(request).catch(() =>
+        new Response(JSON.stringify({ error: "offline" }), {
+          status: 503,
+          headers: { "Content-Type": "application/json" }
+        })
+      )
+    );
   }
 });
 
