@@ -199,6 +199,21 @@
                             </select>
                             <span asp-validation-for="ExerciseId" class="text-danger small"></span>
                         </div>
+                        <script>
+                            (function () {
+                                const _exercises = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(exercises.Select(e => new {
+                                    e.Id,
+                                    e.Name,
+                                    MuscleGroups = e.ExerciseMuscleGroups.Select(emg => new {
+                                        Name = emg.MuscleGroup.Name,
+                                        IsPrimary = emg.IsPrimary
+                                    })
+                                })));
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    initExercisePicker(document.getElementById('exerciseSelect'), _exercises);
+                                });
+                            })();
+                        </script>
                     }
 
                     <!-- Sets -->
@@ -363,6 +378,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/exercise-picker.js"></script>
     <script src="~/js/training.js"></script>
     <style>
         .card-minimize-content {

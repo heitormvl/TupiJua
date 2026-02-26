@@ -229,6 +229,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/exercise-helpers.js"></script>
+    <script src="~/js/exercise-picker.js"></script>
     
     <script>
         let exerciseCounter = @Model.Exercises.Count;
@@ -247,8 +248,11 @@
             {
                 <text>
                 const select@(i) = document.getElementById('exercise-@i');
-                if (select@(i) && select@(i).value) {
-                    showMuscleGroups(select@(i), @i);
+                if (select@(i)) {
+                    initExercisePicker(select@(i), exercisesList);
+                    if (select@(i).value) {
+                        showMuscleGroups(select@(i), @i);
+                    }
                 }
                 </text>
             }
@@ -378,6 +382,10 @@
             `;
 
             container.appendChild(exerciseCard);
+
+            // Initialize exercise picker on the newly added select
+            const newSelectEl = document.getElementById(`exercise-${exerciseCounter}`);
+            if (newSelectEl) initExercisePicker(newSelectEl, exercisesList);
             
             // Animate card appearance
             setTimeout(() => {
