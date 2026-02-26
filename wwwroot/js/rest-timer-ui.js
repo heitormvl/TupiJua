@@ -188,19 +188,26 @@ class RestTimerUI {
                     </div>
                     <div class="rest-timer-modal-body">
                         <label for="restTimerInput" class="form-label">Tempo de descanso (segundos)</label>
-                        <input type="number" 
-                               id="restTimerInput" 
-                               class="form-control" 
-                               min="1" 
-                               max="9999" 
-                               value="${this.defaultSeconds}"
-                               placeholder="Segundos">
-                        <div class="rest-timer-presets">
-                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="30">30s</button>
-                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="60">60s</button>
-                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="90">90s</button>
-                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="120">2min</button>
-                            <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="180">3min</button>
+                        <div class="row g-2 align-items-center">
+                            <div class="col-4 d-flex flex-column gap-2">
+                                <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="30">30s</button>
+                                <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="60">60s</button>
+                                <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="90">90s</button>
+                            </div>
+                            <div class="col-4">
+                                <input type="number"
+                                       id="restTimerInput"
+                                       class="form-control text-center rest-timer-input-large"
+                                       min="1"
+                                       max="9999"
+                                       value="${this.defaultSeconds}"
+                                       placeholder="s">
+                            </div>
+                            <div class="col-4 d-flex flex-column gap-2">
+                                <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="120">2min</button>
+                                <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="180">3min</button>
+                                <button class="btn btn-sm btn-outline-primary rest-timer-preset" data-seconds="300">5min</button>
+                            </div>
                         </div>
                     </div>
                     <div class="rest-timer-modal-footer">
