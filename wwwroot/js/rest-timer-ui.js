@@ -381,6 +381,12 @@ class RestTimerUI {
             return;
         }
 
+        // Solicita permissão de notificação antes de iniciar, de forma não-bloqueante e com tratamento de erro explícito
+        RestTimerUI.requestNotificationPermission()
+            .catch((error) => {
+                console.warn('Falha ao solicitar permissão de notificação:', error);
+            });
+
         this.saveDuration(seconds);
         this.closeModal();
         
@@ -487,15 +493,27 @@ class RestTimerUI {
             navigator.vibrate([200, 100, 200, 100, 200]);
         }
 
-        // Notificação do navegador
+        // Notificação via Service Worker (funciona em background) ou fallback direto
         if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('TupiJua - Descanso Completo!', {
+            const notifOptions = {
                 body: 'Seu tempo de descanso acabou. Bora treinar! 💪',
-                icon: '/images/icon-192.png',
-                badge: '/images/icon-192.png',
+                icon: '/images/android-chrome-192x192.png',
+                badge: '/images/android-chrome-192x192.png',
                 tag: 'rest-timer',
-                requireInteraction: false
-            });
+                requireInteraction: false,
+                data: { url: window.location.href }
+            };
+
+            if (window.swRegistration) {
+                // Preferível: via SW – funciona mesmo com o app em segundo plano
+                window.swRegistration.showNotification('TupiJua – Descanso Completo! 💪', notifOptions)
+                    .catch((error) => {
+                        console.warn('swRegistration.showNotification falhou, usando fallback:', error);
+                        new Notification('TupiJua – Descanso Completo! 💪', notifOptions);
+                    });
+            } else {
+                new Notification('TupiJua – Descanso Completo! 💪', notifOptions);
+            }
         }
 
         // Mostra alerta visual com dismiss
