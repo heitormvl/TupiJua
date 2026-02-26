@@ -14,7 +14,7 @@ function initRegisterForm() {
     const submitButton = document.getElementById('submitButton');
     const loginLink = document.getElementById('loginLink');
 
-    if (!usernameInput) return; // Exit if not on register page
+    if (!confirmPasswordInput) return; // Exit if not on register page
 
     // Progressive field reveal
     function showNextField(currentField, nextField, delay = 400) {
